@@ -475,15 +475,28 @@
 			this._scale = new Object();
 			this._scale.x = 1;
 		}
-        this._scale.y = y;
-        this.onChangeEvent.needsRedraw = true;
-    };
+		this._scale.y = y;
+		this.onChangeEvent.needsRedraw = true;
+	};
+	/**
+	 * Inverts the object in the x axis
+	 * Note: Works exactly as invertX
+	 * @method mirror
+	 */
+	Renderizable.prototype.mirror = function () {
+		this.invertX();
+	};
 	/**
 	 * Inverts the object in the x axis
 	 * @method invertX
 	 */
     Renderizable.prototype.invertX = function () {
-        this._scale.x = -1;
+		if ( !this._scale ) {
+			this._scale = new Object();
+			this._scale.x = 1;
+			this._scale.y = 1;
+		}
+        this._scale.x *= -1;
         this.onChangeEvent.needsRedraw = true;
     };
 	/**
@@ -491,6 +504,11 @@
 	 * @method invertY
 	 */
     Renderizable.prototype.invertY = function () {
+		if ( !this._scale ) {
+			this._scale = new Object();
+			this._scale.x = 1;
+			this._scale.y = 1;
+		}
         this._scale.y = -1;
         this.onChangeEvent.needsRedraw = true;
     };

@@ -22,21 +22,47 @@
 			
 			onClick.removeEventListener(onClickListener);
 
+	 * @example 
+
+			var obj = { name: "Ninja" };
+
+			function onClickListener() {
+				console.log("Clicked on: " + this.name); //Will print Ninja
+			}
+	 
+			var onClick = new M.EventListener();
+			
+			onClick.addEventListener(onClickListener, obj); //Bind execution context to obj
+			
+			onClick.raise();
+			
+			onClick.removeEventListener(onClickListener);
 	 */
 	function EventListener() {
 		this.listeners = new Array();
 	}
-
-	EventListener.prototype.addEventListener = function(listener) {
+	/**
+	 * @method addEventListener
+	 * @param {Function} listener 
+	 * @param {Object} owner [optional] object to bind the listener to
+	 */
+	EventListener.prototype.addEventListener = function(listener, owner) {
+		if ( owner ) {
+			listener = listener.bind(owner);
+		}
 		this.listeners.push(listener);
 	};
-
+	/**
+	 * @method raise
+	 */
 	EventListener.prototype.raise = function() {
 		for ( var i = 0, l = this.listeners.length; i < l; i++ ) {
 			this.listeners[i](arguments);
 		}
 	};
-
+	/**
+	 * @method removeEventListener
+	 */
 	EventListener.prototype.removeEventListener = function(listener) {
 		var l = this.listeners.indexOf(listener);
 		if ( l > -1 ) {

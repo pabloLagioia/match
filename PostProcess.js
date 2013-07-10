@@ -23,12 +23,13 @@
 	GrayScale.prototype.run = function(context) {
 		var imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height),
             d = imageData.data,
+			l = d.length,
 			i,
 			r,
 			g,
 			b,
 			v;
-		for (i = 0; i < d.length; i += 4) {
+		for (i = 0; i < l; i += 4) {
 			r = d[i];
 			g = d[i+1];
 			b = d[i+2];

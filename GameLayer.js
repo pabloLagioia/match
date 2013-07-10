@@ -4,7 +4,7 @@
 (function(M) {
 
 	/**
-	 * A game layer is a like an offscreen canvas where all renderizable objects, that is objects that implement an
+	 * A game layer is like an offscreen canvas where all renderizable objects, that is objects that implement an
 	 * onRender method, are put together for rendering. Game layers can be applied properties like alpha or scaling.
 	 * All rendering takes place in a buffer which result is then rendered to the main canvas.
 	 * NOTE: You need at least one layer in your game
@@ -26,7 +26,6 @@
 		 * @type CanvasRenderingContext2D
 		 */
 		this.buffer = document.createElement("canvas").getContext("2d");
-		// this.buffer = M.frontBuffer;
 		/**
 		 * Array of Renderizables
 		 * @property onRenderList
@@ -77,7 +76,7 @@
 		 * @example
 				this.alpha = 0.5;
 		 */
-		this.alpha;
+		this._alpha;
 		/**
 		 * Parrallax factor is used for parralax scrolling. The object x and y coordinates are multiplied by the camera position to translate the scene in different speeds
 		 * @property parrallaxFactor
@@ -125,7 +124,7 @@
 		 * @param {float} value alpha value to set. Must be between 0 and 1
 		 */
 		setAlpha: function(value) {
-			this.alpha = value;
+			this._alpha = value;
 		},
 		/**
 		 * Gets the transparency of the object
@@ -153,6 +152,10 @@
 		 */
 		fadeOut: function(seconds, onFinished) {
 			this._onLoopAnimations.push(new M.effects.visual.FadeOut(this, seconds, onFinished));
+			return this;
+		},
+		continousFade: function (seconds, fadeOutFirst, min, max) {
+			this._onLoopAnimations.push(new M.effects.visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
 			return this;
 		},
 		/**

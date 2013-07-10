@@ -267,6 +267,11 @@
 		context.restore();
 
 	};
+	Sprite.prototype.setSize = function(width, height) {
+		this.oW = width;
+		this.oH = height;
+		this.onChangeEvent.needsRedraw = true;
+	};
     /**
 	 * Sets the index of the frame to render
 	 *

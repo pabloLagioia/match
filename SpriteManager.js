@@ -93,7 +93,7 @@
 
             image.frames = [{x:0, y: 0, width: image.width, height: image.height, halfWidth: image.width / 2, halfHeight: image.height / 2}];
 
-        } else if ( typeof image.frames == "array" ) {
+        } else if ( image.frames instanceof Array ) {
 
 			for ( var i in image.frames ) {
 
@@ -236,20 +236,39 @@
         }
 
     };
-
+	/**
+	 * Removes the sprite that matches the given id
+	 * @method remove
+	 * @param {String} id the sprite id
+	 */
+	SpriteManager.prototype.remove = function(id) {
+		if ( this[id] instanceof Image ) {
+			delete this[id];
+			if ( this.total - 1 >= 0 ) {
+				this.total--;
+			}
+			if ( this.toLoad - 1 >= 0 ) {
+				this.toLoad--;
+			}
+		}
+	};
 	/**
 	 * Removes all sprites
 	 * @method removeAll
 	 */
 	SpriteManager.prototype.removeAll = function() {
-		for ( var i in this ) {
-			delete this[i];
+		for ( var id in this ) {
+			this.remove(id);
 		}
+	};
+	/**
+	 * Removes all event listeners
+	 * @method removeAllEventListeners
+	 */
+	SpriteManager.prototype.removeAllEventListeners = function() {
 		this.onImageLoaded = new EventListener();
 		this.onAllImagesLoaded = new EventListener();
 		this.onImageError = new EventListener();
-		this.toLoad = 0;
-		this.total = 0;
 	};
 
     M.SpriteManager = new SpriteManager();

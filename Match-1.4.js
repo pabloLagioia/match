@@ -366,7 +366,6 @@ var M = window.M || {};
 			for ( ; i < l; i++ ) {
 				f.drawImage( list[i].onLoop(p), 0, 0 );
 			}
-			
 
 		},
 		/**
@@ -398,8 +397,8 @@ var M = window.M || {};
 					backBuffer.globalCompositeOperation = currentLayer.composite;
 				}
 
-				if ( currentLayer.alpha >= 0 && currentLayer.alpha <= 1 ) {
-					backBuffer.globalAlpha = currentLayer.alpha;
+				if ( currentLayer._alpha >= 0 && currentLayer._alpha <= 1 ) {
+					backBuffer.globalAlpha = currentLayer._alpha;
 				}
 
 				backBuffer.translate(backBuffer.halfWidth, backBuffer.halfHeight);
@@ -662,6 +661,13 @@ var M = window.M || {};
 		 */
 		isDoubleBuffered: function() {
 			return this.render == this.renderDoubleBuffer;
+		},
+		setCanvasSize: function(w, h) {
+			if ( this.frontBuffer ) {
+				this.frontBuffer.canvas.width = w;
+				this.frontBuffer.canvas.height = h;
+				this.updateBufferSize();
+			}
 		},
 		/**
 		 * Updates the back buffer size to match the size of the game canvas
