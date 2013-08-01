@@ -13,7 +13,9 @@
 	function Circle( properties ) {
 
 		Renderizable.apply(this, arguments);
-		
+
+		this.changed = true;
+
 		/**
 		 * Fill Style used to fill the circle. Can be a color, a pattern or a gradient
 		 * @private
@@ -367,6 +369,75 @@
 		}
 		this._changed = true;
 	};
+
+	Circle.prototype.buffers = {
+		b: new Array(),
+		// i: new Array(),
+		c: 0
+	}
+	for ( var i = 0; i < 9; i++ ) {
+		var buffer = document.createElement("canvas").getContext("2d");
+		buffer.elements = 0;
+		buffer.maxElements = 600;
+		buffer.canvas.width = 30000;
+		buffer.canvas.height = 50;
+		Circle.prototype.buffers.b.push(buffer);
+		// Circle.prototype.buffers.i.push(new Image());
+	}
+
+	Circle.prototype.save = function() {
+
+		var buffer = this.buffers.b[this.buffers.c];
+		// var buffer = document.createElement("canvas").getContext("2d");
+
+		if ( buffer.elements + 1 > buffer.maxElements ) {
+			this.buffers.c++;
+			buffer = this.buffers.b[this.buffers.c];
+		}
+
+		buffer.save();
+
+		this._applyAlpha(buffer);
+
+		buffer.translate(this._radius, this._radius);
+
+		this._applyScale(buffer);
+
+		this._applyShadow(buffer);
+
+		if ( this._lineWidth ) {
+			buffer.lineWidth = this._lineWidth;
+		}
+
+		buffer.beginPath();
+		buffer.arc( buffer.elements * this._radius * 2, 0, this._radius, this._startAngle, this._endAngle, false);
+		// buffer.arc( 0, 0, this._radius, this._startAngle, this._endAngle, false);
+		buffer.closePath();
+
+		if ( this._fillStyle ) {
+			buffer.fillStyle = this._fillStyle;
+			buffer.fill();
+		}
+
+		if ( this._strokeStyle ) {
+			buffer.strokeStyle = this._strokeStyle;
+			buffer.stroke( -this._radius, -this._radius, this._width, this._height );
+		}
+
+		// this.buffers.i[this.buffers.c].src = buffer.canvas.toDataURL();
+		// this.img = this.buffers.i[this.buffers.c];
+		this.img = buffer.canvas;
+		// this.img = new Image();
+		// this.img.src = buffer.canvas.toDataURL();
+
+		this.changed = false;
+
+		this.elementNumber = buffer.elements;
+		buffer.elements++;
+
+		buffer.restore();
+
+	};
 	/**
 	 * Renders the current sprite in the provided context
 	 *
@@ -378,43 +449,56 @@
 	 */
 	Circle.prototype.onRender = function(context, canvas, cameraX, cameraY) {
 
-		context.save();
-
-		this._applyOperation(context);
-		this._applyAlpha(context);
-		this._applyTranslation(context, cameraX, cameraY);
-		this._applyRotation(context);
-		this._applyScale(context);
-
-		context.beginPath();
-		context.arc( 0, 0, this._radius, this._startAngle, this._endAngle, false);
-		context.closePath();
-
-		if ( this._fillStyle ) {
-			context.fillStyle = this._fillStyle;
-			context.fill();
+		if ( this.changed ) {
+			this.save();
 		}
 
-		if ( this._shadow ) {
-			context.shadowColor = this._shadow.color;
-			context.shadowBlur = this._shadow.blur;
-			context.shadowOffsetX = this._shadow.x;
-			context.shadowOffsetY = this._shadow.y;
-		}
-		
-		if ( this._lineWidth ) {
-			context.lineWidth = this._lineWidth;
-		}
+		var r = this._radius * 2;
+		context.drawImage(this.img, this.elementNumber * r, 0, r, r, this._x - this._radius, this._y - this._radius, r, r);
+		// context.drawImage(this.img, this._x - this._radius, this._y - this._radius);
 
-		if ( this._strokeStyle ) {
-			context.strokeStyle = this._strokeStyle;
-			context.stroke( -this._halfWidth, -this._halfHeight, this._width, this._height );
-		}
+		// this._applyOperation(context);
+		// this._applyAlpha(context);
 
-		context.restore();
+		// if ( this._scale ) {
+			// context.save();
+			// this._applyTranslation(context, cameraX, cameraY);
+			// this._applyScale(context);
 
-		this._changed = false;
-		this._zIndexchanged = false;
+			// context.beginPath();
+			// context.arc( 0, 0, this._radius, this._startAngle, this._endAngle, false);
+			// context.closePath();
+
+			// if ( this._fillStyle ) {
+				// context.fillStyle = this._fillStyle;
+				// context.fill();
+			// }
+
+			// context.restore();
+
+		// } else {
+
+			// context.beginPath();
+			// context.arc( this._x - this._radius, this._y - this._radius, this._radius, this._startAngle, this._endAngle, false);
+			// context.closePath();
+
+			// if ( this._fillStyle ) {
+				// context.fillStyle = this._fillStyle;
+				// context.fill();
+			// }
+
+		// }
+
+		// this._applyShadow(context);
+
+		// if ( this._lineWidth ) {
+			// context.lineWidth = this._lineWidth;
+		// }
+
+		// if ( this._strokeStyle ) {
+			// context.strokeStyle = this._strokeStyle;
+			// context.stroke( -this._halfWidth, -this._halfHeight, this._width, this._height );
+		// }
 
 	};
 

@@ -2,7 +2,7 @@
  * @module Match
  * @namespace renderers
  */
-(function(M) {
+(function(M, visual) {
 	/**
 	 * Provides basic behaviour for rendering game objects
 	 *
@@ -95,6 +95,13 @@
 		 */
         this._onLoopAnimations = [];
 		/**
+		 * Array that contains chained animations for this object
+		 * @private
+		 * @property _chainAnimations
+		 * @type Array
+		 */
+        this._chainAnimations = [];
+		/**
 		 * Array that contains timers for this object
 		 * @private
 		 * @property _onLoopTimers
@@ -107,7 +114,7 @@
 		 * @property _alpha
 		 * @type float
 		 */
-		this._alpha;
+		this._alpha = null;
 		/**
 		 * object read by layers to determine whether the layer should be redrawn or it's objects should be sorted based on zIndex
 		 * @private
@@ -132,7 +139,7 @@
 	 * @param {String} key key of the object to remove
 	 */
 	Renderizable.prototype.removeChild = function(key) {
-		delete this.children[key];
+		this.children[key] = null;
 	};
 	/**
 	 * Adds the child by the given key
@@ -144,6 +151,7 @@
 		if ( !this.children ) {
 			this.children = new Object();
 		}
+		object.onChangeEvent = this.onChangeEvent;
 		this.children[key] = object;
 	};
 	/**
@@ -160,6 +168,8 @@
     Renderizable.prototype.onLoop = function (p) {
         this._loopThroughAnimations();
         this._loopThroughTimers();
+		this.prevX = this._x;
+		this.prevY = this._y;
         if (this.onUpdate) this.onUpdate(p);
     };
 	/**
@@ -185,8 +195,12 @@
 	 * @param {float} value alpha value to set. Must be between 0 and 1
 	 */
 	Renderizable.prototype.setAlpha = function(value) {
-		this._alpha = value;
-		this.onChangeEvent.needsRedraw = true;
+		if ( value >= 0 && value <= 1 ) {
+			this._alpha = value;
+			this.onChangeEvent.needsRedraw = true;
+		} else {
+			this._alpha = null;
+		}
 	};
 	/**
 	 * Gets the transparency of the object
@@ -201,35 +215,41 @@
 	 * @private
 	 * @method _loopThroughAnimations
 	 */
-    Renderizable.prototype._loopThroughAnimations = function () {
-        var i = 0,
-        l = this._onLoopAnimations.length;
-        for (; i < l; i++) {
-            if (!this._onLoopAnimations[i].onLoop()) {
-                this._onLoopAnimations.splice(i, 1);
-            }
-        }
-    };
+	Renderizable.prototype._loopThroughAnimations = function () {
+		var i = 0,
+			l = this._onLoopAnimations.length,
+			c;
+		for (; i < l; i++) {
+			if (!this._onLoopAnimations[i].onLoop()) {
+				this._onLoopAnimations.splice(i, 1);
+			}
+		}
+		if ( this._chainAnimations.length ) {
+			if (!this._chainAnimations[0].onLoop()) {
+				this._chainAnimations.splice(0, 1);
+			}
+		}
+	};
 	/**
 	 * Adds a fade in animation to this object
 	 * @method fadeIn
 	 * @param {int} seconds time in seconds that the fade in will take
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
-    Renderizable.prototype.fadeIn = function (seconds, onFinished) {
-        this._onLoopAnimations.push(new M.effects.visual.FadeIn(this, seconds, onFinished));
-        return this;
-    };
+	Renderizable.prototype.fadeIn = function (seconds, onFinished) {
+		this._onLoopAnimations.push(new visual.FadeIn(this, seconds, onFinished));
+		return this;
+	};
 	/**
 	 * Adds a fade out animation to this object
 	 * @method fadeOut
 	 * @param {int} seconds time in seconds that the fade out will take
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
-    Renderizable.prototype.fadeOut = function (seconds, onFinished) {
-        this._onLoopAnimations.push(new M.effects.visual.FadeOut(this, seconds, onFinished));
-        return this;
-    };
+	Renderizable.prototype.fadeOut = function (seconds, onFinished) {
+		this._onLoopAnimations.push(new visual.FadeOut(this, seconds, onFinished));
+		return this;
+	};
 	/**
 	 * Adds a continouse fade animation to this object
 	 * @method continousFade
@@ -238,11 +258,11 @@
 	 * @param {int} [min] minumum alpha value, defaults to 0
 	 * @param {int} [max] maximum alpha value, defaults to 1
 	 */
-    Renderizable.prototype.continousFade = function (seconds, fadeOutFirst, min, max) {
-        this._onLoopAnimations.push(new M.effects.visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
-        return this;
-    };
-    /**
+	Renderizable.prototype.continousFade = function (seconds, fadeOutFirst, min, max) {
+		this._onLoopAnimations.push(new visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
+		return this;
+	};
+	/**
 	 * Moves an object to the given coordinates in the provided seconds
 	 * @method move
 	 * @param {float} x the destination x coordinate
@@ -251,10 +271,10 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.move = function (x, y, seconds, onFinished) {
-        this._onLoopAnimations.push(new M.effects.visual.Move(this, x, y, seconds, onFinished));
-        return this;
-    };
-    /**
+		this._onLoopAnimations.push(new visual.Move(this, x, y, seconds, onFinished));
+		return this;
+	};
+	/**
 	 * Scales an object up to the given values in the provided seconds
 	 * @method scaleUp
 	 * @param {float} x the destination width factor
@@ -262,10 +282,10 @@
 	 * @param {int} seconds time in seconds that the scaling will take
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
-    Renderizable.prototype.scaleUp = function (x, y, seconds, onFinished) {
-        this._onLoopAnimations.push(new M.effects.visual.ScaleUp(this, x, y, seconds, onFinished));
-        return this;
-    };
+	Renderizable.prototype.scaleUp = function (x, y, seconds, onFinished) {
+		this._onLoopAnimations.push(new visual.ScaleUp(this, x, y, seconds, onFinished));
+		return this;
+	};
 	/**
 	 * Scales an object down to the given values in the provided seconds
 	 * @method scaleDown
@@ -275,9 +295,9 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.scaleDown = function (x, y, seconds, onFinished) {
-        this._onLoopAnimations.push(new M.effects.visual.ScaleDown(this, x, y, seconds, onFinished));
-        return this;
-    };
+		this._onLoopAnimations.push(new visual.ScaleDown(this, x, y, seconds, onFinished));
+		return this;
+	};
 	/**
 	 * Makes an object twinkle the given amount of times in the duration provided
 	 * @method twinkle
@@ -285,10 +305,10 @@
 	 * @param {int} durationInMilliseconds the duration, in milliseconds, the twinkle effect will last
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
-    Renderizable.prototype.twinkle = function (timesToTwinkle, durationInMilliseconds, onFinished) {
-        this._onLoopAnimations.push(new M.effects.visual.Twinkle(this, timesToTwinkle, durationInMilliseconds, onFinished));
-        return this;
-    };
+	Renderizable.prototype.twinkle = function (timesToTwinkle, durationInMilliseconds, onFinished) {
+		this._onLoopAnimations.push(new visual.Twinkle(this, timesToTwinkle, durationInMilliseconds, onFinished));
+		return this;
+	};
 	/**
 	 * Rotates an object to the given angle in the provided seconds
 	 * @method rotate
@@ -296,10 +316,110 @@
 	 * @param {int} seconds the duration the rotation effect will take to reach the provided angle
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
-    Renderizable.prototype.rotate = function (angle, seconds, onFinished) {
-        this._onLoopAnimations.push(new M.effects.visual.Rotate(this, angle, seconds, onFinished));
-        return this;
-    };
+	Renderizable.prototype.rotate = function (angle, seconds, onFinished) {
+		this._onLoopAnimations.push(new visual.Rotate(this, angle, seconds, onFinished));
+		return this;
+	};
+	/**
+	 * Adds a fade in animation to this object
+	 * @method fadeIn
+	 * @param {int} seconds time in seconds that the fade in will take
+	 * @param {Function} onFinished function to call once the animation finishes
+	 */
+	Renderizable.prototype.chainWait = function (seconds, onFinished) {
+		this._chainAnimations.push(new visual.Wait(this, seconds, onFinished));
+		return this;
+	};
+	/**
+	 * Adds a fade in animation to this object
+	 * @method fadeIn
+	 * @param {int} seconds time in seconds that the fade in will take
+	 * @param {Function} onFinished function to call once the animation finishes
+	 */
+	Renderizable.prototype.chainFadeIn = function (seconds, onFinished) {
+		this._chainAnimations.push(new visual.FadeIn(this, seconds, onFinished));
+		return this;
+	};
+	/**
+	 * Adds a fade out animation to this object
+	 * @method fadeOut
+	 * @param {int} seconds time in seconds that the fade out will take
+	 * @param {Function} onFinished function to call once the animation finishes
+	 */
+	Renderizable.prototype.chainFadeOut = function (seconds, onFinished) {
+		this._chainAnimations.push(new visual.FadeOut(this, seconds, onFinished));
+		return this;
+	};
+	/**
+	 * Adds a continouse fade animation to this object
+	 * @method continousFade
+	 * @param {int} seconds time in seconds that the fade in and fade out will take
+	 * @param {Boolean} [fadeOutFirst] determines whether the animation will start fading in or out
+	 * @param {int} [min] minumum alpha value, defaults to 0
+	 * @param {int} [max] maximum alpha value, defaults to 1
+	 */
+	Renderizable.prototype.chainContinousFade = function (seconds, fadeOutFirst, min, max) {
+		this._chainAnimations.push(new visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
+		return this;
+	};
+	/**
+	 * Moves an object to the given coordinates in the provided seconds
+	 * @method move
+	 * @param {float} x the destination x coordinate
+	 * @param {float} y the destination y coordinate
+	 * @param {int} seconds time in seconds that the fade in and fade out will take
+	 * @param {Function} onFinished function to call once the animation finishes
+	 */
+	Renderizable.prototype.chainMove = function (x, y, seconds, onFinished) {
+		this._chainAnimations.push(new visual.Move(this, x, y, seconds, onFinished));
+		return this;
+	};
+	/**
+	 * Scales an object up to the given values in the provided seconds
+	 * @method scaleUp
+	 * @param {float} x the destination width factor
+	 * @param {float} y the destination height factor
+	 * @param {int} seconds time in seconds that the scaling will take
+	 * @param {Function} onFinished function to call once the animation finishes
+	 */
+	Renderizable.prototype.chainScaleUp = function (x, y, seconds, onFinished) {
+		this._chainAnimations.push(new visual.ScaleUp(this, x, y, seconds, onFinished));
+		return this;
+	};
+	/**
+	 * Scales an object down to the given values in the provided seconds
+	 * @method scaleDown
+	 * @param {float} x the destination width factor
+	 * @param {float} y the destination height factor
+	 * @param {int} seconds time in seconds that the scaling will take
+	 * @param {Function} onFinished function to call once the animation finishes
+	 */
+	Renderizable.prototype.chainScaleDown = function (x, y, seconds, onFinished) {
+		this._chainAnimations.push(new visual.ScaleDown(this, x, y, seconds, onFinished));
+		return this;
+	};
+	/**
+	 * Makes an object twinkle the given amount of times in the duration provided
+	 * @method twinkle
+	 * @param {int} timesToTwinkle the amount of times the object will twinkle
+	 * @param {int} durationInMilliseconds the duration, in milliseconds, the twinkle effect will last
+	 * @param {Function} onFinished function to call once the animation finishes
+	 */
+	Renderizable.prototype.chainTwinkle = function (timesToTwinkle, durationInMilliseconds, onFinished) {
+		this._chainAnimations.push(new visual.Twinkle(this, timesToTwinkle, durationInMilliseconds, onFinished));
+		return this;
+	};
+	/**
+	 * Rotates an object to the given angle in the provided seconds
+	 * @method rotate
+	 * @param {float} the destination angle
+	 * @param {int} seconds the duration the rotation effect will take to reach the provided angle
+	 * @param {Function} onFinished function to call once the animation finishes
+	 */
+	Renderizable.prototype.chainRotate = function (angle, seconds, onFinished) {
+		this._chainAnimations.push(new visual.Rotate(this, angle, seconds, onFinished));
+		return this;
+	};
 	/**
 	 * Loops through the timers of the object
 	 * @private
@@ -681,6 +801,24 @@
 		this.onChangeEvent.needsRedraw = true;
     };
 	/**
+	 * Returns true if this object moved in the x axis
+	 *
+	 * @method movedInX
+	 * @param {CanvasRenderingContext2D} context
+	 */
+	Renderizable.prototype.movedInX = function () {
+		return this.prevX != this._x;
+	};
+	/**
+	 * Returns true if this object moved in the y axis
+	 *
+	 * @method movedInY
+	 * @return {Boolean}
+	 */
+	Renderizable.prototype.movedInY = function () {
+		return this.prevY != this._y;
+	};
+	/**
 	 * Applies the operation of this object to the provided context as composite operation
 	 *
 	 * @method _applyOperation
@@ -688,7 +826,12 @@
 	 * @param {CanvasRenderingContext2D} context
 	 */
 	Renderizable.prototype._applyOperation = function(context) {
-		if ( this.operation ) context.globalCompositeOperation = this.operation;
+		if ( this.operation ) {
+			context.globalCompositeOperation = this.operation;
+			context.operationChanged = false;
+		} else if (context.operationChanged) {
+			context.resetOperation();
+		}
 	};
 	/**
 	 * Applies the alpha of this object to the provided context
@@ -698,8 +841,29 @@
 	 * @param {CanvasRenderingContext2D} context
 	 */
 	Renderizable.prototype._applyAlpha = function(context) {
-		if ( this._alpha >= 0 && this._alpha <= 1 ) {
+		if ( this._alpha != null && this._alpha >= 0 && this._alpha <= 1 ) {
 			context.globalAlpha = this._alpha;
+			context.alphaChanged = false;
+		} else if (context.alphaChanged) {f
+			context.resetAlpha();
+		}
+	};
+	/**
+	 * Applies the shadow of this object to the provided context
+	 *
+	 * @method _applyShadow
+	 * @protected
+	 * @param {CanvasRenderingContext2D} context
+	 */
+	Renderizable.prototype._applyShadow = function(context) {
+		if ( this._shadow ) {
+			context.shadowOffsetX = x;
+			context.shadowOffsetY = y;
+			context.shadowColor = color;
+			context.shadowBlur = blur;
+			context.shadowChanged = false;
+		} else if (context.shadowChanged) {
+			context.resetShadow();
 		}
 	};
 	/**
@@ -738,21 +902,6 @@
 			context.scale(this._scale.x, this._scale.y);
 		}
 	};
-	/**
-	 * Applies the shadow of this object to the provided context
-	 *
-	 * @method _applyShadow
-	 * @protected
-	 * @param {CanvasRenderingContext2D} context
-	 */
-	Renderizable.prototype._applyShadow = function(context) {
-		if ( this._shadow ) {
-			context.shadowColor = this._shadow.color;
-			context.shadowBlur = this._shadow.blur;
-			context.shadowOffsetX = this._shadow.offsetX;
-			context.shadowOffsetY = this._shadow.offsetY;
-		}
-	};
     /**
 	 * Offsets the alpha value
 	 *
@@ -784,7 +933,7 @@
 	 * @return {Boolean}
 	 */
     Renderizable.prototype.isVisible = function (cameraX0, cameraY0, cameraX1, cameraY1) {
-		if ( !this._visible ) return false;
+		if ( this._alpha == 0 || !this._visible ) return false;
 		return this.isIn(cameraX0, cameraY0, cameraX1, cameraY1);
     };
 	/**
@@ -861,6 +1010,8 @@
 	 * @param {float} y the y coordinate to add
 	 */
     Renderizable.prototype.offset = function (x, y) {
+		this.prevX = this._x;
+		this.prevY = this._y;
         this._x += x;
         this._y += y;
         this.onChangeEvent.needsRedraw = true;
@@ -872,6 +1023,7 @@
 	 * @param {float} x the x coordinate to add
 	 */
     Renderizable.prototype.offsetX = function (x) {
+		this.prevX = this._x;
         this._x += x;
         this.onChangeEvent.needsRedraw = true;
     };
@@ -882,8 +1034,18 @@
 	 * @param {float} y the y coordinate to add
 	 */
     Renderizable.prototype.offsetY = function (y) {
+		this.prevY = this._y;
         this._y += y;
         this.onChangeEvent.needsRedraw = true;
+    };
+	/**
+	 * Centers the object at the given vector2d object
+	 *
+	 * @method centerAt
+	 * @param {Vector2d} vector2d object containing x and y attributes
+	 */
+	Renderizable.prototype.centerAt = function (vector2d) {
+		this.setLocation(vector2d.x, vector2d.y);
     };
 	/**
 	 * Returns the x coordinate of this object that belongs to it's center
@@ -940,4 +1102,4 @@
         return this.height;
     };
 
-})(window.M);
+})(window.M, window.M.effects.visual);

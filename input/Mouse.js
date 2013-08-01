@@ -3,27 +3,29 @@
  */
 (function(M) {
 
+	var instance;
+
 	function mouseDownHelper(e) {
-		M.mouse.mousedown(e);
+		instance.mousedown(e);
 	}
 	function mouseUpHelper(e) {
-		M.mouse.mouseup(e);
+		instance.mouseup(e);
 	}
 	function mouseClickHelper(e) {
-		M.mouse.click(e);
+		instance.click(e);
 	}
 	function mouseMoveHelper(e) {
-		M.mouse.mousemove(e);
+		instance.mousemove(e);
 	}
 	function mouseWheelHelper(e) {
-		M.mouse.mousewheel(e);
+		instance.mousewheel(e);
 	}
 	function mouseWheelHelperFireFox(e) {
-		M.mouse.DOMMouseScroll(e);
+		instance.DOMMouseScroll(e);
 	}
-	// function contextMenuHelper(e) {
-		// e.preventDefault();
-	// }
+	function contextMenuHelper(e) {
+		e.preventDefault();
+	}
 
 	/**
 	 * Provides mouse support.
@@ -75,8 +77,7 @@
 		document.addEventListener("mouseup", mouseUpHelper, false);
 		document.addEventListener("mousemove", mouseMoveHelper, false);
 		document.addEventListener("click", mouseClickHelper, false);
-		// document.addEventListener("contextmenu", contextMenuHelper, false );
-        		
+
 	}
 
 	Mouse.prototype = {
@@ -117,6 +118,18 @@
 
 		},
 		/**
+		 * Prevents the context menu from showing up when the user right clicks on the document
+		 * @method preventContexMenu
+		 * @param {Boolean} value boolean that determines whether to prevent context menu or not
+		 */
+		preventContexMenu: function(value) {
+			if ( value ) {
+				document.addEventListener("contextmenu", contextMenuHelper, false );
+			} else {
+				document.removeEventListener("contextmenu", contextMenuHelper, false );
+			}
+		},
+		/**
 		 * Executes the events of the selected object
 		 * @method fireEventOnLastSelectedObject
 		 * @private
@@ -125,7 +138,7 @@
 
 			var s = this.selectedObject,
 				ps = this.prevSelectedObject;
-		
+
 			if ( s ) {
 				if ( s.onMouseIn && !s._mouseInRaised ) {
 					s._mouseInRaised = true;
@@ -143,8 +156,10 @@
 				if ( s.onClick && this.clicked() ) {
 					s.onClick(this);
 				}
-				if ( s.onMouseDown && this.down() ) {
-					s.onMouseDown(this);
+				if ( this.down() ) {
+					if ( s.onMouseDown ) {
+						s.onMouseDown(this);
+					}
 					this.isDragging = true;
 					if ( s.onDrag ) {
 						s.onDrag(this);
@@ -403,6 +418,8 @@
 
 	}
 
-	M.setMouse(new Mouse());
+	instance = new Mouse();
+
+	M.setMouse(instance);
 
 })(window.Match);

@@ -245,7 +245,7 @@
 			context = M.offScreenContext;
 
 		context.save();
-		context.font = this._family;
+		context.font = this._style + this._variant + this._weight + this._size + this._family;
 		context.fillStyle = this._fillStyle;
 
 		width = context.measureText(this._text).width;

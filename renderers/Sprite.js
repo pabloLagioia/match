@@ -226,7 +226,7 @@
         this._loopThroughTimers();
         if (this.onUpdate) this.onUpdate(p);
 		this._animate();
-	}
+	};
 	/**
 	 * Renders the current sprite in the provided context
 	 *
@@ -237,39 +237,47 @@
 	 * @param {int} cameraY
 	 */
 	Sprite.prototype.onRender = function( context, canvas, cameraX, cameraY ) {
-		
+
 		if ( ! this._image ) return;
 
-		context.save();
-		
 		this._applyOperation(context);
 		this._applyAlpha(context);
-		this._applyTranslation(context, cameraX, cameraY);
-		this._applyRotation(context);
-		this._applyScale(context);
-		this._applyShadow(context);
-
+		
 		var x, y;
 
 		if ( this.pivotX ) {
 			x = this.pivotX;
 		} else {
-			x = -this.currentFrame.halfWidth;
+			x = -this.oHW || -this.currentFrame.halfWidth;
 		}
 
 		if ( this.pivotY ) {
 			y = this.pivotY;
 		} else {
-			y = -this.currentFrame.halfHeight;
+			y = -this.oHH || -this.currentFrame.halfHeight;
 		}
-		context.drawImage( this._image, this.currentFrame.x, this.currentFrame.y, this.currentFrame.width, this.currentFrame.height, x, y, this.oW || this.currentFrame.width, this.oH || this.currentFrame.height );
 
-		context.restore();
+		if ( this._rotation || this._scale ) {
+			context.save();
+			this._applyTranslation(context, cameraX, cameraY);
+			this._applyRotation(context);
+			this._applyScale(context);
+
+			context.drawImage( this._image, this.currentFrame.x, this.currentFrame.y, this.currentFrame.width, this.currentFrame.height, x, y, this.oW || this.currentFrame.width, this.oH || this.currentFrame.height );
+
+			context.restore();
+		} else {
+			context.drawImage( this._image, this.currentFrame.x, this.currentFrame.y, this.currentFrame.width, this.currentFrame.height, this._x + x, this._y + y, this.oW || this.currentFrame.width, this.oH || this.currentFrame.height );
+		}
+
+		this._applyShadow(context);
 
 	};
 	Sprite.prototype.setSize = function(width, height) {
 		this.oW = width;
 		this.oH = height;
+		this.oHW = width / 2;
+		this.oHH = height / 2;
 		this.onChangeEvent.needsRedraw = true;
 	};
     /**

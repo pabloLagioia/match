@@ -18,7 +18,7 @@
         this.children = {};
 	}
     GameObject.prototype.removeChild = function(key) {
-        delete this.children[key];
+        this.children[key] = null;
     };
 	/**
 	 * Abstract method that is called once per game loop.

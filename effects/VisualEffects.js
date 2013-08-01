@@ -539,11 +539,17 @@
 		this.object = object;
 		this.onFinished = onFinished;
 
-		object.setAlpha(0);
-
 	}
 
-	FadeIn.prototype.onLoop = function(p) {
+	FadeIn.prototype.initialize = function() {
+
+		this.object.setAlpha(0);
+		this.onLoop = this.run;
+		return true;
+
+	};
+
+	FadeIn.prototype.run = function() {
 
 		var newAlpha = this.object.getAlpha() + this.rate;
 	
@@ -558,6 +564,8 @@
 		return true;
 
 	};
+
+	FadeIn.prototype.onLoop = FadeIn.prototype.initialize;
 
 	/**
 	 * Creates a FadeOut object to be applied to the given renderers.Renderizable.
@@ -579,11 +587,15 @@
 		this.object = object;
 		this.onFinished = onFinished;
 
-		object.setAlpha( 1 );
-
 	}
 
-	FadeOut.prototype.onLoop = function(p) {
+	FadeOut.prototype.initialize = function() {
+		this.object.setAlpha(1);
+		this.onLoop = this.run;
+		return true;
+	};
+
+	FadeOut.prototype.run = function() {
 
 		var newAlpha = this.object.getAlpha() - this.rate;
 
@@ -598,7 +610,49 @@
 		return true;
 
 	};
-	
+
+	FadeOut.prototype.onLoop = FadeOut.prototype.initialize;
+
+	/**
+	 * Creates a Wait object to be applied to the given renderers.Renderizable.
+	 * Wait is used for chained effects
+	 * @class Wait
+	 * @constructor
+	 * @extends GameObject
+	 * @param {renderers.Renderizable} object object to apply the tint
+	 * @param {int} seconds fade out duration in seconds
+	 * @param {Function} [onFinished] function to execute on animation finish
+	 */
+	function Wait(object, seconds, onFinished) {
+
+		if ( seconds == undefined ) seconds = 1;
+
+		this.seconds = seconds;
+		this.object = object;
+		this.timer = 0;
+		this.onFinished = onFinished;
+
+	}
+
+	Wait.prototype.initialize = function(p) {
+		this.timer = new M.TimeCounter(this.seconds * 1000);
+		this.onLoop = this.run;
+	};
+
+	Wait.prototype.run = function() {
+
+
+		if ( this.timer.elapsed() ) {
+			if ( this.onFinished ) this.onFinished.apply( this.object );
+			return false;
+		}
+
+		return true;
+
+	};
+
+	Wait.prototype.onLoop = Wait.prototype.initialize;
+
 	/**
 	 * Creates ContinouseFade object to be applied to the given renderers.Renderizable.
 	 * Continously fades in and out the object
@@ -1085,6 +1139,7 @@
 		ScaleDown: ScaleDown,
 		Rotate: Rotate,
 		Twinkle: Twinkle,
+		Wait: Wait
 
 	};
 

@@ -69,6 +69,12 @@
 			this.listeners.splice(l, 1);
 		}
 	};
+	/**
+	 * @method removeAllEventListeners
+	 */
+	EventListener.prototype.removeAllEventListeners = function() {
+		this.listeners = new Array();
+	};
 
 	M.EventListener = EventListener;
 

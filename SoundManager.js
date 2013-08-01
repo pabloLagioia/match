@@ -406,11 +406,11 @@
 
 			if ( map.onProgress ) {
 				this.onSoundLoaded.addEventListener(map.onProgress);
-				delete map.onProgress;
+				map.onProgress = null;
 			}
 			if ( map.onFinish ) {
 				this.onAllSoundsLoaded.addEventListener(map.onFinish);
-				delete map.onFinish;
+				map.onFinish = null;
 			}
 
 			for ( var i in map ) {

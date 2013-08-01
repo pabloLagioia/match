@@ -13,6 +13,8 @@
 	 */
     function SpriteManager() {
 
+		this.path = "";
+
 		/**
 		 * The amount of sprites remaining to load
 		 * @property toLoad
@@ -133,7 +135,7 @@
 
 		}
 
-        this.onImageLoaded.raise({image: image, remaining: this.toLoad, total: this.total});
+        this.onImageLoaded.raise({image: image, name: image.getAttribute("data-name"), remaining: this.toLoad, total: this.total});
 
         if ( this.toLoad <= 0 ) this.onAllImagesLoaded.raise();
 
@@ -200,11 +202,11 @@
 
 		if ( map.onProgress ) {
 			this.onImageLoaded.addEventListener(map.onProgress);
-			delete map.onProgress;
+			map.onProgress = null;
 		}
 		if ( map.onFinish ) {
 			this.onAllImagesLoaded.addEventListener(map.onFinish);
-			delete map.onFinish;
+			map.onFinish = null;
 		}
 
 		for ( i in map ) {
@@ -212,6 +214,7 @@
 			current = map[i],
 			img = new Image();
 
+			img.setAttribute("data-name", i);
             img.onload = onLoad;
             img.onerror = onError;
 
@@ -219,11 +222,11 @@
 
             if ( typeof current == "string" ) {
 
-                img.src = current;
+                img.src = this.path + current;
 
             } else {
 
-                img.src = current.source;
+                img.src = this.path + current.source;
 
                 img.frames = current.frames;
 

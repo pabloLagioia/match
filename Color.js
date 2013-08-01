@@ -74,10 +74,38 @@
 	Color.prototype.alpha = function() {
 		return this.rgba(0, 0, 0, 0);
 	};
-
+	/**
+	 * Returns a random rgb color
+	 * @method random
+	 * @return {String}
+	 */
 	Color.prototype.random = function() {
 		var math = window.Math;
 		return this.rgb(math.round(math.random() * 255), math.round(math.random() * 255), math.round(math.random() * 255));
+	};
+	/**
+	 * Returns an object with the attributes r, g, b from the given argument
+	 * @method random
+	 * @param {String} rgbString a string containing rgb colors
+	 * @return {String}
+		 * @example 
+				var orangeColorObject = M.color.rgbStringToObject("rgb(255, 200, 0)");
+		 */
+	Color.prototype.rgbStringToObject = function(rgbString) {
+
+		var obj = new Object();
+
+		if ( rgbString ) {
+			var regexResult = rgbString.match(/rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/);
+			if ( regexResult ) {
+				obj.r = parseInt(regexResult[1]);
+				obj.g = parseInt(regexResult[2]);
+				obj.b = parseInt(regexResult[3]);
+			}
+		}
+
+		return obj;
+
 	};
 
 	namespace.color = new Color();
