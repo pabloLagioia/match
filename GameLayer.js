@@ -388,7 +388,9 @@
 
 		this.onRenderList.push(object);
 
-		if ( object.onLoop ) M.pushGameObject(object);
+		if ( object.onLoop ) {
+			M.pushGameObject(object);
+		}
 
 		var camera = M.camera,
 			cameraX0 = camera.x * this.parrallaxFactor.x,
@@ -526,37 +528,29 @@
 	 */
 	GameLayer.prototype.remove = function( object ) {
 
-		if ( object != undefined ) {
+		if ( ! object ) return;
 
-			if ( typeof object == "string" ) {
+		if ( typeof object == "string" ) {
 
-				this.remove( this.get( object ) );
+			this.remove( this.get( object ) );
 
-			} else if ( isNaN( object ) ) {
+		} else {
 
-				var index = this.onRenderList.indexOf( object );
+			var i = this.onRenderList.indexOf( object );
 
-				if ( index != -1 ) {
-
-					this.onRenderList.splice( index, 1);
-
-				}
-
-			} else {
-
-				this.onRenderList.splice( object, 1);
-
+			if ( i > -1 ) {
+				this.onRenderList.splice( i, 1 );
 			}
-
-			if ( object.onLoop ) {
-
-				M.removeGameObject( object );
-
-			}
-
-			this._needsRedraw = true;
 
 		}
+
+		if ( object.onLoop ) {
+
+			M.removeGameObject( object );
+
+		}
+
+		this._needsRedraw = true;
 
 	};
 	/**

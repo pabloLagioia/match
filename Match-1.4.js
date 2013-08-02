@@ -369,16 +369,16 @@ var M = window.M || {};
 		for ( ; i < l; i++ ) {
 			f.drawImage( list[i].onLoop(p), 0, 0 );
 			//TODO: REVIEW
-			if ( this.frontBuffers ) {
-				var w = frontCanvas.width,
-					h = frontCanvas.height,
-					c;
-				for ( var j = 0; j < this.frontBuffers.length; j++ ) {
-					c = this.frontBuffers[j];
-					c.clearRect(0, 0, w, h);
-					c.drawImage(f.canvas, 0, 0);
-				}
-			}
+			// if ( this.frontBuffers ) {
+				// var w = frontCanvas.width,
+					// h = frontCanvas.height,
+					// c;
+				// for ( var j = 0; j < this.frontBuffers.length; j++ ) {
+					// c = this.frontBuffers[j];
+					// c.clearRect(0, 0, w, h);
+					// c.drawImage(f.canvas, 0, 0);
+				// }
+			// }
 		}
 
 	};
@@ -641,11 +641,7 @@ var M = window.M || {};
 	 */
 	Match.prototype.pushGameObject = function(gameObject) {
 		if ( !gameObject.onLoop ) throw new Error("Cannot add object " + gameObject.constructor.name + ", it doesn't have an onLoop method");
-		// if ( this._intro._isPlaying ) {
-			// this._intro._objects.push(gameObject);
-		// } else {
-			this._gameObjects.push(gameObject);
-		// }
+		this._gameObjects.push(gameObject);
 	};
 	/**
 	 * Shortcut to pushGameObject
@@ -870,6 +866,20 @@ var M = window.M || {};
 		return pixelsPerSecond / this.getAverageFps();
 	};
 	/**
+	 * Returns a speed measured in pixels based on the average fps
+	 *
+	 * @method getSpeed
+	 * @param {int} pixelsPerSecond the amount of pixels that an object should be moved per second
+	 * @return {float} the pixels to move the object relative to the average fps of the current device
+	 */
+	Match.prototype.getSpeedFixedAt = function( pixelsPerSecond, fps ) {
+
+		var avgFps = this.getAverageFps();
+
+		return (pixelsPerSecond / avgFps) * (fps / avgFps);
+
+	};
+	/**
 	 * Gets the current frames per second
 	 * @method getFps
 	 * @return {int} the frames per second
@@ -923,15 +933,6 @@ var M = window.M || {};
 	
 		this._isPlaying = ! this._isPlaying;
 
-	};
-	//TODO: REVIEW
-	Match.prototype.addCanvas = function(canvas) {
-		if ( !this.frontBuffers ) {
-			this.frontBuffers = [];
-		}
-		canvas.width = this.frontBuffer.canvas.width;
-		canvas.height = this.frontBuffer.canvas.height;
-		this.frontBuffers.push(canvas.getContext("2d"));
 	};
 	/**
 	 * Sets Match to loop through the scene using the provided canvas.
@@ -1196,6 +1197,16 @@ var M = window.M || {};
 		}
 		decimals = parseInt( a );
 		return Math.round( number * decimals ) / decimals;
+	};
+	/**
+	 * Rounds a number down using the fastest round method in javascript.
+	 * @see http://jsperf.com/math-floor-vs-math-round-vs-parseint/33
+	 * @method round
+	 * @param {double} number the number to round
+	 * @return {int}
+	 */
+	Match.prototype.fastRound = function(number) {
+		return number >> 0;
 	};
 	/**
 	 * Returns the a number indicating what percentage represents the given arguments

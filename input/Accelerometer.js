@@ -24,6 +24,19 @@
 		this._hasEvent = false;
 	};
 
+	Accelerometer.prototype.right = function() {
+		return this._hasEvent && (this.acceleration.x > 0 || this.accelerationIncludingGravity.x > 0);
+	};
+	Accelerometer.prototype.left = function() {
+		return this._hasEvent && (this.acceleration.x < 0 || this.accelerationIncludingGravity.y < 0);
+	};
+	Accelerometer.prototype.up = function() {
+		return this._hasEvent && this.acceleration.y > 0;
+	};
+	Accelerometer.prototype.down = function() {
+		return this._hasEvent && this.acceleration.y < 0;
+	};
+
 	Accelerometer.prototype.applyToObject = function(node) {
 		if ( this._hasEvent ) {
 			if ( node.onDeviceAccelerationIncludingGravity ) {

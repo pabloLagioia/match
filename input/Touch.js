@@ -116,6 +116,9 @@
 	Touch.prototype.ended = function() {
 		return this.events.end;
 	};
+	Touch.prototype.any = function() {
+		return this.started() || this.moved() || this.ended();
+	};
 	/**
 	 * Executes the events of the selected object
 	 * @method fireEventOnLastSelectedObject
