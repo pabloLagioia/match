@@ -90,17 +90,24 @@
 		/**
 		 * Array that contains animations for this object
 		 * @private
-		 * @property behaviours
-		 * @type Array
+		 * @property animations
+		 * @type ArrayList
 		 */
-        this.behaviours = new M.ArrayList();
+        this.animations = new M.ArrayList();
 		/**
 		 * Array that contains chained animations for this object
 		 * @private
-		 * @property chainedBehaviours
-		 * @type Array
+		 * @property chainedAnimations
+		 * @type ArrayList
 		 */
-        this.chainedBehaviours = new M.ArrayList();
+        this.chainedAnimations = new M.ArrayList();
+        /**
+		 * Array that contains behaviours for this object
+		 * @private
+		 * @property behaviours
+		 * @type ArrayList
+		 */
+        this.behaviours = new M.ArrayList();
 		/**
 		 * Index of the behaviour that's being executed at the moment
 		 * @private
@@ -217,14 +224,14 @@
 			}
 		}
 
-		this.behaviours.each(doLoop);
+		this.animations.each(doLoop);
 		
-		if ( this.chainedBehaviours.size ) {
-			if ( !this.chainedBehaviours._list[this._currentChainedBehaviour].onLoop() ) {
+		if ( this.chainedAnimations.size ) {
+			if ( !this.chainedAnimations._list[this._currentChainedBehaviour].onLoop() ) {
 				this._currentChainedBehaviour++;
 			}
-			if ( this._currentChainedBehaviour == this.chainedBehaviours.size ) {
-				this.chainedBehaviours.removeAll();
+			if ( this._currentChainedBehaviour == this.chainedAnimations.size ) {
+				this.chainedAnimations.removeAll();
 				this._currentChainedBehaviour = 0;
 			}
 		}
@@ -235,7 +242,7 @@
 	 * @method clearAnimations
 	 */
 	Renderizable.prototype.clearAnimations = function () {
-		this.behaviours = new Array();
+		this.animations = new Array();
 	};
 	/**
 	 * Adds a fade in animation to this object
@@ -244,7 +251,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.fadeIn = function (seconds, onFinished) {
-		this.behaviours.push(new visual.FadeIn(this, seconds, onFinished));
+		this.animations.push(new visual.FadeIn(this, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -254,7 +261,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.fadeOut = function (seconds, onFinished) {
-		this.behaviours.push(new visual.FadeOut(this, seconds, onFinished));
+		this.animations.push(new visual.FadeOut(this, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -266,7 +273,7 @@
 	 * @param {int} [max] maximum alpha value, defaults to 1
 	 */
 	Renderizable.prototype.continousFade = function (seconds, fadeOutFirst, min, max) {
-		this.behaviours.push(new visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
+		this.animations.push(new visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
 		return this;
 	};
 	/**
@@ -280,7 +287,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.move = function (x, y, seconds, easingX, easingY, loop, onFinished) {
-		this.behaviours.push(new visual.Easing(this, x, y, seconds, easingX, easingY, loop, onFinished));
+		this.animations.push(new visual.Easing(this, x, y, seconds, easingX, easingY, loop, onFinished));
 		return this;
 	};
 	/**
@@ -292,7 +299,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.scaleUp = function (x, y, seconds, onFinished) {
-		this.behaviours.push(new visual.ScaleUp(this, x, y, seconds, onFinished));
+		this.animations.push(new visual.ScaleUp(this, x, y, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -304,7 +311,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.scaleDown = function (x, y, seconds, onFinished) {
-		this.behaviours.push(new visual.ScaleDown(this, x, y, seconds, onFinished));
+		this.animations.push(new visual.ScaleDown(this, x, y, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -315,7 +322,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.twinkle = function (timesToTwinkle, durationInMilliseconds, onFinished) {
-		this.behaviours.push(new visual.Twinkle(this, timesToTwinkle, durationInMilliseconds, onFinished));
+		this.animations.push(new visual.Twinkle(this, timesToTwinkle, durationInMilliseconds, onFinished));
 		return this;
 	};
 	/**
@@ -326,7 +333,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.rotate = function (angle, seconds, onFinished) {
-		this.behaviours.push(new visual.Rotate(this, angle, seconds, onFinished));
+		this.animations.push(new visual.Rotate(this, angle, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -336,7 +343,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.chainWait = function (seconds, onFinished) {
-		this.chainedBehaviours.push(new visual.Wait(this, seconds, onFinished));
+		this.chainedAnimations.push(new visual.Wait(this, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -346,7 +353,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.chainFadeIn = function (seconds, onFinished) {
-		this.chainedBehaviours.push(new visual.FadeIn(this, seconds, onFinished));
+		this.chainedAnimations.push(new visual.FadeIn(this, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -356,7 +363,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.chainFadeOut = function (seconds, onFinished) {
-		this.chainedBehaviours.push(new visual.FadeOut(this, seconds, onFinished));
+		this.chainedAnimations.push(new visual.FadeOut(this, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -368,7 +375,7 @@
 	 * @param {int} [max] maximum alpha value, defaults to 1
 	 */
 	Renderizable.prototype.chainContinousFade = function (seconds, fadeOutFirst, min, max) {
-		this.chainedBehaviours.push(new visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
+		this.chainedAnimations.push(new visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
 		return this;
 	};
 	/**
@@ -380,8 +387,8 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.chainMove = function (x, y, seconds, easingX, easingY) {
-		// this.chainedBehaviours.push(new visual.Move(this, x, y, seconds, onFinished));
-		this.chainedBehaviours.push(new visual.Easing(this, x, y, seconds, easingX, easingY));
+		// this.chainedAnimations.push(new visual.Move(this, x, y, seconds, onFinished));
+		this.chainedAnimations.push(new visual.Easing(this, x, y, seconds, easingX, easingY));
 		return this;
 	};
 	/**
@@ -393,7 +400,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.chainScaleUp = function (x, y, seconds, onFinished) {
-		this.chainedBehaviours.push(new visual.ScaleUp(this, x, y, seconds, onFinished));
+		this.chainedAnimations.push(new visual.ScaleUp(this, x, y, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -405,7 +412,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.chainScaleDown = function (x, y, seconds, onFinished) {
-		this.chainedBehaviours.push(new visual.ScaleDown(this, x, y, seconds, onFinished));
+		this.chainedAnimations.push(new visual.ScaleDown(this, x, y, seconds, onFinished));
 		return this;
 	};
 	/**
@@ -416,7 +423,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.chainTwinkle = function (timesToTwinkle, durationInMilliseconds, onFinished) {
-		this.chainedBehaviours.push(new visual.Twinkle(this, timesToTwinkle, durationInMilliseconds, onFinished));
+		this.chainedAnimations.push(new visual.Twinkle(this, timesToTwinkle, durationInMilliseconds, onFinished));
 		return this;
 	};
 	/**
@@ -427,7 +434,7 @@
 	 * @param {Function} onFinished function to call once the animation finishes
 	 */
 	Renderizable.prototype.chainRotate = function (angle, seconds, onFinished) {
-		this.chainedBehaviours.push(new visual.Rotate(this, angle, seconds, onFinished));
+		this.chainedAnimations.push(new visual.Rotate(this, angle, seconds, onFinished));
 		return this;
 	};
 	/**

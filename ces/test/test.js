@@ -1,10 +1,61 @@
 function main() {
 
+	var engine1 = {
+		maxSpeed: 100,
+		acceleration: 6,
+		deceleration: 4
+	}
+
+	var car = new M.renderers.Sprite("car");
+
+	car.addAttribute("maxSpeed", engine1.maxSpeed);
+	car.addAttribute("acceleration", engine1.acceleration);
+	car.addAttribute("deceleration", engine1.deceleration);
+	car.addAttribute("speed", 0);
+	
+	// car.addAttributes(engine1);
+
+	car.addBehaviour(increaseSpeedKeyBinding);
+	car.addBehaviour(fixObjectToBoundsInX);
+	car.addBehaviour(fixObjectToBoundsInY);
+
+	function increaseSpeedOnKeyDown(obj) {
+		if ( M.keyboard.keysDown[obj.increaseSpeedKeyBinding] ) {
+			obj.addBehaviour(increaseSpeedBasedOnAccelerationAndMaxSpeed);
+			obj.removeBehaviour(decreaseSpeedBasedOnAccelerationAndMaxSpeed);
+		} else if (M.keyboard.keysDown[obj.decreaseSpeedKeyBinding) {
+			obj.removeBehaviour(increaseSpeedBasedOnAccelerationAndMaxSpeed);
+			obj.addBehaviour(decreaseSpeedBasedOnAccelerationAndMaxSpeed);
+		}
+	}
+	function increaseSpeedBasedOnAccelerationAndMaxSpeed(obj) {
+		obj.speed += obj.acceleration;
+		if ( obj.speed > obj.maxSpeed ) {
+			obj.speed = obj.maxSpeed;
+		}
+	}
+	function fixObjectToBoundsInX(obj) {
+		if ( obj._x > obj.bounds.maxX ) {
+			obj.setX(obj.bound.maxX);
+		}
+		if ( obj.location.x < obj.bounds.minX ) {
+			obj.location.x = obj.bound.minX;
+		}
+	}
+	function fixObjectToBoundsInY(obj) {
+		if ( obj.location.y > obj.bounds.maxY ) {
+			obj.location.y = obj.bound.maxY;
+		}
+		if ( obj.location.y < obj.bounds.minY ) {
+			obj.location.y = obj.bound.minY;
+		}
+	}
+	function rotateObject(obj) {
+
+	}
+
+
 	M.registerGameAttributes({
-		Location: function (x, y) {
-			this.x = x || 0;
-			this.y = y || 0;
-		},
 		Speed: function (x, y) {
 			this.x = x || 0;
 			this.y = y || 0;
@@ -20,15 +71,7 @@ function main() {
 		MaxSpeed: function () {
 			this.x = 4;
 			this.y = 4;
-		},
-		Size: function (width, height) {
-			this.width = width;
-			this.height = height;
-			this._halfWidth = this.width / 2;
-			this._halfHeight = this.height / 2;
-		},
-		backgroundLayer: M.createLayer(),
-		frontLayer: M.createLayer()
+		}
 	});
 
 	M.registerGameBehaviours({
@@ -86,18 +129,9 @@ function main() {
 		this.addAttribute("maxSpeed", new attributes.MaxSpeed);
 		this.addAttribute("acceleration", new attributes.Acceleration);
 		this.addAttribute("deceleration", new attributes.Deceleration);
-		this.addAttribute("fillStyle", "red");
-		this.addAttribute("layer", attributes.frontLayer);
-		this.addAttribute("size", new attributes.Size(100, 100));
 		this.addBehaviours(behaviours.moveWithKeyboard);
 		this.addBehaviours(behaviours.moveUpDown);
 		this.addBehaviours(behaviours.accelerate);
-		// this.addBehaviours(behaviours.decelerate);
-		this.addBehaviours(renderingEngine.renderRectangleNoTransform);
 	});
-
-	car = M.createEntity("Car");
-
-	M.pushGameObject(car);
 
 }
