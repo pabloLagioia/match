@@ -29,8 +29,9 @@
 	 * @example
 			this.healthBarId = this.pushChild(new HealthBar());
 	 */
-    GameObject.prototype.pushChild = function(child) {
+    GameObject.prototype.pushChild = function(child, x, y) {
 		child.ownerLayer = this.ownerLayer;
+		child.setLocation(this._x + x, this._y + y);
 		return this.children.push(child);
 	};
 	/**

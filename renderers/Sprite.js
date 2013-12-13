@@ -50,7 +50,7 @@
 		 * @protected
 		 * @type int
 		 */
-		 this.frameIndex = 0;
+		 this._frameIndex = 0;
 		 /**
 		 * Indicates if the animation if playing
 		 * @property isPlaying
@@ -65,8 +65,8 @@
 		 */
 		
 		if ( img ) this.setImage(img);
-		
-		this.setLocation(x, y);
+
+		this.setLocation(x || 0, y || 0);
 		
 	}
 
@@ -242,6 +242,9 @@
 	Sprite.prototype.onLoop = function(p) {
         this._loopThroughAnimations();
         this._loopThroughTimers();
+        for ( var i = 0; i < this.behaviours.size; i++ ) {
+        	this.behaviours._list[i](this, this.attributes);
+        }
         if (this.onUpdate) this.onUpdate(p);
 		this._animate();
 	};

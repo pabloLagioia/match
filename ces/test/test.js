@@ -1,29 +1,36 @@
+var car, spaceShip;
+
 function main() {
 
-	var engine1 = {
-		maxSpeed: 100,
-		acceleration: 6,
-		deceleration: 4
+	function moveBasedOnSpeed(obj) {
+		var speed = obj.attributes.speed;
+		obj.offsetX(speed.x);
+		obj.offsetY(speed.y);
 	}
-
-	var car = new M.renderers.Sprite("car");
-
-	car.addAttribute("maxSpeed", engine1.maxSpeed);
-	car.addAttribute("acceleration", engine1.acceleration);
-	car.addAttribute("deceleration", engine1.deceleration);
-	car.addAttribute("speed", 0);
-	
-	// car.addAttributes(engine1);
-
-	car.addBehaviour(increaseSpeedKeyBinding);
-	car.addBehaviour(fixObjectToBoundsInX);
-	car.addBehaviour(fixObjectToBoundsInY);
-
+	function moveBasedOnSpeedAndDirection(obj) {
+		obj.offset(obj.attributes.speed.x * obj.attributes.direction.x, obj.attributes.speed.y * obj.attributes.direction.y);
+	}
+	function moveOnKeyDownUsingSpeed(obj) {
+		if ( M.keyboard.keysDown.up ) {
+			obj.attributes.speed.y += 0.01;
+		} else if (M.keyboard.keysDown.down) {
+			obj.attributes.speed.y -= 0.01;
+		}
+	}
+	function accelerateOnKeyDown(obj) {
+		if ( M.keyboard.keysDown[obj.increaseSpeedKeyBinding] ) {
+			obj.addBehaviour(increaseSpeedBasedOnAccelerationAndMaxSpeed);
+			obj.removeBehaviour(decreaseSpeedBasedOnAccelerationAndMaxSpeed);
+		} else if (M.keyboard.keysDown[obj.decreaseSpeedKeyBinding]) {
+			obj.removeBehaviour(increaseSpeedBasedOnAccelerationAndMaxSpeed);
+			obj.addBehaviour(decreaseSpeedBasedOnAccelerationAndMaxSpeed);
+		}
+	}
 	function increaseSpeedOnKeyDown(obj) {
 		if ( M.keyboard.keysDown[obj.increaseSpeedKeyBinding] ) {
 			obj.addBehaviour(increaseSpeedBasedOnAccelerationAndMaxSpeed);
 			obj.removeBehaviour(decreaseSpeedBasedOnAccelerationAndMaxSpeed);
-		} else if (M.keyboard.keysDown[obj.decreaseSpeedKeyBinding) {
+		} else if (M.keyboard.keysDown[obj.decreaseSpeedKeyBinding]) {
 			obj.removeBehaviour(increaseSpeedBasedOnAccelerationAndMaxSpeed);
 			obj.addBehaviour(decreaseSpeedBasedOnAccelerationAndMaxSpeed);
 		}
@@ -54,84 +61,65 @@ function main() {
 
 	}
 
+	function centerCannon(obj) {
+		obj.children[0].setLocation(obj._x, obj._y);
+	}
 
-	M.registerGameAttributes({
-		Speed: function (x, y) {
-			this.x = x || 0;
-			this.y = y || 0;
-		},
-		Deceleration: function () {
-			this.x = 1;
-			this.y = 1;
-		},
-		Acceleration: function () {
-			this.x = 0;
-			this.y = 0;
-		},
-		MaxSpeed: function () {
-			this.x = 4;
-			this.y = 4;
-		}
+	function Vector2d(x, y) {
+		this.x = x || 0;
+		this.y = y || 0;
+	}
+
+	M.defineAttribute("Speed", Vector2d);
+	M.defineAttribute("Acceleration", Vector2d);
+
+	M.defineBehaviour("increaseSpeedOnKeyDown", increaseSpeedOnKeyDown);
+	M.defineBehaviour("increaseSpeedBasedOnAccelerationAndMaxSpeed", increaseSpeedBasedOnAccelerationAndMaxSpeed);
+	M.defineBehaviour("centerCannon", centerCannon);
+	
+	M.defineEntity("Tank", function () {
+
+		var attr = M.game.attributes,
+			behaviours = M.game.behaviours,
+			Sprite = M.renderers.Sprite,
+			tank = new Sprite("tank"),
+			cannon = new Sprite("tank");
+
+		tank.addAttribute("speed", new attr.Speed);
+
+		tank.setFrameIndex(0);
+
+		cannon.setFrameIndex(1);
+
+		tank.pushChild(cannon, 10, 10);
+
+		tank.addBehaviour(moveBasedOnSpeed);
+		tank.addBehaviour(moveOnKeyDownUsingSpeed);
+		// tank.addBehaviour(centerCannon);
+
+		return tank;
+
 	});
 
-	M.registerGameBehaviours({
-		moveWithKeyboard: function(attr) {
-			if ( M.keyboard.keysDown.left ) {
-				attr.acceleration.x = -1;
-			} else if ( M.keyboard.keysDown.right ) {
-				attr.acceleration.x = 1;
-			} else {
-				attr.acceleration.x = 0;
-			}
-			if ( M.keyboard.keysDown.up ) {
-				attr.acceleration.y = -1;
-			} else if ( M.keyboard.keysDown.down ) {
-				attr.acceleration.y = 1;				
-			} else {
-				attr.acceleration.y = 0;
-			}
-		},
-		moveSideWards: function(attr) {
-			attr.location.x += attr.speed.x;
-			attr.layer.needsRedraw = true;
-		},
-		accelerate: function(attr) {
-			if ( attr.speed.y < attr.maxSpeed.y ) {
-				attr.speed.y += attr.acceleration.y;
-			}
-			if ( attr.speed.x < attr.maxSpeed.x ) {
-				attr.speed.x += attr.acceleration.x;
-			}
-		},
-		decelerate: function(attr) {
-			if ( attr.speed.y > 0 ) {
-				attr.speed.y -= attr.deceleration.y;
-			} else {
-				attr.speed.y = 0;
-			}
-			if ( attr.speed.x > 0 ) {
-				attr.speed.x -= attr.deceleration.x;
-			} else {
-				attr.speed.x = 0;
-			}
-		},
-		moveUpDown: function(attr) {
-			attr.location.y += attr.speed.y;
+
+	M.sprites.load({
+		"tank": {
+			source: "tank.png",
+			frames: [
+				{x: 0, y: 0, width: 73, height: 116},
+				{x: 74, y: 0, width: 47, height: 116}
+			]
 		}
-	});
+	}, function() {
 
-	var behaviours = M.game.behaviours,
-		attributes = M.game.attributes;
+		var layer = M.createLayer(),
+			tank = M.game.entities.Tank();
 
-	M.registerGameEntity("Car", function() {
-		this.addAttribute("location", new attributes.Location(0, 0));
-		this.addAttribute("speed", new attributes.Speed);
-		this.addAttribute("maxSpeed", new attributes.MaxSpeed);
-		this.addAttribute("acceleration", new attributes.Acceleration);
-		this.addAttribute("deceleration", new attributes.Deceleration);
-		this.addBehaviours(behaviours.moveWithKeyboard);
-		this.addBehaviours(behaviours.moveUpDown);
-		this.addBehaviours(behaviours.accelerate);
+		tank.setLocation(M.getSceneCenter().x , M.getSceneCenter().y);
+		tank.children[0].setLocation(M.getSceneCenter().x , M.getSceneCenter().y);
+
+		layer.push(tank);
+
 	});
 
 }

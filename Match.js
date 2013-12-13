@@ -279,11 +279,12 @@ var M = window.M || {},
 			}
 		};
 
-		this.game = {
-			attributes: {},
-			behaviours: {},
-			entities: {}
-		}
+		// this.game = {
+		// 	attributes: {},
+		// 	behaviours: {},
+		// 	entities: {}
+		// }
+		this.game = new Game();
 
 		var self = this;
 		/*
@@ -294,116 +295,6 @@ var M = window.M || {},
 		});
 
 	}
-	
-	Match.prototype.registerClass = function() {
-	
-		var namespace = arguments[0].split("\."),
-			clousure = arguments[arguments.length - 1],
-			current = window,
-			l = namespace.length - 1,
-			dependencies = [],
-			name;
-		
-		for ( var i = 0; i < l; i++ ) {
-			name = namespace[i];
-			if ( !current[name] ) {
-				current[name] = new Object();
-			}
-			current = current[name];
-		}
-		
-		if ( ! current[namespace[l]] ) {
-		
-			//Adds the default namespace as a dependency so it is available as the first argument of the clousure
-			// dependencies.push(current);
-			
-			for ( var i = 1; i < arguments.length - 1; i++ ) {
-				dependencies.push(arguments[i]);
-			}
-			
-			current[namespace[l]] = clousure.apply(clousure, dependencies);
-			current[namespace[l]].namespace = arguments[0];
-		
-		}
-
-	};
-
-	Match.prototype.registerGameObject = function() {
-		// The current implementation may change to:
-		// arguments[0] = "M.game.objects" + arguments[0];
-		// arguments[0] = "M.game.classes" + arguments[0];
-		// registerGameClass;
-		console.warn("registerGameObject implementation is not final and may change");
-		arguments[0] = "game." + arguments[0];
-		this.registerClass.apply(this, arguments);
-	};
-
-	Match.prototype.registerPlugin = function() {
-		arguments[0] = "M.plugins." + arguments[0];
-		this.registerClass.apply(this, arguments);
-	};
-
-	Match.prototype.registerPluginTemplate = function(id, html) {
-		this.plugins.html[id] = html;
-	};
-	/**
-	 * Returns a game class or object based on the given name
-	 *
-	 * @method getGameObject
-	 * @param {String} className the name of the class or object to retrieve
-	 * @return {Object} the object registered by the given className
-	 */
-	Match.prototype.getGameObject = function(className) {
-		console.warn("getGameObject implementation is not final and may change");
-		// The current implementation may change to:
-		// return this.game.objects[className];
-		return game[className];
-	};
-	/**
-	 * Instantiates a game object by the given className and calls the setters
-	 * on it provided in setAttributes
-	 *
-	 * NOTE: The class you are willing to instantiate must have a public and
-	 * non arguments constructor
-	 *
-	 * @method getGameClassInstance
-	 * @private
-	 *
-	 * @param {String} className
-	 * @param {Map} setAttributes
-	 * @return {Object} the instantiated game object
-	 */
-	Match.prototype._getClassInstance = function(className, setAttributes) {
-	
-		var path = className.split("."),
-			clazz = window,
-			instance,
-			i,
-			keyValuePair;
-		
-		for ( var i = 0; i < path.length; i++ ) {
-			clazz = clazz[path[i]];
-		}
-		
-		instance = new clazz();
-		
-		for ( i in setAttributes ) {
-			
-			keyValuePair = setAttributes[i];
-			
-			if ( instance[keyValuePair.key] ) {
-				if ( typeof instance[keyValuePair.key] == "function" ) {
-					instance[keyValuePair.key](keyValuePair.value);
-				} else {
-					instance[keyValuePair.key] = keyValuePair.value;
-				}
-			}
-			
-		}
-		
-		return instance;
-		
-	};
 
 	Match.prototype.getPluginTemplate = function(id) {
 		var div = document.createElement("div");
@@ -1537,39 +1428,73 @@ var M = window.M || {},
 	};
 
 	/** CES PARADIGM *****************************************************************************************/
-	Match.prototype.registerGameEntity = function(name, constructor) {
-		this.game.entities[name] = constructor;
+	// Match.prototype._define = function(type, name, constructor) {
+	// 	var namespace = this._createNamespaceFromString("M.game." + type + "." + name);
+	// 	namespace.namespace[namespace.name] = constructor;
+	// };
+	// Match.prototype.defineAttribute = function(name, constructor) {
+	// 	this._define("attributes", name, constructor);
+	// };
+	// Match.prototype.defineBehaviour = function(name, constructor) {
+	// 	this._define("behaviours", name, constructor);
+	// };
+	// Match.prototype.defineEntity = function(name, constructor) {
+	// 	this._define("entities", name, constructor);
+	// };
+	// Match.prototype.defineEntities = function(entities) {
+	// 	for ( var i in map ) {
+	// 		this.defineEntity(i, map[i]);
+	// 	}
+	// };
+	// Match.prototype.defineAttributes = function(map) {
+	// 	for ( var i in map ) {
+	// 		this.defineAttribute(i, map[i]);
+	// 	}
+	// };
+	// Match.prototype.defineBehaviours = function(map) {
+	// 	for ( var i in map ) {
+	// 		this.defineBehaviour(i, map[i]);
+	// 	}
+	// };
+	// /**
+	//  * Create acts as a factory
+	//  */
+	// Match.prototype.create = function(name) {
+	// 	return this.game.entities[name]();
+	// };
+	Match.prototype.defineAttribute = function(name, value) {
+		this.game.attributes.add(name, value);
 	};
-	Match.prototype.registerGameAttribute = function(name, constructor) {
-		this.game.attributes[name] = constructor;
+	Match.prototype.defineBehaviour = function(name, value) {
+		this.game.behaviours.add(name, value);
 	};
-	Match.prototype.registerGameBehaviour = function(name, behaviour) {
-		this.game.behaviours[name] = behaviour;
+	Match.prototype.defineEntity = function(name, value) {
+		this.game.entities.add(name, value);
 	};
-	Match.prototype.registerGameEntities = function(entities) {
+	Match.prototype.defineAttributes = function(map) {
 		for ( var i in map ) {
-			this.registerGameEntity(i, map[i]);
+			this.defineAttribute(i, map[i]);
 		}
 	};
-	Match.prototype.registerGameAttributes = function(map) {
+	Match.prototype.defineBehaviours = function(map) {
 		for ( var i in map ) {
-			this.registerGameAttribute(i, map[i]);
+			this.defineBehaviour(i, map[i]);
 		}
 	};
-	Match.prototype.registerGameBehaviours = function(map) {
+	Match.prototype.defineEntities = function(entities) {
 		for ( var i in map ) {
-			this.registerGameBehaviour(i, map[i]);
+			this.defineEntity(i, map[i]);
 		}
 	};
-	Match.prototype.createEntity = function(name) {
-
-		var entity = new Entity();
-		entity.name = name;
-		this.game.entities[name].call(entity, this.game.attributes, this.game.behaviours);
-
-		return entity;
-
-	};
+	// Match.prototype.createEntity = function(name) {
+	// 	return this.game.entities[name]();
+	// };
+	// Match.prototype.getAttribute = function(name) {
+	// 	return this.game.attributes[name];
+	// };
+	// Match.prototype.getBehaviour = function(name) {
+	// 	return this.game.behaviours[name];
+	// };
 	/********************************************************************************************************/
 	
 	/* Save console usage for debugging purposes */

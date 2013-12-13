@@ -1,6 +1,6 @@
-function Entity() {
-	this.attributes = {};
-	this.behaviours = [];
+function Entity(props) {
+	this.attributes = props.attributes || {};
+	this.behaviours = props.behaviours || [];
 }
 Entity.prototype.update = function() {
 	for ( var i = 0; i < this.behaviours.length; i++ ) {

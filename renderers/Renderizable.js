@@ -12,6 +12,7 @@
 	 * @param {Object} [properties] properties to construct this object
 	 */
     function Renderizable(properties) {
+    	M.GameObject.call(this);
 		/**
 		 * X coordinate of the object
 		 * @private
@@ -107,6 +108,13 @@
 		 * @property behaviours
 		 * @type ArrayList
 		 */
+        this.attributes = {};
+        /**
+		 * Array that contains behaviours for this object
+		 * @private
+		 * @property behaviours
+		 * @type ArrayList
+		 */
         this.behaviours = new M.ArrayList();
 		/**
 		 * Index of the behaviour that's being executed at the moment
@@ -142,6 +150,38 @@
         this.set(properties);
 
 	}
+	Renderizable.prototype.addAttribute = function(name, attribute) {
+		this.attributes[name] = attribute;
+	};
+	Renderizable.prototype.addBehaviour = function(behaviour) {
+		this.behaviours.push(behaviour);
+	};
+	Renderizable.prototype.addAttributes = function(map) {
+		for ( var i in map ) {
+			this.addAttribute(i, map[i]);
+		}
+	};
+	Renderizable.prototype.addBehaviours = function() {
+		for ( var i = 0; i < arguments.length; i++ ) {
+			this.behaviours.push(arguments[i]);
+		}
+	};
+	Renderizable.prototype.removeBehaviours = function() {
+		for ( var i in arguments ) {
+			this.behaviours.splice(this.behaviours.indexOf(i), 1);
+		}
+	};
+	Renderizable.prototype.removeAttributes = function() {
+		for ( var i in arguments ) {
+			this.attributes[i] = null;
+		}
+	};
+	Renderizable.prototype.replaceBehaviour = function(out, in_) {
+		this.behaviours[this.behaviours.indexOf(out)] = in_;
+	};
+	Renderizable.prototype.replaceAttribute = function(name, in_) {
+		this.attributes[name] = in_;
+	};
 	/**
 	 * Notifies owner layer about a change in this object
 	 * @method notifyChange
@@ -170,6 +210,9 @@
     Renderizable.prototype.onLoop = function (p) {
         this._loopThroughAnimations();
         this._loopThroughTimers();
+        for ( var i = 0; i < this.behaviours.length; i++ ) {
+        	this.behaviours[i](this, this.attributes);
+        }
         if (this.onUpdate) this.onUpdate(p);
     };
 	/**
@@ -746,7 +789,9 @@
         } else {
             this._x = value + this._halfWidth;
         }
-		this.updateChildrenPosition();
+		for ( var i = 0; i < this.children.length; i++ ) {
+			this.children[i].setLeft();
+		}
         this.notifyChange();
     };
 	/**
@@ -1062,12 +1107,25 @@
 	 * @param {float} y the y coordinate to add
 	 */
     Renderizable.prototype.offset = function (x, y) {
-		this.prevX = this._x;
-		this.prevY = this._y;
-		this._x += x;
-		this._y += y;
-		this.updateChildrenPosition();
-        this.notifyChange();
+
+    	var notify = false;
+
+    	if ( x != 0 ) {
+			this.prevX = this._x;
+			this._x += x;
+			notify = true;
+		}
+		if ( y != 0 ) {
+			this.prevY = this._y;
+			this._y += y;
+			notify = true;
+		}
+
+		if ( notify ) {
+			this.updateChildrenPosition();
+    	    this.notifyChange();
+    	}
+
     };
 	/**
 	 * Adds the given x coordinate to that of the object
@@ -1149,6 +1207,8 @@
 		return this.constructor.name;
     };
 
+    M.extend(Renderizable, M.GameObject);
+
 	M.renderers = M.renderers || {};
 	M.renderers.Renderizable = Renderizable;
 
@@ -1164,5 +1224,6 @@
     Rectangle.prototype.getHeight = function() {
         return this.height;
     };
+
 
 })(M, M.effects.visual);
