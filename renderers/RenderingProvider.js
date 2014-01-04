@@ -3,8 +3,12 @@
 	function RenderingProvider() {
 	}
 
-	RenderingProvider.prototype.getRenderer2d = function () {
-		return new M.renderers.Renderer2d();
+	RenderingProvider.prototype.getStandardRenderer = function () {
+		return new M.renderers.StandardRenderer();
+	};
+
+	RenderingProvider.prototype.getWebGLRenderer = function () {
+		return new M.renderers.WebGLRenderer();
 	};
 
 	namespace.renderingProvider = new RenderingProvider();

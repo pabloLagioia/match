@@ -3,6 +3,7 @@
 	/**
 	 * @class Renderer
 	 * @constructor
+	 * @abstract
 	 */
 	function Renderer() {
 		this.canvas = document.createElement("canvas");
