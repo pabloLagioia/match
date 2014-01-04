@@ -118,6 +118,8 @@
 
 	};
 
+	Polygon.name = "Polygon";
+
 	M.extend(Polygon, GameObject);
 
 	M.Polygon = Polygon;

@@ -48,9 +48,10 @@
 	 */
 	EventListener.prototype.addEventListener = function(listener, owner) {
 		if ( owner ) {
-			listener = listener.bind(owner);
+			this.listeners.push(new ObjectListener(listener, owner));
+		} else {
+			this.listeners.push(new FunctionListener(listener));
 		}
-		this.listeners.push(listener);
 	};
 	/**
 	 * @method raise
@@ -62,8 +63,8 @@
 		
 		if ( l == 0 ) return;
 		
-		for ( var i = 0; i < l; i++ ) {
-			this.listeners[i](arguments);
+		for ( ; i < l; i++ ) {
+			this.listeners[i].run(arguments);
 		}
 		
 	};
@@ -87,6 +88,50 @@
 		return listeners;
 	};
 
+	EventListener.name = "EventListener";
+
 	namespace.EventListener = EventListener;
 
+	/**
+	 * Wraps a function to use it as a listener
+	 * 
+	 * @class FunctionListener
+	 * @constructor
+	 * @param {Function} callback function to invoke
+	 */
+	function FunctionListener(callback) {
+		this.callback = callback;
+	}
+	/**
+	 * Invokes callback function
+	 * @method run
+	 */
+	FunctionListener.prototype.run = function(args) {
+		this.callback(args[0]);
+	};
+
+	/**
+	 * Wraps an object and the callback name
+	 * 
+	 * @class ObjectListener
+	 * @constructor
+	 * @param {String} callbackName name of the function to call
+	 * @param {Object} object object in which to invoke the callback
+	 */
+	function ObjectListener(callbackName, object) {
+		this.callbackName = callbackName;
+		this.object = object;
+	}
+	/**
+	 * Invokes callback function on object
+	 * @method run
+	 */
+	ObjectListener.prototype.run = function(args) {
+		this.object[this.callbackName](args[0]);
+	};
+
 })(window);
+
+var el = new EventListener()
+el.addEventListener("saludar", {saludar: function() {console.debug(arguments)}});
+el.raise("hola");

@@ -63,6 +63,8 @@
 
 	};
 
+	Line.name = "Line";
+
 	M.Line = Line;
 
 })(window.Match);

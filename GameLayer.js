@@ -287,8 +287,8 @@
 				cameraX1 = cameraX0 + p.camera.viewportWidth,
 				cameraY1 = cameraY0 + p.camera.viewportHeight,
 				buffer = this.buffer,
-				canvas = buffer.canvas,
-				time;
+				canvas = buffer.canvas/*,
+				time*/;
 
 			this.clear(buffer, canvas);
 

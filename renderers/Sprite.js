@@ -16,7 +16,7 @@
 	 */
 	function Sprite(img, x, y) {
 
-		Renderizable.apply(this);
+		this.extendsRenderizable();
 		
 		/**
 		 * The image to render
@@ -458,6 +458,8 @@
 		return "Sprite";
     };
 	
+    Sprite.name = "Sprite";
+
 	M.extend( Sprite, Renderizable );
 
 	namespace.Sprite = Sprite;

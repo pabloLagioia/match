@@ -11,7 +11,7 @@
 	 */
 	function Text( properties ) {
 
-		Renderizable.apply(this, arguments);
+		this.extendsRenderizable(properties);
 		/**
 		 * Font style
 		 * @private
@@ -560,6 +560,8 @@
 		return "Text";
     };
 
+    Text.name = "Text";
+    
 	M.extend( Text, Renderizable );
 
 	namespace.Text = Text;

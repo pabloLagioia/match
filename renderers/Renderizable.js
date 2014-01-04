@@ -1207,6 +1207,8 @@
 		return this.constructor.name;
     };
 
+    Renderizable.name = "Renderizable";
+
     M.extend(Renderizable, M.GameObject);
 
 	M.renderers = M.renderers || {};

@@ -271,7 +271,14 @@ var M = window.M || {},
 		 * @type EventListener
 		 */
 		this.onGameObjectRemoved = new EventListener();
-		
+		/**
+		 * Array containing input handlers
+		 * @property _inputHandlers
+		 * @type Array
+		 * @private
+		 */
+		this._inputHandlers = [];
+
 		this.setDoubleBuffer(false);
 
 		this.plugins = {
@@ -474,35 +481,48 @@ var M = window.M || {},
 		}
 
 	};
+	/**
+	 * Calls applyToObject to of each input handler
+	 * @method _applyInput
+	 * @param {Node} node to apply input handling to
+	 */
+	Match.prototype._applyInput = function(node) {
+		var i = 0,
+			l = this._inputHandlers.length;
+		for ( ; i < l; i++ ) {
+			this._inputHandlers[i].applyToObject(node);
+		}
+	};
+	/**
+	 * Updates all input handlers
+	 * @method _updateInput
+	 */
+	Match.prototype._updateInput = function() {
+		var i = 0,
+			l = this._inputHandlers.length;
+		for ( ; i < l; i++ ) {
+			this._inputHandlers[i].update();
+		}
+	};
 	Match.prototype._buildInputMapping = function() {
 
-		var p = this.onLoopProperties,
-			applyInput = "",
-			updateInput = "";
+		var p = this.onLoopProperties;
 
 		if ( p.keyboard ) {
-			applyInput += "p.keyboard.applyToObject(node);";
-			updateInput += "p.keyboard.update();";
+			this._inputHandlers.push(p.keyboard);
 		}
 		if ( p.mouse ) {
-			applyInput += "p.mouse.applyToObject(node);";
-			updateInput += "p.mouse.update();";
+			this._inputHandlers.push(p.mouse);
 		}
 		if ( p.touch ) {
-			applyInput += "p.touch.applyToObject(node);";
-			updateInput += "p.touch.update();";
+			this._inputHandlers.push(p.touch);
 		}
 		if ( p.accelerometer ) {
-			applyInput += "p.accelerometer.applyToObject(node);";
-			updateInput += "p.accelerometer.update();";
+			this._inputHandlers.push(p.accelerometer);
 		}
 		if ( p.orientation ) {
-			applyInput += "p.orientation.applyToObject(node);";
-			updateInput += "p.orientation.update();";
+			this._inputHandlers.push(p.orientation);
 		}
-
-		this._applyInput = new Function("p", "node", applyInput);
-		this._updateInput = new Function("p", updateInput);
 
 	};
 	/**
@@ -1315,12 +1335,16 @@ var M = window.M || {},
 	 * @param {Object} descendant object to put the methods from the parents prototype
 	 * @param {Object} parent where to take the methods to put in descendant
 	 */
-	Match.prototype.extend = function( descendant, parent ) {
+	Match.prototype.extend = function( child, parent ) {
+
+		child.prototype["extends" + parent.name] = parent;
 
 		for (var m in parent.prototype) {
 
-			if ( !descendant.prototype[m] ) {
-				descendant.prototype[m] = parent.prototype[m];
+			if ( !child.prototype[m] ) {
+				child.prototype[m] = parent.prototype[m];
+			} else if ( !child.prototype[parent.name + m]) {
+				child.prototype[parent.name + capitalizeFirstLetter(m)] = parent.prototype[m];
 			}
 
 		}
@@ -1513,124 +1537,6 @@ var M = window.M || {},
 		window.console.log = window.console.debug = window.console.error = window.console.warning = function() {};
 
 	}
-
-	/* Enhance dom elements */
-	HTMLElement.prototype.remove = function() {
-		this.parentNode.removeChild(this);
-	};
-
-	HTMLElement.prototype.setClass = function(cssClass) {
-		this.setAttribute("class", cssClass);
-	};
-	
-	HTMLCanvasElement.prototype.getCenter = function() {
-		return {x: this.width / 2, y: this.height / 2};
-	};
-
-	HTMLCanvasElement.prototype.setSize = function( width, height ) {
-		this.width = width;
-		this.height = height;
-	};
-
-	HTMLCanvasElement.prototype.adjustTo = function( width, height ) {
-		this.style.setProperty("width", width + "px", null);
-		this.style.setProperty("height", height + "px", null);
-	};
-
-	HTMLCanvasElement.prototype.adjustToAvailSize = function() {
-		this.adjustTo( window.screen.availWidth + "px", window.screen.availHeight + "px" );
-	};
-
-	HTMLCanvasElement.prototype.resizeKeepingAspect = function( times ) {
-		this.adjustTo( this.width * times, this.height * times );
-	};
-
-	HTMLCanvasElement.prototype.getRight = function() {
-		return this.offsetLeft + this.offsetWidth;
-	};
-
-	HTMLCanvasElement.prototype.getBottom = function() {
-		return this.offsetTop + this.offsetHeight;
-	};
-
-	HTMLCanvasElement.prototype.getAvailWidth = function() {
-		if ( this.getRight() < window.screen.availWidth ) { 
-			return this.offsetWidth;
-		} else {
-			return window.screen.availWidth - this.offsetLeft;
-		}
-	};
-
-	HTMLCanvasElement.prototype.getAvailHeight = function() {
-		if ( this.getBottom() < window.screen.availHeight ) { 
-			return this.offsetHeight;
-		} else {
-			return window.screen.availHeight - this.offsetTop;
-		}
-	};
-
-	HTMLCanvasElement.prototype.getViewport = function() {
-		var viewport = {};
-		if ( this.offsetLeft < 0 ) {
-			viewport.left = -this.offsetLeft;
-		} else {
-			viewport.left = 0;
-		}
-		if ( this.offsetTop < 0 ) {
-			viewport.top = -this.offsetTop;
-		} else {
-			viewport.top = 0;
-		}
-		if ( this.offsetLeft + this.offsetWidth > window.screen.availWidth ) {
-			viewport.right = window.screen.availWidth - this.offsetLeft;
-		} else {
-			viewport.right = this.offsetWidth;
-		}
-		if ( this.offsetTop + this.offsetHeight > window.screen.availHeight ) {
-			viewport.bottom = window.screen.availHeight - this.offsetTop;
-		} else {
-			viewport.bottom = this.offsetHeight;
-		}
-		return viewport;
-	};
-
-	HTMLCanvasElement.prototype.getAspect = function() {
-		var aspect = { x: 1, y: 1 };
-		if ( this.style.width && this.width != parseInt(this.style.width) ) {
-			aspect.x = this.width / parseInt(this.style.width);
-		}
-		if ( this.style.height && this.height != parseInt(this.style.height) ) {
-			aspect.y = this.height / parseInt(this.style.height);
-		}
-		return aspect;
-	};
-
-	CanvasRenderingContext2D.prototype.resetOperation = function() {
-		if ( this.operationChanged && this.globalCompositeOperation != "source-over" ) {
-			this.globalCompositeOperation = "source-over";
-			this.operationChanged = false;
-		}
-	};
-	CanvasRenderingContext2D.prototype.resetAlpha = function() {
-		if ( this.alphaChanged && this.globalAlpha != 1 ) {
-			this.globalAlpha = 1;
-			this.alphaChanged = false;
-		}
-	};
-	CanvasRenderingContext2D.prototype.resetShadow = function() {
-		if ( this.shadowChanged ) {
-			if ( this.shadowBlur != 0 ) {
-				this.shadowBlur = 0;
-			}
-			if ( this.shadowOffsetX != 0 ) {
-				this.shadowOffsetX = 0;
-			}
-			if ( this.shadowOffsetY != 0 ) {
-				this.shadowOffsetY = 0;
-			}
-			this.shadowChanged = false;
-		}
-	};
 
 	if ( !window.requestAnimationFrame ) {
 

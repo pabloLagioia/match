@@ -12,7 +12,7 @@
 	 */
 	function Rectangle( properties ) {
 
-		Renderizable.apply(this, arguments);
+		this.extendsRenderizable(properties);
 
 		/**
 		 * Fill Style used to fill the rectangle. Can be a color, a pattern or a gradient
@@ -239,14 +239,8 @@
 		this._applyShadow(context);
 
 	};
-	/**
-	 * Returns the constructor's name
-	 *
-	 * @method toString
-	 */
-    Rectangle.prototype.toString = function() {
-		return "Rectangle";
-    };
+
+    Rectangle.name = "Rectangle";
 
 	M.extend(Rectangle, Renderizable);
 

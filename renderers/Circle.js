@@ -12,7 +12,7 @@
 	 */
 	function Circle( properties ) {
 
-		Renderizable.apply(this, arguments);
+		this.extendsRenderizable(properties);
 		/**
 		 * Fill Style used to fill the circle. Can be a color, a pattern or a gradient
 		 * @private
@@ -431,6 +431,8 @@
     Circle.prototype.toString = function() {
 		return "Circle";
     };
+
+    Circle.name = "Circle";
 
 	M.extend(Circle, Renderizable);
 

@@ -30,6 +30,8 @@
 		}
 	};
 
+	Triangle.name = "Triangle";
+
 	M.extend( Triangle, Polygon );
 
 })(window.Match, window.Match.Polygon);
