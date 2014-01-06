@@ -279,19 +279,10 @@ var M = window.M || {},
 		 */
 		this._inputHandlers = [];
 
-		this.setDoubleBuffer(false);
-
 		this.plugins = {
 			html: {
 			}
 		};
-
-		// this.game = {
-		// 	attributes: {},
-		// 	behaviours: {},
-		// 	entities: {}
-		// }
-		this.game = new Game();
 
 		var self = this;
 		/*
@@ -373,86 +364,6 @@ var M = window.M || {},
 		this.orientation = orientation;
 		this.onLoopProperties.orientation = orientation;
 		this._buildInputMapping();
-	};
-	/**
-	 * Renders the contents of the layers to the game canvas without using a middle buffer. This may result in flickering
-	 * in some systems and does not allow applying properties to layers
-	 * @method renderSingleBuffer
-	 * @param {Array} list array of game layers
-	 * @param {CanvasRenderingContext2D} fronCanvas the canvas attached to the document where the game takes place
-	 * @param {OnLoopProperties} p useful objects for performance increase
-	 */
-	Match.prototype.renderSingleBuffer = function(list, frontCanvas, p) {
-
-		/**
-		 * Cache variables that are used in this function
-		 */
-		var l = list.length,
-			i = 0,
-			f = this.frontBuffer;
-
-		f.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
-
-		for ( ; i < l; i++ ) {
-			f.drawImage( list[i].onLoop(p), 0, 0 );
-		}
-
-	};
-	/**
-	 * Renders the contents of the layers to the game canvas using a middle buffer to avoid flickering. Enables the use of layer properties
-	 * @method renderDoubleBuffer
-	 * @param {Array} list array of game layers
-	 * @param {CanvasRenderingContext2D} fronCanvas the canvas attached to the document where the game takes place
-	 * @param {OnLoopProperties} p useful objects for performance increase
-	 */
-	Match.prototype.renderDoubleBuffer = function(list, frontCanvas, p) {
-
-		/*
-		 * Cache variables that are used in this function
-		 */
-		var l = list.length,
-			i = 0,
-			currentLayer,
-			backBuffer = this.backBuffer;
-
-		backBuffer.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
-
-		for ( ; i < l; i++ ) {
-
-			currentLayer = list[i];
-
-			var result = currentLayer.onLoop(p);
-
-			backBuffer.save();
-
-			if ( currentLayer.composite ) {
-				backBuffer.globalCompositeOperation = currentLayer.composite;
-			}
-
-			if ( currentLayer._alpha != null && currentLayer._alpha >= 0 && currentLayer._alpha <= 1 ) {
-				backBuffer.globalAlpha = currentLayer._alpha;
-			}
-
-			backBuffer.translate(backBuffer.halfWidth, backBuffer.halfHeight);
-
-			if ( currentLayer.rotation ) {
-				backBuffer.rotate(currentLayer.rotation);
-			}
-
-			if ( currentLayer.scale ) {
-				backBuffer.scale(currentLayer.scale.x, currentLayer.scale.y);
-			}
-
-			backBuffer.drawImage( result, -backBuffer.halfWidth, -backBuffer.halfHeight);
-
-			backBuffer.restore();
-
-		}
-
-		this.frontBuffer.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
-
-		this.frontBuffer.drawImage( backBuffer.canvas, 0, 0 );
-
 	};
 	/**
 	 * Calls the onLoop method on all elements in nodes
@@ -543,12 +454,9 @@ var M = window.M || {},
 		
 		this._updateInput(p);
 
-		/*
-		 * Render using single buffer or double buffer
-		 * @see renderSingleBuffer
-		 * @see renderDoubleBuffer
-		 */
-		this.render(this._gameLayers, this.frontBuffer.canvas, p);
+		for ( var i = 0, l = this._gameLayers.length; i < l; i++ ) {
+			this.renderer.render(this._gameLayers[i]);
+		}
 
 		/*
 		 * Update FPS count
@@ -566,7 +474,7 @@ var M = window.M || {},
 	 * @return {String} a string representing an image in base64
 	 */
 	Match.prototype.getAsBase64Image = function() {
-		return this.frontBuffer.canvas.toDataURL();
+		return this.renderer.getAsBase64Image();
 	};
 	/**
 	 * Gets the result of all layers as an html image
@@ -712,121 +620,6 @@ var M = window.M || {},
 		this._gameObjects = new Array();
 	};
 	/**
-	 * Creates a new canvas rendering context
-	 *
-	 * NOTE: Using this method may result in some objects not to be updated or rendered and bliking. Please call the remove method from match
-	 *
-	 * @method createNewContext
-	 * @return {CanvasRenderingContext2D} the new context
-	 */
-	Match.prototype.createNewContext = function() {
-		return window.document.createElement("canvas").getContext("2d");
-	};
-	/**
-	 * Sets double buffering on or off
-	 *
-	 * NOTE: Double buffering enables the use of layer properties such as alpha or rotation
-	 *
-	 * @method setDoubleBuffer
-	 * @param {Boolean} value the value that determines whether to use double buffer or not
-	 */
-	Match.prototype.setDoubleBuffer = function(value) {
-		if ( value ) {
-			this.backBuffer = this.createNewContext();
-			this.updateBufferSize();
-			this.render = this.renderDoubleBuffer;
-		} else {
-			this.render = this.renderSingleBuffer;
-		}
-	};
-	/**
-	 * Returns whether double buffering is enabled or not
-	 *
-	 * @method isDoubleBuffered
-	 * @return {Boolean} true if double buffering is enabled false if not
-	 */
-	Match.prototype.isDoubleBuffered = function() {
-		return this.render == this.renderDoubleBuffer;
-	};
-	/**
-	 * Sets the size of the current canvas
-	 *
-	 * @method setCanvasSize
-	 * @param {float} w width
-	 * @param {float} h height
-	 */
-	Match.prototype.setCanvasSize = function(w, h) {
-		if ( this.frontBuffer ) {
-			this.frontBuffer.canvas.width = w;
-			this.frontBuffer.canvas.height = h;
-			this.updateBufferSize();
-		}
-	};
-	/**
-	 * Stretches the contents of the canvas to the size of the html document.
-	 * This works as forcing a fullscreen, if the navigation bars of the browser were hidden.
-	 *
-	 * NOTE: This method behaves exactly as setCanvasStretchTo using document client width and height
-	 *
-	 * @method setCanvasStretch
-	 * @param {Boolean} value true to stretch, false to set default values
-	 */
-	Match.prototype.setCanvasStretch = function(value) {
-		if ( value ) {
-			this.setCanvasStretchTo(document.documentElement.clientWidth, document.documentElement.clientHeight);
-		} else {
-			this.setCanvasStretchTo("auto", "auto");
-		}
-	};
-	/**
-	 * Stretches the contents of the canvas to the size of the html document.
-	 *
-	 * @method setCanvasStretchTo
-	 * @param {String} w width in coordinates, as css pixels or percentages
-	 * @param {String} h height in coordinates, as css pixels or percentages
-	 */
-	Match.prototype.setCanvasStretchTo = function(w, h) {
-		if ( this.frontBuffer ) {
-			if ( w ) {
-				if ( typeof w == "number" || ( w != "auto" && w.indexOf("px") == "-1" && w.indexOf("%") == "-1" ) ) {
-					w = w + "px";
-				}
-				this.frontBuffer.canvas.style.width = w;
-			}
-
-			if ( h ) {
-				if ( typeof h == "number" || ( h != "auto" && h.indexOf("px") == "-1" && h.indexOf("%") == "-1" ) ) {
-					h = h + "px";
-				}
-				this.frontBuffer.canvas.style.height = h;
-			}
-		}
-	};
-	/**
-	 * Updates the back buffer size to match the size of the game canvas
-	 *
-	 * @method updateBufferSize
-	 */
-	Match.prototype.updateBufferSize = function() {
-		if ( this.frontBuffer ) {
-			if ( this.backBuffer && this.frontBuffer ) {
-				this.backBuffer.canvas.width = this.frontBuffer.canvas.width;
-				this.backBuffer.canvas.height = this.frontBuffer.canvas.height;
-				this.backBuffer.halfWidth = this.backBuffer.canvas.width / 2;
-				this.backBuffer.halfHeight = this.backBuffer.canvas.height / 2;
-			}
-			this.offScreenCanvas.width = this.frontBuffer.canvas.width;
-			this.offScreenCanvas.height = this.frontBuffer.canvas.height;
-
-			if ( this.collisions.PixelPerfect ) {
-				this.collisions.PixelPerfect.testContext.canvas.width = this.offScreenCanvas.width;
-				this.collisions.PixelPerfect.testContext.canvas.height = this.offScreenCanvas.height;
-			}
-
-			this.updateViewport();
-		}
-	};
-	/**
 	 * Creates a new game layer, adds it to the game layer list and returns it
 	 *
 	 * @method createGameLayer
@@ -845,7 +638,7 @@ var M = window.M || {},
 	/**
 	 * Forces all layers to redraw it's content
 	 *
-	 * @method createGameLayer
+	 * @method redrawAllLayers
 	 * @param name name of the layer
 	 * @param zIndex z-index of the layer
 	 * @return {GameLayer} the newly created layer
@@ -1103,13 +896,12 @@ var M = window.M || {},
 	 * call this method again unless you need to change the canvas
 	 *
 	 * @param {HTMLCanvasElement} canvas the canvas where to perform the rendering
-	 * @param {Boolean} doubleBuffer a boolean determinig whether to use double buffering or not
 	 * @method start
 	 * @example
 			//Use canvas by id gameCanvas and use double buffering
 			M.start(document.querySelector("#gameCanvas"), true);
 	 */
-	Match.prototype.start = function(canvas, doubleBuffer) {
+	Match.prototype.start = function(canvas, mode) {
 
 		if ( !canvas ) {
 			canvas = M.dom("canvas");
@@ -1125,16 +917,7 @@ var M = window.M || {},
 								   canvas.mozRequestFullScreen || 
 								   canvas.msRequestFullScreen;
 
-		this.frontBuffer = canvas.getContext("2d");
-
-		this.updateBufferSize();
-		this.updateViewport();
-
-		var i = 0, l = this._gameLayers.length;
-
-		for ( ; i < l; i++ ) {
-			this._gameLayers[i].setBufferSize(canvas);
-		}
+		this.renderer = this.renderingProvider.getRenderer(canvas, mode);
 
 		this._isPlaying = true;
 
@@ -1144,16 +927,6 @@ var M = window.M || {},
 
 		// M._intro.play();
 
-	};
-	/**
-	 * Updates the camera viewport to match the size of the game canvas
-	 * @method updateViewport
-	 */
-	Match.prototype.updateViewport = function() {
-		this.camera.setViewport( this.frontBuffer.canvas.width, this.frontBuffer.canvas.height );
-	};
-	Match.prototype.getViewportSize = function() {
-		return { width: this.camera.viewportWidth, height: this.camera.viewportHeight };
 	};
 	/**
 	 * Removes the provided index from the given array
@@ -1337,6 +1110,9 @@ var M = window.M || {},
 	 */
 	Match.prototype.extend = function( child, parent ) {
 
+		if ( !child ) throw new Error("child is undefined and cannot be extended");
+		if ( !parent ) throw new Error("parent is undefined thus you cannot extend child");
+	
 		child.prototype["extends" + parent.name] = parent;
 
 		for (var m in parent.prototype) {

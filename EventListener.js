@@ -131,7 +131,3 @@
 	};
 
 })(window);
-
-var el = new EventListener()
-el.addEventListener("saludar", {saludar: function() {console.debug(arguments)}});
-el.raise("hola");

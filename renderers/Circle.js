@@ -367,63 +367,6 @@
 		this.notifyChange();
 	};
 	/**
-	 * Renders the current sprite in the provided context
-	 *
-	 * @method onRender
-	 * @param {CanvasRenderingContext2D} context
-	 * @param {HTMLCanvasElement} canvas
-	 * @param {int} cameraX
-	 * @param {int} cameraY
-	 */
-	Circle.prototype.onRender = function(context, canvas, cameraX, cameraY) {
-
-		this._applyOperation(context);
-		this._applyAlpha(context);
-
-		if ( this._scale ) {
-
-			context.save();
-
-			this._applyTranslation(context, cameraX, cameraY);
-			this._applyScale(context);
-
-			context.beginPath();
-			context.arc( 0, 0, this._radius, this._startAngle, this._endAngle, false);
-			context.closePath();
-
-			if ( this._fillStyle ) {
-				context.fillStyle = this._fillStyle;
-				context.fill();
-			}
-
-			context.restore();
-
-		} else {
-
-			context.beginPath();
-			context.arc( this._x - this._radius / 2, this._y - this._radius / 2, this._radius, this._startAngle, this._endAngle, false);
-			context.closePath();
-
-			if ( this._fillStyle ) {
-				context.fillStyle = this._fillStyle;
-				context.fill();
-			}
-
-		}
-
-		this._applyShadow(context);
-
-		if ( this._lineWidth ) {
-			context.lineWidth = this._lineWidth;
-		}
-
-		if ( this._strokeStyle ) {
-			context.strokeStyle = this._strokeStyle;
-			context.stroke( -this._halfWidth, -this._halfHeight, this._width, this._height );
-		}
-
-	};
-	/**
 	 * Returns the constructor's name
 	 *
 	 * @method toString

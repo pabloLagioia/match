@@ -49,6 +49,8 @@
 		 */
 		this._lineWidth = null;
 
+		this.TYPE = M.renderers.TYPES.RECTANGLE;
+
 		this.set( properties );
 
 	}
@@ -184,60 +186,6 @@
 	 */
 	Rectangle.prototype.getShadow = function() {
 		return this._shadow;
-	};
-	/**
-	 * Renders the current text in the provided context
-	 *
-	 * @method onRender
-	 * @param {CanvasRenderingContext2D} context
-	 * @param {HTMLCanvasElement} canvas
-	 * @param {int} cameraX
-	 * @param {int} cameraY
-	 */
-	Rectangle.prototype.onRender = function(context, canvas, cameraX, cameraY) {
-
-		this._applyOperation(context);
-		this._applyAlpha(context);
-
-		if ( this._rotation || this._scale ) {
-			context.save();
-			this._applyTranslation(context, cameraX, cameraY);
-			this._applyRotation(context);
-			this._applyScale(context);
-			if ( this._fillStyle ) {
-				context.fillStyle = this._fillStyle;
-			}
-			context.fillRect( -this._halfWidth, -this._halfHeight, this._width, this._height );
-
-			if ( this._lineWidth ) {
-				context.lineWidth = this._lineWidth;
-			}
-
-			if ( this._strokeStyle ) {
-				context.strokeStyle = this._strokeStyle;
-				context.strokeRect( -this._halfWidth, -this._halfHeight, this._width, this._height );
-			}
-
-			context.restore();
-		} else {
-			if ( this._fillStyle ) {
-				context.fillStyle = this._fillStyle;
-			}
-			context.fillRect( this._x - this._halfWidth, this._y - this._halfHeight, this._width, this._height );
-
-			if ( this._lineWidth ) {
-				context.lineWidth = this._lineWidth;
-			}
-
-			if ( this._strokeStyle ) {
-				context.strokeStyle = this._strokeStyle;
-				context.strokeRect( this._x - this._halfWidth, this._y - this._halfHeight, this._width, this._height );
-			}
-
-		}
-
-		this._applyShadow(context);
-
 	};
 
     Rectangle.name = "Rectangle";

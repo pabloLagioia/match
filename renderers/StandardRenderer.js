@@ -1,15 +1,20 @@
 (function (Renderer) {
 	
-	function StandardRenderer() {
+	function StandardRenderer(canvas) {
 
-		this.extendsRenderer();
+		this.extendsRenderer(canvas);
 
-		this.context = this.canvas.getContext("2d");
+		this.frontBuffer = this.canvas.getContext("2d");
+		
+		this.backBuffer = document.createElement("canvas").getContext("2d");
 
-		this.canvas.width = frontCanvas.width;
-		this.canvas.height = frontCanvas.height;
+		this.backBuffer.canvas.width = this.frontBuffer.canvas.width;
+		this.backBuffer.canvas.height = this.frontBuffer.canvas.height;
+		
+		this.backBufferHalfWidth = this.backBuffer.canvas.width / 2;
+		this.backBufferHalfHeight = this.backBuffer.canvas.height / 2;
 
-		this.context = this.canvas.getContext("2d");
+		this.frontBuffer = this.canvas.getContext("2d");
 
 		this.compositeOperations = [
 			"source-over", 
@@ -44,6 +49,11 @@
 		this.RECTANGLE = 3;
 		this.CIRCLE = 4;
 
+		this.camera = new M.Camera();
+
+		this.updateBufferSize();
+		this.updateViewport();
+		
 	}
 	/**
 	 * Applies the operation of this object to the context as composite operation
@@ -52,20 +62,20 @@
 	 * @protected
 	 * @param {StandardRenderer} context
 	 */
-	StandardRenderer.prototype._applyOperation = function(object) {
+	StandardRenderer.prototype._applyOperation = function(object, context) {
 		if ( object._compositeOperation ) {
 			context.globalCompositeOperation = this.compositeOperations[object._compositeOperation];
 			this.compositeOperation = object._compositeOperation;
 		} else if (this.compositeOperation != this.DEFAULT_COMPOSITE_OPERATION) {
-			this.resetOperation();
+			this.resetOperation(context);
 		}
 	};
 	/**
 	 * @method resetOperation
 	 * @abstract
 	 */
-	StandardRenderer.prototype.resetOperation = function() {
-		this.context.globalCompositeOperation = this.compositeOperations[this.DEFAULT_COMPOSITE_OPERATION];
+	StandardRenderer.prototype.resetOperation = function(context) {
+		context.globalCompositeOperation = this.compositeOperations[this.DEFAULT_COMPOSITE_OPERATION];
 		this.compositeOperation = this.DEFAULT_COMPOSITE_OPERATION;
 	};
 	/**
@@ -75,19 +85,19 @@
 	 * @protected
 	 * @param {StandardRenderer} context
 	 */
-	StandardRenderer.prototype._applyAlpha = function(context) {
-		if ( this.alpha != object._alpha && object._alpha >= 0 && object._alpha <= 1 ) {
+	StandardRenderer.prototype._applyAlpha = function(object, context) {
+		if ( object._alpha != null && this.alpha != object._alpha && object._alpha >= 0 && object._alpha <= 1 ) {
 			context.globalAlpha = this.alpha = object._alpha;
 		} else if (this.alpha != this.DEFAULT_ALPHA) {
-			this.resetAlpha();
+			this.resetAlpha(context);
 		}
 	};
 	/**
 	 * @method resetAlpha
 	 * @abstract
 	 */
-	StandardRenderer.prototype.resetAlpha = function() {
-		this.context.globalAlpha = this.alpha = this.DEFAULT_ALPHA;
+	StandardRenderer.prototype.resetAlpha = function(context) {
+		context.globalAlpha = this.alpha = this.DEFAULT_ALPHA;
 	};
 	/**
 	 * Applies the shadow of this object to the provided context
@@ -96,7 +106,7 @@
 	 * @protected
 	 * @param {StandardRenderer} context
 	 */
-	StandardRenderer.prototype._applyShadow = function(object) {
+	StandardRenderer.prototype._applyShadow = function(object, context) {
 		if ( object._shadow ) {
 			var s = object._shadow;
 			context.shadowOffsetX = this.shadowOffsetX = s.x;
@@ -105,23 +115,23 @@
 			context.shadowColor = s.color;
 			context.shadowChanged = false;
 		} else if (this.shadowChanged) {
-			this.resetShadow();
+			this.resetShadow(context);
 		}
 	};
 	/**
 	 * @method resetShadow
 	 * @abstract
 	 */
-	StandardRenderer.prototype.resetShadow = function() {
+	StandardRenderer.prototype.resetShadow = function(context) {
 		if ( this.shadowChanged ) {
 			if ( this.shadowBlur != this.DEFAULT_SHADOW_BLUR ) {
-				this.context.shadowBlur = this.shadowBlur = this.DEFAULT_SHADOW_BLUR;
+				context.shadowBlur = this.shadowBlur = this.DEFAULT_SHADOW_BLUR;
 			}
 			if ( this.shadowOffsetX != this.DEFAULT_SHADOW_BLUR ) {
-				this.context.shadowOffsetX = this.shadowOffsetX = this.DEFAULT_SHADOW_OFFSET_X;
+				context.shadowOffsetX = this.shadowOffsetX = this.DEFAULT_SHADOW_OFFSET_X;
 			}
 			if ( this.shadowOffsetY != this.DEFAULT_SHADOW_OFFSET_Y ) {
-				this.context.shadowOffsetY = this.shadowOffsetY = this.DEFAULT_SHADOW_OFFSET_Y;
+				context.shadowOffsetY = this.shadowOffsetY = this.DEFAULT_SHADOW_OFFSET_Y;
 			}
 			this.shadowChanged = false;
 		}
@@ -135,7 +145,7 @@
 	 * @param {int} [cameraX] defaults to 0
 	 * @param {int} [cameraY] defaults to 0
 	 */
-	StandardRenderer.prototype._applyTranslation = function(object, cameraX, cameraY) {
+	StandardRenderer.prototype._applyTranslation = function(object, context, cameraX, cameraY) {
 		context.translate(object._x - cameraX, object._y - cameraY);
 	};
 	/**
@@ -145,9 +155,9 @@
 	 * @protected
 	 * @param {StandardRenderer} context
 	 */
-	StandardRenderer.prototype._applyRotation = function(object) {
+	StandardRenderer.prototype._applyRotation = function(object, context) {
 		if ( object._rotation ) {
-			this.context.rotate(object._rotation);
+			context.rotate(object._rotation);
 		}
 	};
 	/**
@@ -157,9 +167,9 @@
 	 * @protected
 	 * @param {StandardRenderer} context
 	 */
-	StandardRenderer.prototype._applyScale = function(object) {
+	StandardRenderer.prototype._applyScale = function(object, context) {
 		if ( object._scale ) {
-			this.context.scale(object._scale.x, object._scale.y);
+			context.scale(object._scale.x, object._scale.y);
 		}
 	};
 	/**
@@ -170,32 +180,137 @@
 	StandardRenderer.prototype.clear = function(context) {
 		context.clearRect(0,0, context.canvas.width, context.canvas.height);
 	};
-	StandardRenderer.prototype.render = function(object) {
-		if ( object.type == Sprite) {
-		} else if ( object.type == Layer ) {
-		} else if ( object.type == Rectangle ) {
+	
+	/**
+	 * Renders the contents of the layers to the game canvas without using a middle buffer. This may result in flickering
+	 * in some systems and does not allow applying properties to layers
+	 * @method renderSingleBuffer
+	 * @param {Array} gameLayerList array of game layers
+	 * @param {CanvasRenderingContext2D} fronCanvas the canvas attached to the document where the game takes place
+	 * @param {OnLoopProperties} p useful objects for performance increase
+	 */
+	StandardRenderer.prototype.renderSingleBuffer = function(gameLayerList, frontCanvas, p) {
+
+		/**
+		 * Cache variables that are used in this function
+		 */
+		var l = gameLayerList.length,
+			i = 0,
+			f = this.frontBuffer;
+
+		f.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+
+		for ( ; i < l; i++ ) {
+			f.drawImage( gameLayerList[i].onLoop(p), 0, 0 );
 		}
+
 	};
+	/**
+	 * Renders the contents of the layers to the game canvas using a middle buffer to avoid flickering. Enables the use of layer properties
+	 * @method renderDoubleBuffer
+	 * @param {Array} gameLayerList array of game layers
+	 * @param {CanvasRenderingContext2D} fronCanvas the canvas attached to the document where the game takes place
+	 * @param {OnLoopProperties} p useful objects for performance increase
+	 */
+	StandardRenderer.prototype.renderDoubleBuffer = function(gameLayerList, frontCanvas, p) {
 
-	StandardRenderer.prtotype.renderRectangle = function(renderizable, context, cameraX, cameraY) {
+		/*
+		 * Cache variables that are used in this function
+		 */
+		var l = gameLayerList.length,
+			i = 0,
+			currentLayer,
+			backBuffer = this.backBuffer;
 
-		this._applyOperation(renderizable.operation);
-		this._applyAlpha(renderizable.alpha);
+		backBuffer.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+
+		for ( ; i < l; i++ ) {
+
+			currentLayer = gameLayerList[i];
+
+			var result = currentLayer.onLoop(p);
+
+			backBuffer.save();
+
+			if ( currentLayer.composite ) {
+				backBuffer.globalCompositeOperation = currentLayer.composite;
+			}
+
+			if ( currentLayer._alpha != null && currentLayer._alpha >= 0 && currentLayer._alpha <= 1 ) {
+				backBuffer.globalAlpha = currentLayer._alpha;
+			}
+
+			backBuffer.translate(this.backBufferHalfWidth, this.backBufferHalfHeight);
+
+			if ( currentLayer.rotation ) {
+				backBuffer.rotate(currentLayer.rotation);
+			}
+
+			if ( currentLayer.scale ) {
+				backBuffer.scale(currentLayer.scale.x, currentLayer.scale.y);
+			}
+
+			backBuffer.drawImage( result, -this.backBufferHalfWidth, -this.backBufferHalfHeight);
+
+			backBuffer.restore();
+
+		}
+
+		this.frontBuffer.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+
+		this.frontBuffer.drawImage( backBuffer.canvas, 0, 0 );
+
+	};
+	/**
+	 * Updates the back buffer size to match the size of the game canvas
+	 *
+	 * @method updateBufferSize
+	 */
+	StandardRenderer.prototype.updateBufferSize = function() {
+
+		if ( this.backBuffer && this.frontBuffer ) {
+			this.backBuffer.canvas.width = this.frontBuffer.canvas.width;
+			this.backBuffer.canvas.height = this.frontBuffer.canvas.height;
+			this.backBufferHalfWidth = this.backBuffer.canvas.width / 2;
+			this.backBufferHalfHeight = this.backBuffer.canvas.height / 2;
+		}
+		
+		if ( M.collisions.PixelPerfect ) {
+			M.collisions.PixelPerfect.testContext.canvas.width = this.backBuffer.canvas.width;
+			M.collisions.PixelPerfect.testContext.canvas.height = this.backBuffer.canvas.height;
+		}
+
+		this.updateViewport();
+
+	};
+	/**
+	 * Updates the camera viewport to match the size of the game canvas
+	 * @method updateViewport
+	 */
+	StandardRenderer.prototype.updateViewport = function() {
+		this.camera.setViewport( this.frontBuffer.canvas.width, this.frontBuffer.canvas.height );
+	};
+	StandardRenderer.prototype.getViewportSize = function() {
+		return { width: this.camera.viewportWidth, height: this.camera.viewportHeight };
+	};
+	StandardRenderer.prototype.renderRectangle = function(renderizable, context, cameraX, cameraY) {
+
+		this._applyOperation(renderizable, context);
+		this._applyAlpha(renderizable, context);
 
 		if ( renderizable._rotation || renderizable._scale ) {
 
 			context.save();
 			
-			this._applyTranslation(context, cameraX, cameraY);
-			this._applyRotation(context);
-			this._applyScale(context);
+			this._applyTranslation(renderizable, context, cameraX, cameraY);
+			this._applyRotation(renderizable, context);
+			this._applyScale(renderizable, context);
 			
 			if ( renderizable._fillStyle ) {
 				context.fillStyle = renderizable._fillStyle;
 			}
 
 			context.fillRect( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
-
 
 			if ( renderizable._strokeStyle ) {
 
@@ -230,34 +345,209 @@
 
 		}
 
+		this._applyShadow(renderizable, context);
+
+	};
+	/**
+	 * Renders the current text in the provided context
+	 *
+	 * @method onRender
+	 * @param {CanvasRenderingContext2D} context
+	 * @param {HTMLCanvasElement} canvas
+	 * @param {int} cameraX
+	 * @param {int} cameraY
+	 */
+	StandardRenderer.prototype.renderText = function( renderizable, context, cameraX, cameraY ) {
+
+		this._applyOperation(renderizable, context);
+		this._applyAlpha(renderizable, context);
+
+		//TODO: caching oportunity
+		context.font = renderizable._style + renderizable._variant + renderizable._weight + renderizable._size + renderizable._family;
+
+		context.textAlign = renderizable._textAlign;
+
+		context.textBaseline = renderizable._textBaseline;
+
+		context.fillStyle = renderizable._fillStyle;
+
+		this._applyShadow(renderizable, context);
+
+		if ( renderizable._rotation || renderizable._scale ) {
+
+			context.save();
+
+			this._applyTranslation(renderizable, context, cameraX, cameraY);
+			this._applyRotation(renderizable, context);
+			this._applyScale(renderizable, context);
+
+			this.fillText(renderizable, context, 0, 0);
+
+			context.restore();
+
+		} else {
+
+			this.fillText(renderizable, context, renderizable._x, renderizable._y);
+
+		}
+
+	};
+	StandardRenderer.prototype.fillText = function(renderer, context, x , y) {
+
+		if ( renderer.multiLine ) {
+			for ( var i = 0; i < renderer.multiLine.length; i++ ) {
+				context.fillText( renderer.multiLine[i], x, y + i * renderer.getHeight() );
+			}
+		} else {
+			context.fillText( renderer._text, x, y );
+		}
+
+		if ( renderer._strokeStyle ) {
+			context.strokeStyle = renderer._strokeStyle;
+			context.lineWidth = renderer._lineWidth || 1;
+			context.strokeText(renderer._text, x, y );
+		}
+
+	};
+	/**
+	 * Renders the current sprite in the provided context
+	 *
+	 * @method onRender
+	 * @param {CanvasRenderingContext2D} context
+	 * @param {HTMLCanvasElement} canvas
+	 * @param {int} cameraX
+	 * @param {int} cameraY
+	 */
+	StandardRenderer.prototype.renderCircle = function( renderizable, context, cameraX, cameraY ) {
+
+		this._applyOperation(renderizable, context);
+		this._applyAlpha(renderizable, context);
+
+		if ( renderizable._scale ) {
+
+			context.save();
+
+			this._applyTranslation(renderizable, context, cameraX, cameraY);
+			this._applyScale(renderizable, context);
+
+			context.beginPath();
+			context.arc( 0, 0, renderizable._radius, renderizable._startAngle, renderizable._endAngle, false);
+			context.closePath();
+
+			if ( renderizable._fillStyle ) {
+				context.fillStyle = renderizable._fillStyle;
+				context.fill();
+			}
+
+			context.restore();
+
+		} else {
+
+			context.beginPath();
+			//TODO: Cache radius / 2 as halfRadius in Circle
+			context.arc( renderizable._x - renderizable._radius / 2, renderizable._y - renderizable._radius / 2, renderizable._radius, renderizable._startAngle, renderizable._endAngle, false);
+			context.closePath();
+
+			if ( renderizable._fillStyle ) {
+				context.fillStyle = this._fillStyle;
+				context.fill();
+			}
+
+		}
+
+		this._applyShadow(renderizable, context);
+
+		if ( renderizable._strokeStyle ) {
+
+			if ( renderizable._lineWidth ) {
+				context.lineWidth = renderizable._lineWidth;
+			}
+			
+			context.strokeStyle = renderizable._strokeStyle;
+			context.stroke( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
+			
+		}
+
+	};
+	/**
+	 * Renders the current sprite in the provided context
+	 *
+	 * @method renderSprite
+	 * @param {CanvasRenderingContext2D} context
+	 * @param {HTMLCanvasElement} canvas
+	 * @param {int} cameraX
+	 * @param {int} cameraY
+	 */
+	StandardRenderer.prototype.renderSprite = function( renderizable, context, cameraX, cameraY ) {
+
+		if ( ! renderizable._image ) return;
+
+		this._applyOperation(renderizable, context);
+		this._applyAlpha(renderizable, context);
+		
+		var x, y;
+
+		if ( renderizable.pivotX ) {
+			x = renderizable.pivotX;
+		} else {
+			x = -renderizable.oHW || -renderizable.currentFrame.halfWidth;
+		}
+
+		if ( renderizable.pivotY ) {
+			y = renderizable.pivotY;
+		} else {
+			y = -renderizable.oHH || -renderizable.currentFrame.halfHeight;
+		}
+
+		if ( renderizable._rotation || renderizable._scale ) {
+		
+			context.save();
+			
+			this._applyTranslation(renderizable, context, cameraX, cameraY);
+			this._applyRotation(renderizable, context);
+			this._applyScale(renderizable, context);
+
+			context.drawImage( renderizable._image, renderizable.currentFrame.x, renderizable.currentFrame.y, renderizable.currentFrame.width, renderizable.currentFrame.height, x, y, renderizable.oW || renderizable.currentFrame.width, renderizable.oH || renderizable.currentFrame.height );
+
+			context.restore();
+			
+		} else {
+		
+			context.drawImage( renderizable._image, renderizable.currentFrame.x, renderizable.currentFrame.y, renderizable.currentFrame.width, renderizable.currentFrame.height, renderizable._x + x, renderizable._y + y, renderizable.oW || renderizable.currentFrame.width, renderizable.oH || renderizable.currentFrame.height );
+
+		}
+
 		this._applyShadow(context);
 
 	};
-	StandardRenderer.prototype.renderLayer = function (object) {
+	StandardRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight) {
 	
-		if ( object.needsRedraw ) {
+		if ( layer.needsRedraw ) {
 
-			var cameraX0 = p.camera._x * object.parrallaxFactor.x,
-				cameraY0 = p.camera._y * object.parrallaxFactor.y,
-				cameraX1 = cameraX0 + p.camera.viewportWidth,
-				cameraY1 = cameraY0 + p.camera.viewportHeight,
-				buffer = this.buffer,
-				canvas = buffer.canvas,
+			var cameraX0 = cameraX * layer.parrallaxFactor.x,
+				cameraY0 = cameraX * layer.parrallaxFactor.y,
+				cameraX1 = cameraX0 + viewportWidth,
+				cameraY1 = cameraY0 + viewportHeight,
 				current;
 
-			this.clear(this.context);
+			this.backBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
 
-			for ( var i = 0, l = object.onRenderList.length; i < l; i++ ) {
+			for ( var i = 0, l = layer.onRenderList.length; i < l; i++ ) {
 
-				this.render(object.onRenderList[i]);
-
+				current = layer.onRenderList[i];
+				
+				if ( this.isVisible(current, cameraX0, cameraY0, cameraX1, cameraY1) ) {
+				
+					this.render(current, this.backBuffer, cameraX, cameraY);
+				
+				}
+				
 			}
 
-			this.renderGameObjects(this.onRenderList, buffer, canvas, cameraX0, cameraY0, cameraX1, cameraY1);
+			layer.needsRedraw = false;
 
-			object.needsRedraw = false;
-
-			// this.result = this.postProcessing.run(buffer);
+			this.frontBuffer.clearRect(0, 0, this.frontBuffer.canvas.width, this.frontBuffer.canvas.height);
+			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
 
 		}
 
@@ -267,110 +557,67 @@
 		}
 
 	};
-	StandardRenderer.prototype.render = function(object) {
+	/**
+	 * Returns whether this object is visible and is inside the given viewport
+	 *
+	 * @method isVisible
+	 * @param {float} cameraX0 the left coordinate of the camera
+	 * @param {float} cameraY0 the top coordinate of the camera
+	 * @param {float} cameraX1 the right coordinate of the viewport
+	 * @param {float} cameraY1 the bottom coordinate of the viewport
+	 * @return {Boolean}
+	 */
+    StandardRenderer.prototype.isVisible = function (object, cameraX0, cameraY0, cameraX1, cameraY1) {
+    	
+		if ( object._alpha == 0 || !object._visible ) return false;
+    	
+    	var insideViewport = object.isIn(cameraX0, cameraY0, cameraX1, cameraY1);
 
-		var camera = M.camera;
-
-		if ( object.type == Sprite) {
-
-		} else if ( object.type == Layer ) {
-			this.renderLayer(object, object._context, camera);
-		} else if ( object.type == Rectangle ) {
-			this.renderLayer(object, object._context, camera._x, camera._y);
-		}
-		
-	};
-	StandardRenderer.prtotype.renderRectangle = function(renderizable, context, cameraX, cameraY) {
-
-		this._applyOperation(renderizable.operation);
-		this._applyAlpha(renderizable.alpha);
-
-		if ( renderizable._rotation || renderizable._scale ) {
-
-			context.save();
-			
-			this._applyTranslation(context, cameraX, cameraY);
-			this._applyRotation(context);
-			this._applyScale(context);
-			
-			if ( renderizable._fillStyle ) {
-				context.fillStyle = renderizable._fillStyle;
+    	if ( object.onOutsideViewport ) {
+			if ( !(object._raisedNotVisible && insideViewport) ) {
+				object.onOutsideViewport();
+				object._raisedNotVisible = true;
+			} else {
+				object._raisedNotVisible = false;
 			}
-
-			context.fillRect( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
-
-
-			if ( renderizable._strokeStyle ) {
-
-				if ( renderizable._lineWidth ) {
-					context.lineWidth = renderizable._lineWidth;
-				}
-
-				context.strokeStyle = renderizable._strokeStyle;
-				context.strokeRect( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
-			}
-
-			context.restore();
-		
-		} else {
-		
-			if ( renderizable._fillStyle ) {
-				context.fillStyle = renderizable._fillStyle;
-			}
-		
-			context.fillRect( renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight, renderizable._width, renderizable._height );
-
-			if ( renderizable._strokeStyle ) {
-
-				if ( renderizable._lineWidth ) {
-					context.lineWidth = renderizable._lineWidth;
-				}
-
-				context.strokeStyle = renderizable._strokeStyle;
-				context.strokeRect( renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight, renderizable._width, renderizable._height );
-
-			}
-
 		}
 
-		this._applyShadow(context);
+		return insideViewport; 
+    
+    };
+	StandardRenderer.prototype.render = function(object, context, cameraX, cameraY) {
 
-	};
-	StandardRenderer.prototype.renderLayer = function (layer, context, camera) {
-	
-		if ( layer.needsRedraw ) {
-
-			var cameraX0 = camera._x * layer.parrallaxFactor.x,
-				cameraY0 = camera._y * layer.parrallaxFactor.y,
-				cameraX1 = cameraX0 + camera.viewportWidth,
-				cameraY1 = cameraY0 + camera.viewportHeight,
-				buffer = this.buffer,
-				canvas = buffer.canvas,
-				current;
-
-			this.clear(this.context);
-
-			for ( var i = 0, l = layer.onRenderList.length; i < l; i++ ) {
-
-				this.render(layer.onRenderList[i]);
-
-			}
-
-			// this.renderGameObjects(this.onRenderList, buffer, canvas, cameraX0, cameraY0, cameraX1, cameraY1);
-
-			layer.needsRedraw = false;
-
-			// this.result = this.postProcessing.run(buffer);
-
+		//TODO: We should store a renderer in the object and create a factory for the objects, that way we avoid any if statements
+		switch ( object.TYPE ) {
+			case M.renderers.TYPES.SPRITE:
+				this.renderSprite(object, context, cameraX, cameraY);
+				break;
+			case M.renderers.TYPES.LAYER:
+				this.renderLayer(object, object._context, this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
+				break;
+			case M.renderers.TYPES.TEXT:
+				this.renderText(object, context, cameraX, cameraY);
+				break;
+			case M.renderers.TYPES.RECTANGLE:
+				this.renderRectangle(object, context, cameraX, cameraY);
+				break;
+			case M.renderers.TYPES.CIRCLE:
+				this.renderCircle(object, context, cameraX, cameraY);
+				break;
+			default:
+				throw new Error("Unable to render object of type " + object.TYPE);
 		}
-
-		if ( layer.needsSorting ) {
-			layer.sort();
-			layer.needsSorting = false;
+		
+		if ( object.children ) {
+			for ( var i = 0, l = object.children.length; i < l; i++ ) {
+				this.render(object.children[i], context, cameraX, cameraY);
+			}
 		}
 
 	};
 
 	M.extend(StandardRenderer, Renderer);
+
+	M.renderers.StandardRenderer = StandardRenderer;
 
 })(M.renderers.Renderer);

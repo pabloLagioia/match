@@ -112,6 +112,8 @@
 		if ( M.frontBuffer ) {
 			this.setSize(M.frontBuffer.canvas.width, M.frontBuffer.canvas.height);
 		}
+		
+		this.TYPE = M.renderers.TYPES.LAYER;
 
 	}
 
@@ -393,12 +395,6 @@
 			throw new Error(M.getObjectName(object) + " must implement onRender method");
 		}
 
-		if ( !object.isVisible ) {
-			//throw new Error(M.getObjectName(object) + " does not implement isVisible method. A default method will be appended. Rendering objects outside of game area is inefficient and innecessary, please implement isVisible for better performance");
-			console.warn(M.getObjectName(object) + " does not implement isVisible method. A default method will be appended. Rendering objects outside of game area is inefficient and innecessary, please implement isVisible for better performance");
-			object.isVisible = function() { return true; };
-		}
-
 		if ( !object.setZIndex ) {
 			// throw new Error(M.getObjectName(object) + " does not implement setZIndex method");
 			console.warn(M.getObjectName(object) + " does not implement setZIndex method");
@@ -447,15 +443,8 @@
 			M.pushGameObject(object);
 		}
 
-		var camera = M.camera,
-			cameraX0 = camera.x * this.parrallaxFactor.x,
-			cameraY0 = camera.y * this.parrallaxFactor.y,
-			cameraX1 = cameraX0 + camera.viewportWidth,
-			cameraY1 = cameraY0 + camera.viewportHeight;
-
-		if ( !this.needsRedraw ) {
-			this.needsRedraw = object.isVisible(cameraX0, cameraY0, cameraX1, cameraY1);
-		}
+		//TODO: We need to know which objects were added so if they were outside the viewport we must not re render
+		this.needsRedraw = true;
 
 	};
 	/**

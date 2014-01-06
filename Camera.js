@@ -128,6 +128,6 @@
 		return this.getLeftFromLayer(layer) + this.viewportWidth;
 	};
 	
-	M.onLoopProperties.camera = M.camera = new Camera();
+	M.Camera = Camera;
 
 })(window.Match);

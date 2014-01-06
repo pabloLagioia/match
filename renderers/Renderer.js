@@ -5,8 +5,9 @@
 	 * @constructor
 	 * @abstract
 	 */
-	function Renderer() {
-		this.canvas = document.createElement("canvas");
+	function Renderer(canvas) {
+		this.canvas = canvas;
+		this.frontBuffer = null;
 	}
 	/**
 	 * @method render
@@ -121,7 +122,51 @@
 		}
 		return aspect;
 	};
+	/**
+	 * Stretches the contents of the canvas to the size of the html document.
+	 * This works as forcing a fullscreen, if the navigation bars of the browser were hidden.
+	 *
+	 * NOTE: This method behaves exactly as setCanvasStretchTo using document client width and height
+	 *
+	 * @method setCanvasStretch
+	 * @param {Boolean} value true to stretch, false to set default values
+	 */
+	Renderer.prototype.setCanvasStretch = function(value) {
+		if ( value ) {
+			this.setCanvasStretchTo(document.documentElement.clientWidth, document.documentElement.clientHeight);
+		} else {
+			this.setCanvasStretchTo("auto", "auto");
+		}
+	};
+	/**
+	 * Stretches the contents of the canvas to the given size
+	 *
+	 * @method setCanvasStretchTo
+	 * @param {String} w width in coordinates, as css pixels or percentages
+	 * @param {String} h height in coordinates, as css pixels or percentages
+	 */
+	Renderer.prototype.setCanvasStretchTo = function(w, h) {
+		if ( this.frontBuffer ) {
+			if ( w ) {
+				if ( typeof w == "number" || ( w != "auto" && w.indexOf("px") == "-1" && w.indexOf("%") == "-1" ) ) {
+					w = w + "px";
+				}
+				this.frontBuffer.canvas.style.width = w;
+			}
 
-	namespace.Renderer = Renderer;
+			if ( h ) {
+				if ( typeof h == "number" || ( h != "auto" && h.indexOf("px") == "-1" && h.indexOf("%") == "-1" ) ) {
+					h = h + "px";
+				}
+				this.frontBuffer.canvas.style.height = h;
+			}
+		}
+	};
+	
+	Renderer.name = "Renderer";
 
-})(M.renderers);
+	M.renderers = M.renderers || {};
+
+	namespace.renderers.Renderer = Renderer;
+
+})(M);

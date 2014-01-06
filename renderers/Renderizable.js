@@ -994,34 +994,6 @@
         this.notifyChange();
     };
 	/**
-	 * Returns whether this object is visible and is inside the given viewport
-	 *
-	 * @method isVisible
-	 * @param {float} cameraX0 the left coordinate of the camera
-	 * @param {float} cameraY0 the top coordinate of the camera
-	 * @param {float} cameraX1 the right coordinate of the viewport
-	 * @param {float} cameraY1 the bottom coordinate of the viewport
-	 * @return {Boolean}
-	 */
-    Renderizable.prototype.isVisible = function (cameraX0, cameraY0, cameraX1, cameraY1) {
-    	
-		if ( this._alpha == 0 || !this._visible ) return false;
-    	
-    	var insideViewport = this.isIn(cameraX0, cameraY0, cameraX1, cameraY1);
-
-    	if ( this.onOutsideViewport ) {
-			if ( !(this._raisedNotVisible && insideViewport) ) {
-				this.onOutsideViewport();
-				this._raisedNotVisible = true;
-			} else {
-				this._raisedNotVisible = false;
-			}
-		}
-
-		return insideViewport; 
-    
-    };
-	/**
 	 * Returns whether this object is inside the given rectangle
 	 *
 	 * @method isIn
@@ -1035,7 +1007,10 @@
 
         if (this._rotation) {
 			/* Check using polygon collision */
-			//TODO: We might optimize this. Save the rectangle as a collision area, update it only if rotation has changed and pass it to haveCollided
+			/*
+			 * TODO: We might optimize this. Save the rectangle as a collision area, update it 
+			 * only if rotation has changed and pass it to haveCollided and cache M.collisions.Polygon
+			 */
             return M.collisions.Polygon.haveCollided(this, new Rectangle(x0, y0, x1, y1));
         } else {
             if (this.getBottom() < y0) return false;
