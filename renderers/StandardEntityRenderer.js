@@ -1,8 +1,8 @@
-(function (Renderer) {
+(function (StandardRenderer) {
 	
-	function StandardRenderer(canvas) {
+	function StandardEntityRenderer(canvas) {
 
-		this.extendsRenderer(canvas);
+		this.extendsStandardRenderer(canvas);
 
 		this.frontBuffer = this.canvas.getContext("2d");
 		
@@ -60,9 +60,9 @@
 	 *
 	 * @method _applyOperation
 	 * @protected
-	 * @param {StandardRenderer} context
+	 * @param {StandardEntityRenderer} context
 	 */
-	StandardRenderer.prototype._applyOperation = function(object, context) {
+	StandardEntityRenderer.prototype._applyOperation = function(object, context) {
 		if ( object._compositeOperation ) {
 			context.globalCompositeOperation = this.compositeOperations[object._compositeOperation];
 			this.compositeOperation = object._compositeOperation;
@@ -74,7 +74,7 @@
 	 * @method resetOperation
 	 * @abstract
 	 */
-	StandardRenderer.prototype.resetOperation = function(context) {
+	StandardEntityRenderer.prototype.resetOperation = function(context) {
 		context.globalCompositeOperation = this.compositeOperations[this.DEFAULT_COMPOSITE_OPERATION];
 		this.compositeOperation = this.DEFAULT_COMPOSITE_OPERATION;
 	};
@@ -83,9 +83,9 @@
 	 *
 	 * @method _applyOperation
 	 * @protected
-	 * @param {StandardRenderer} context
+	 * @param {StandardEntityRenderer} context
 	 */
-	StandardRenderer.prototype._applyAlpha = function(object, context) {
+	StandardEntityRenderer.prototype._applyAlpha = function(object, context) {
 		if ( object._alpha != null && this.alpha != object._alpha && object._alpha >= 0 && object._alpha <= 1 ) {
 			context.globalAlpha = this.alpha = object._alpha;
 		} else if (this.alpha != this.DEFAULT_ALPHA) {
@@ -96,7 +96,7 @@
 	 * @method resetAlpha
 	 * @abstract
 	 */
-	StandardRenderer.prototype.resetAlpha = function(context) {
+	StandardEntityRenderer.prototype.resetAlpha = function(context) {
 		context.globalAlpha = this.alpha = this.DEFAULT_ALPHA;
 	};
 	/**
@@ -104,9 +104,9 @@
 	 *
 	 * @method _applyShadow
 	 * @protected
-	 * @param {StandardRenderer} context
+	 * @param {StandardEntityRenderer} context
 	 */
-	StandardRenderer.prototype._applyShadow = function(object, context) {
+	StandardEntityRenderer.prototype._applyShadow = function(object, context) {
 		if ( object._shadow ) {
 			var s = object._shadow;
 			context.shadowOffsetX = this.shadowOffsetX = s.x;
@@ -122,7 +122,7 @@
 	 * @method resetShadow
 	 * @abstract
 	 */
-	StandardRenderer.prototype.resetShadow = function(context) {
+	StandardEntityRenderer.prototype.resetShadow = function(context) {
 		if ( this.shadowChanged ) {
 			if ( this.shadowBlur != this.DEFAULT_SHADOW_BLUR ) {
 				context.shadowBlur = this.shadowBlur = this.DEFAULT_SHADOW_BLUR;
@@ -145,7 +145,7 @@
 	 * @param {int} [cameraX] defaults to 0
 	 * @param {int} [cameraY] defaults to 0
 	 */
-	StandardRenderer.prototype._applyTranslation = function(object, context, cameraX, cameraY) {
+	StandardEntityRenderer.prototype._applyTranslation = function(object, context, cameraX, cameraY) {
 		context.translate(object._x - cameraX, object._y - cameraY);
 	};
 	/**
@@ -153,9 +153,9 @@
 	 *
 	 * @method _applyRotation
 	 * @protected
-	 * @param {StandardRenderer} context
+	 * @param {StandardEntityRenderer} context
 	 */
-	StandardRenderer.prototype._applyRotation = function(object, context) {
+	StandardEntityRenderer.prototype._applyRotation = function(object, context) {
 		if ( object._rotation ) {
 			context.rotate(object._rotation);
 		}
@@ -165,9 +165,9 @@
 	 *
 	 * @method _applyScale
 	 * @protected
-	 * @param {StandardRenderer} context
+	 * @param {StandardEntityRenderer} context
 	 */
-	StandardRenderer.prototype._applyScale = function(object, context) {
+	StandardEntityRenderer.prototype._applyScale = function(object, context) {
 		if ( object._scale ) {
 			context.scale(object._scale.x, object._scale.y);
 		}
@@ -177,7 +177,7 @@
 	 * @method clear
 	 * @param {HTMLContext2d} context to clear
 	 */
-	StandardRenderer.prototype.clear = function(context) {
+	StandardEntityRenderer.prototype.clear = function(context) {
 		context.clearRect(0,0, context.canvas.width, context.canvas.height);
 	};
 	
@@ -189,7 +189,7 @@
 	 * @param {CanvasRenderingContext2D} fronCanvas the canvas attached to the document where the game takes place
 	 * @param {OnLoopProperties} p useful objects for performance increase
 	 */
-	StandardRenderer.prototype.renderSingleBuffer = function(gameLayerList, frontCanvas, p) {
+	StandardEntityRenderer.prototype.renderSingleBuffer = function(gameLayerList, frontCanvas, p) {
 
 		/**
 		 * Cache variables that are used in this function
@@ -212,7 +212,7 @@
 	 * @param {CanvasRenderingContext2D} fronCanvas the canvas attached to the document where the game takes place
 	 * @param {OnLoopProperties} p useful objects for performance increase
 	 */
-	StandardRenderer.prototype.renderDoubleBuffer = function(gameLayerList, frontCanvas, p) {
+	StandardEntityRenderer.prototype.renderDoubleBuffer = function(gameLayerList, frontCanvas, p) {
 
 		/*
 		 * Cache variables that are used in this function
@@ -266,7 +266,7 @@
 	 *
 	 * @method updateBufferSize
 	 */
-	StandardRenderer.prototype.updateBufferSize = function() {
+	StandardEntityRenderer.prototype.updateBufferSize = function() {
 
 		if ( this.backBuffer && this.frontBuffer ) {
 			this.backBuffer.canvas.width = this.frontBuffer.canvas.width;
@@ -287,13 +287,13 @@
 	 * Updates the camera viewport to match the size of the game canvas
 	 * @method updateViewport
 	 */
-	StandardRenderer.prototype.updateViewport = function() {
+	StandardEntityRenderer.prototype.updateViewport = function() {
 		this.camera.setViewport( this.frontBuffer.canvas.width, this.frontBuffer.canvas.height );
 	};
-	StandardRenderer.prototype.getViewportSize = function() {
+	StandardEntityRenderer.prototype.getViewportSize = function() {
 		return { width: this.camera.viewportWidth, height: this.camera.viewportHeight };
 	};
-	StandardRenderer.prototype.renderRectangle = function(renderizable, context, cameraX, cameraY) {
+	StandardEntityRenderer.prototype.renderRectangle = function(renderizable, context, cameraX, cameraY) {
 
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
@@ -314,7 +314,7 @@
 				context.fillStyle = renderizable._fillStyle;
 			}
 
-			context.fillRect( -renderizable._halfWidth - pivotX, -renderizable._halfHeight - pivotY, renderizable._width, renderizable._height );
+			context.fillRect( pivotX, pivotY, renderizable._width, renderizable._height );
 
 			if ( renderizable._strokeStyle ) {
 
@@ -350,7 +350,7 @@
 		}
 
 		this._applyShadow(renderizable, context);
-
+		
 	};
 	/**
 	 * Renders the current text in the provided context
@@ -361,7 +361,7 @@
 	 * @param {int} cameraX
 	 * @param {int} cameraY
 	 */
-	StandardRenderer.prototype.renderText = function( renderizable, context, cameraX, cameraY ) {
+	StandardEntityRenderer.prototype.renderText = function( renderizable, context, cameraX, cameraY ) {
 
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
@@ -396,7 +396,7 @@
 		}
 
 	};
-	StandardRenderer.prototype.fillText = function(renderer, context, x , y) {
+	StandardEntityRenderer.prototype.fillText = function(renderer, context, x , y) {
 
 		if ( renderer.multiLine ) {
 			for ( var i = 0; i < renderer.multiLine.length; i++ ) {
@@ -422,7 +422,7 @@
 	 * @param {int} cameraX
 	 * @param {int} cameraY
 	 */
-	StandardRenderer.prototype.renderCircle = function( renderizable, context, cameraX, cameraY ) {
+	StandardEntityRenderer.prototype.renderCircle = function( renderizable, context, cameraX, cameraY ) {
 
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
@@ -482,7 +482,7 @@
 	 * @param {int} cameraX
 	 * @param {int} cameraY
 	 */
-	StandardRenderer.prototype.renderSprite = function( renderizable, context, cameraX, cameraY ) {
+	StandardEntityRenderer.prototype.renderSprite = function( renderizable, context, cameraX, cameraY ) {
 
 		if ( ! renderizable._image ) return;
 
@@ -524,7 +524,7 @@
 		this._applyShadow(context);
 
 	};
-	StandardRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight) {
+	StandardEntityRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight) {
 	
 		if ( layer.needsRedraw ) {
 
@@ -532,23 +532,32 @@
 				cameraY0 = cameraX * layer.parrallaxFactor.y,
 				cameraX1 = cameraX0 + viewportWidth,
 				cameraY1 = cameraY0 + viewportHeight,
-				current;
+				current,
+				currentView,
+				currentViews;
 
 			this.backBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
 
 			for ( var i = 0, l = layer.onRenderList.length; i < l; i++ ) {
 
 				current = layer.onRenderList[i];
-				
-				if ( this.isVisible(current, cameraX0, cameraY0, cameraX1, cameraY1) ) {
-				
-					this.render(current, this.backBuffer, cameraX, cameraY);
+				currentViews = current.views._values;
+
+				for ( var j = 0, jl = currentViews.length; j < jl; j++ ) {
+			
+					currentView = currentViews[j];
+			
+					if ( this.isVisible(currentView, cameraX0, cameraY0, cameraX1, cameraY1) ) {
+					
+						this.render(currentView, this.backBuffer, cameraX, cameraY);
+					
+					}
 				
 				}
-				
+
 			}
 
-			layer.needsRedraw = false;
+			// layer.needsRedraw = false;
 
 			this.frontBuffer.clearRect(0, 0, this.frontBuffer.canvas.width, this.frontBuffer.canvas.height);
 			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
@@ -571,7 +580,7 @@
 	 * @param {float} cameraY1 the bottom coordinate of the viewport
 	 * @return {Boolean}
 	 */
-    StandardRenderer.prototype.isVisible = function (object, cameraX0, cameraY0, cameraX1, cameraY1) {
+    StandardEntityRenderer.prototype.isVisible = function (object, cameraX0, cameraY0, cameraX1, cameraY1) {
     	
 		if ( object._alpha == 0 || !object._visible ) return false;
     	
@@ -589,23 +598,24 @@
 		return insideViewport; 
     
     };
-	StandardRenderer.prototype.render = function(object, context, cameraX, cameraY) {
+	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY) {
 
-		//TODO: We should store a renderer in the object and create a factory for the objects, that way we avoid any if statements
+		var types = M.renderers.TYPES;
+		
 		switch ( object.TYPE ) {
-			case M.renderers.TYPES.SPRITE:
+			case types.SPRITE:
 				this.renderSprite(object, context, cameraX, cameraY);
 				break;
-			case M.renderers.TYPES.LAYER:
+			case types.LAYER:
 				this.renderLayer(object, object._context, this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
 				break;
-			case M.renderers.TYPES.TEXT:
+			case types.TEXT:
 				this.renderText(object, context, cameraX, cameraY);
 				break;
-			case M.renderers.TYPES.RECTANGLE:
+			case types.RECTANGLE:
 				this.renderRectangle(object, context, cameraX, cameraY);
 				break;
-			case M.renderers.TYPES.CIRCLE:
+			case types.CIRCLE:
 				this.renderCircle(object, context, cameraX, cameraY);
 				break;
 			default:
@@ -620,8 +630,8 @@
 
 	};
 
-	M.extend(StandardRenderer, Renderer);
+	M.extend(StandardEntityRenderer, StandardRenderer);
 
-	M.renderers.StandardRenderer = StandardRenderer;
+	M.renderers.StandardEntityRenderer = StandardEntityRenderer;
 
-})(M.renderers.Renderer);
+})(M.renderers.StandardRenderer);

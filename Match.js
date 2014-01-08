@@ -365,6 +365,42 @@ var M = window.M || {},
 		this.onLoopProperties.orientation = orientation;
 		this._buildInputMapping();
 	};
+	Match.prototype.registerClass = function() {
+	
+		var namespace = arguments[0].split("\."),
+			clousure = arguments[arguments.length - 1],
+			current = window,
+			l = namespace.length - 1,
+			dependencies = [],
+			name;
+		
+		for ( var i = 0; i < l; i++ ) {
+			name = namespace[i];
+			if ( !current[name] ) {
+				current[name] = new Object();
+			}
+			current = current[name];
+		}
+		
+		if ( ! current[namespace[l]] ) {
+		
+			//Adds the default namespace as a dependency so it is available as the first argument of the clousure
+			// dependencies.push(current);
+			
+			for ( var i = 1; i < arguments.length - 1; i++ ) {
+				dependencies.push(arguments[i]);
+			}
+			
+			current[namespace[l]] = clousure.apply(clousure, dependencies);
+			current[namespace[l]].namespace = arguments[0];
+		
+		}
+
+	};
+	Match.prototype.registerPlugin = function() {
+		arguments[0] = "M.plugins." + arguments[0];
+		this.registerClass.apply(this, arguments);
+	};
 	/**
 	 * Calls the onLoop method on all elements in nodes
 	 * @method updateGameObjects
@@ -377,9 +413,7 @@ var M = window.M || {},
 
 			var node = nodes[i];
 
-			if ( this._applyInput ) {
-				this._applyInput(p, node);
-			}
+			this._applyInput(p, node);
 
 			if (node.onLoop) {
 				node.onLoop(p);

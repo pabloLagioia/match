@@ -114,6 +114,8 @@
 		this._fillStyle = value;
 		this.notifyChange();
 	};
+	Rectangle.prototype.setColor = Rectangle.prototype.setFillStyle;
+	Rectangle.prototype.getColor = Rectangle.prototype.getFillStyle;
 	/**
 	 * Sets the style used to stroke the rectangle
 	 *

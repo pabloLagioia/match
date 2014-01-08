@@ -11,11 +11,14 @@
 		if ( mode && mode.toLowerCase() == "webgl" && this.isWebGLSupported() ) {
 			return this.getWebGLRenderer(canvas);
 		} else {
-			return this.getStandardRenderer(canvas);
+			return this.getStandardEntityRenderer(canvas);
 		}
 	};
 	RenderingProvider.prototype.getStandardRenderer = function (canvas) {
 		return new M.renderers.StandardRenderer(canvas);
+	};
+	RenderingProvider.prototype.getStandardEntityRenderer = function (canvas) {
+		return new M.renderers.StandardEntityRenderer(canvas);
 	};
 
 	RenderingProvider.prototype.getWebGLRenderer = function (canvas) {

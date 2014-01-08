@@ -277,63 +277,6 @@
 	 * @return {HTMLCanvasElement} a canvas contaning the result of the rendering
 	 */
 	GameLayer.prototype.onLoop = function(p) {
-
-		// if ( p.debug ) {
-			// time = new Date().getTime()
-		// }
-
-		if ( this.needsRedraw ) {
-
-			var cameraX0 = p.camera._x * this.parrallaxFactor.x,
-				cameraY0 = p.camera._y * this.parrallaxFactor.y,
-				cameraX1 = cameraX0 + p.camera.viewportWidth,
-				cameraY1 = cameraY0 + p.camera.viewportHeight,
-				buffer = this.buffer,
-				canvas = buffer.canvas/*,
-				time*/;
-
-			this.clear(buffer, canvas);
-
-			this.renderGameObjects(this.onRenderList, buffer, canvas, cameraX0, cameraY0, cameraX1, cameraY1);
-
-			this.needsRedraw = false;
-
-			this.result = this.postProcessing.run(buffer);
-
-		}
-
-		if ( this.needsSorting ) {
-			this.sort();
-			this.needsSorting = false;
-		}
-
-		this._loopThroughAnimations();
-
-		// if ( p.debug ) {
-			// this._loopTime = new Date().getTime() - time;
-		// }
-
-		return this.result;
-
-	};
-	GameLayer.prototype.renderGameObjects = function(nodes, buffer, canvas, cameraX0, cameraY0, cameraX1, cameraY1) {
-		for ( var i = 0; i < nodes.length; i++ ) {
-
-			var node = nodes[i];
-
-			if (node.isVisible(cameraX0, cameraY0, cameraX1, cameraY1)) {
-
-				// renderer[node.renderingType](node);
-
-				node.onRender(buffer, canvas, cameraX0, cameraY0, cameraX1, cameraY1);
-				
-				if ( node.children ) {
-					this.renderGameObjects(node.children, buffer, canvas, cameraX0, cameraY0, cameraX1, cameraY1);
-				}
-
-			}
-
-		}
 	};
 	/**
 	 * Adds this layer to Match list of layers
@@ -391,9 +334,9 @@
 			throw new Error("Cannot push null Object to game layer");
 		}
 
-		if ( !object.onRender ) {
-			throw new Error(M.getObjectName(object) + " must implement onRender method");
-		}
+		// if ( !object.onRender ) {
+			// throw new Error(M.getObjectName(object) + " must implement onRender method");
+		// }
 
 		if ( !object.setZIndex ) {
 			// throw new Error(M.getObjectName(object) + " does not implement setZIndex method");
@@ -408,7 +351,7 @@
 		if ( !object._zIndex ) {
 			object._zIndex = this.onRenderList.length;
 		}
-
+/* 
 		if ( !object.notifyChange ) {
 			// throw new Error(M.getObjectName(object) + " does not implement notifyChange method. This method must inform the onwerLayer of any change in a value that would require a redraw action. ie: function() { this.ownerLayer.renderizableChanged(); } ownerLayer is added when the object is pushed into a layer by default");
 			console.warn(M.getObjectName(object) + " does not implement notifyChange method. This method must inform the onwerLayer of any change in a value that would require a redraw action. ie: function() { this.ownerLayer.renderizableChanged(); } ownerLayer is added when the object is pushed into a layer by default");
@@ -417,7 +360,7 @@
 					this.ownerLayer.renderizableChanged();
 				}
 			}
-		}
+		} */
 
 		if ( !object.notifyZIndexChange ) {
 			// throw new Error(M.getObjectName(object) + " does not implement notifyZIndexChange method. This method must inform the onwerLayer of any change in the zIndex so that the layer reorders its children. ie: function() { this.ownerLayer.zIndexChanged(); } ownerLayer is added when the object is pushed into a layer by default");

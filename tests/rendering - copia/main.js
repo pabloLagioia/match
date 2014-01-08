@@ -42,6 +42,8 @@ function main() {
 			layer.push(rect);
 			layer.push(text);
 			layer.push(sprite);
+
+			layer.push(tank);
 			
 		},
 		
