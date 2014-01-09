@@ -27,6 +27,10 @@
 		 * @type float
 		 */
 		this._y = 0;
+		
+		this.pivotX = 0;
+		this.pivotY = 0;
+		
 		/**
 		 * object width
 		 * @private
@@ -1194,6 +1198,8 @@
         this.height = y1 - y0;
         this._x = x0 + this.width / 2;
         this._y = y0 + this.height / 2;
+		this.pivotX = 0;
+		this.pivotY = 0;
     }
     Rectangle.prototype.getWidth = function() {
         return this.width;

@@ -3,7 +3,17 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 		<title>Match Rendering Tests</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+			}
+			canvas {
+				background-color: green
+			}
+		</style>
 		<script src="../../EventListener.js"></script>
+		<script src="../../DefaultLogger.js"></script>
 		<script src="../../Match.js"></script>
 		<script src="../../utils/ArrayList.js"></script>
 		<script src="../../utils/Ajax.js"></script>
@@ -46,6 +56,12 @@
 		<script src="../../SimpleMap.js"></script>
 		<script src="../../Entity.js"></script>
 		<script src="../../../editor/plugins/plugin-loader.php?plugins=debug"></script>
+		<script src="../../game/attributes/Location.js"></script>
+		<script src="../../game/behaviours/FixViews.js"></script>
+		<script src="../../game/behaviours/Move.js"></script>
+		<script src="../../game/behaviours/MonitorLocationAndRotation.js"></script>
+		<script src="../../game/behaviours/Collision.js"></script>
+		<script src="Tank.js"></script>
 		<script src="main.js"></script>
 	</head>
 	<body>

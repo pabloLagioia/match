@@ -99,7 +99,7 @@ var M = window.M || {},
 		if ( a.canPlayType( "audio/wav" ) != "" ) return ".wav";
 		if ( a.canPlayType( "audio/mp4" ) != "" ) return ".mp4";
 
-		console.warn("This browser does not support audio");
+		this.logger.warn("This browser does not support audio");
 
 	};
 
@@ -180,6 +180,7 @@ var M = window.M || {},
 	 */
 	function Match() {
 		
+		this.logger = new DefaultLogger();
 		/**
 		 * Determines whether to loop though the onLoop list
 		 * @property _isPlaying
@@ -281,6 +282,20 @@ var M = window.M || {},
 
 		this.plugins = {
 			html: {
+			}
+		};
+		
+		/**
+		 * Common game attributes and behaviours
+		 * @property game
+		 * @type Object
+		 */
+		this.game = {
+			behaviours: {
+			},
+			attributes: {
+			},
+			entities: {
 			}
 		};
 
@@ -400,6 +415,20 @@ var M = window.M || {},
 	Match.prototype.registerPlugin = function() {
 		arguments[0] = "M.plugins." + arguments[0];
 		this.registerClass.apply(this, arguments);
+	};
+	Match.prototype.registerBehaviour = function(name, func) {
+		if ( this.game.behaviours[name] == undefined ) {
+			this.game.behaviours[name] = func;
+		} else {
+			this.logger.warn("There already is a behaviour named " + name);
+		}
+	};
+	Match.prototype.registerAttribute = function(name, value) {
+		if ( this.game.attributes[name] == undefined ) {
+			this.game.attributes[name] = value;
+		} else {
+			this.logger.warn("There already is an attribute named " + name);
+		}
 	};
 	/**
 	 * Calls the onLoop method on all elements in nodes
@@ -1297,30 +1326,30 @@ var M = window.M || {},
 	// Match.prototype.create = function(name) {
 	// 	return this.game.entities[name]();
 	// };
-	Match.prototype.defineAttribute = function(name, value) {
-		this.game.attributes.add(name, value);
-	};
-	Match.prototype.defineBehaviour = function(name, value) {
-		this.game.behaviours.add(name, value);
-	};
-	Match.prototype.defineEntity = function(name, value) {
-		this.game.entities.add(name, value);
-	};
-	Match.prototype.defineAttributes = function(map) {
-		for ( var i in map ) {
-			this.defineAttribute(i, map[i]);
-		}
-	};
-	Match.prototype.defineBehaviours = function(map) {
-		for ( var i in map ) {
-			this.defineBehaviour(i, map[i]);
-		}
-	};
-	Match.prototype.defineEntities = function(entities) {
-		for ( var i in map ) {
-			this.defineEntity(i, map[i]);
-		}
-	};
+	// Match.prototype.defineAttribute = function(name, value) {
+		// this.game.attributes.add(name, value);
+	// };
+	// Match.prototype.defineBehaviour = function(name, value) {
+		// this.game.behaviours.add(name, value);
+	// };
+	// Match.prototype.defineEntity = function(name, value) {
+		// this.game.entities.add(name, value);
+	// };
+	// Match.prototype.defineAttributes = function(map) {
+		// for ( var i in map ) {
+			// this.defineAttribute(i, map[i]);
+		// }
+	// };
+	// Match.prototype.defineBehaviours = function(map) {
+		// for ( var i in map ) {
+			// this.defineBehaviour(i, map[i]);
+		// }
+	// };
+	// Match.prototype.defineEntities = function(entities) {
+		// for ( var i in map ) {
+			// this.defineEntity(i, map[i]);
+		// }
+	// };
 	// Match.prototype.createEntity = function(name) {
 	// 	return this.game.entities[name]();
 	// };
@@ -1332,23 +1361,6 @@ var M = window.M || {},
 	// };
 	/********************************************************************************************************/
 	
-	/* Save console usage for debugging purposes */
-	if ( window.console ) {
-
-		if ( window.console.log ) {
-			window.console.debug = window.console.log;
-		}
-		if ( ! window.console.warn ) {
-			window.console.warn = window.console.debug;
-		}
-
-	} else {
-
-		window.console = {};
-		window.console.log = window.console.debug = window.console.error = window.console.warning = function() {};
-
-	}
-
 	if ( !window.requestAnimationFrame ) {
 
 		window.requestAnimationFrame = 

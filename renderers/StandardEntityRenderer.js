@@ -298,14 +298,13 @@
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
 		
+		var pivotX = renderizable.pivotX || -renderizable._halfWidth,
+			pivotY = renderizable.pivotY || -renderizable._halfHeight;
 
 		if ( renderizable._rotation || renderizable._scale ) {
-
+		
 			context.save();
-			
-			var pivotX = renderizable.pivotX || 0,
-				pivotY = renderizable.pivotY || 0;
-			
+
 			this._applyTranslation(renderizable, context, cameraX, cameraY);
 			this._applyRotation(renderizable, context);
 			this._applyScale(renderizable, context);
@@ -323,7 +322,7 @@
 				}
 
 				context.strokeStyle = renderizable._strokeStyle;
-				context.strokeRect( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
+				context.strokeRect( pivotX, pivotY, renderizable._width, renderizable._height );
 			}
 
 			context.restore();
@@ -334,7 +333,7 @@
 				context.fillStyle = renderizable._fillStyle;
 			}
 		
-			context.fillRect( renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight, renderizable._width, renderizable._height );
+			context.fillRect( renderizable._x + pivotX, renderizable._y + pivotY, renderizable._width, renderizable._height );
 
 			if ( renderizable._strokeStyle ) {
 
@@ -343,7 +342,7 @@
 				}
 
 				context.strokeStyle = renderizable._strokeStyle;
-				context.strokeRect( renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight, renderizable._width, renderizable._height );
+				context.strokeRect( renderizable._x + pivotX, renderizable._y + pivotY, renderizable._width, renderizable._height );
 
 			}
 
@@ -559,7 +558,6 @@
 
 			// layer.needsRedraw = false;
 
-			this.frontBuffer.clearRect(0, 0, this.frontBuffer.canvas.width, this.frontBuffer.canvas.height);
 			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
 
 		}

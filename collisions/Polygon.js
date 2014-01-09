@@ -26,7 +26,7 @@
             
 			this.rotate(vertices, renderizable._rotation);
             
-            this.translate(vertices, renderizable._x, renderizable._y);
+            this.translate(vertices, renderizable._x + renderizable.pivotX, renderizable._y + renderizable.pivotY);
 
 			return vertices;
 

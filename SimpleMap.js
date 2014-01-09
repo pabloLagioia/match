@@ -24,7 +24,7 @@
 	 * @param {Object} key object representing unique id
 	 * @param {Object} value value to add
 	 */
-	SimpleMap.prototype.push = function(key, value) {
+	SimpleMap.prototype.set = function(key, value) {
 
 		var existingIndex = this._keys[key];
 
@@ -38,6 +38,7 @@
 		this.length++;
 
 	};
+	SimpleMap.prototype.push = SimpleMap.prototype.set;
 	/**
 	 * Gets the item that matches the given key
 	 * @method get
