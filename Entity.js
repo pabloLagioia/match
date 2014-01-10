@@ -9,7 +9,7 @@
 		if ( typeof value == "function" ) {
 			value = new value;
 		}
-		this.attributes.push(this.name, actualName);
+		this.attributes.set(this.name, actualName);
 		return value;
 	}
 	
@@ -22,7 +22,7 @@
 		if ( typeof value == "function" ) {
 			value = new value;
 		}
-		this.views.push(this.name, value);
+		this.views.set(this.name, value);
 		return value;
 	};
 
@@ -67,7 +67,7 @@
 				return new StoreAs(name, this.attributes);
 			}
 		}
-		this.attributes.push(name, value);
+		this.attributes.set(name, value);
 		return value;
 	};
 	
@@ -78,7 +78,7 @@
 		if ( value == undefined ) {
 			M.logger.error("Cannot add undefined behaviour " + name + " to entity");
 		} else {
-			this.behaviours.push(name, value);
+			this.behaviours.set(name, value);
 		}
 	};
 
@@ -86,7 +86,7 @@
 		if ( value == undefined ) {
 			return new ShowsAs(name, this.views);
 		} else {
-			this.views.push(name, value);
+			this.views.set(name, value);
 		}
 	};
 

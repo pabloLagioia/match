@@ -12,7 +12,7 @@
 	 * @param {Object} [properties] properties to construct this object
 	 */
     function Renderizable(properties) {
-    	M.GameObject.call(this);
+    	this.extendsGameObject();
 		/**
 		 * X coordinate of the object
 		 * @private
@@ -28,8 +28,8 @@
 		 */
 		this._y = 0;
 		
-		this.pivotX = 0;
-		this.pivotY = 0;
+		this.pivotX = null;
+		this.pivotY = null;
 		
 		/**
 		 * object width
@@ -106,20 +106,6 @@
 		 * @type ArrayList
 		 */
         this.chainedAnimations = new M.ArrayList();
-        /**
-		 * Array that contains behaviours for this object
-		 * @private
-		 * @property behaviours
-		 * @type ArrayList
-		 */
-        this.attributes = {};
-        /**
-		 * Array that contains behaviours for this object
-		 * @private
-		 * @property behaviours
-		 * @type ArrayList
-		 */
-        this.behaviours = new M.ArrayList();
 		/**
 		 * Index of the behaviour that's being executed at the moment
 		 * @private
@@ -154,44 +140,13 @@
         this.set(properties);
 
 	}
-	Renderizable.prototype.addAttribute = function(name, attribute) {
-		this.attributes[name] = attribute;
-	};
-	Renderizable.prototype.addBehaviour = function(behaviour) {
-		this.behaviours.push(behaviour);
-	};
-	Renderizable.prototype.addAttributes = function(map) {
-		for ( var i in map ) {
-			this.addAttribute(i, map[i]);
-		}
-	};
-	Renderizable.prototype.addBehaviours = function() {
-		for ( var i = 0; i < arguments.length; i++ ) {
-			this.behaviours.push(arguments[i]);
-		}
-	};
-	Renderizable.prototype.removeBehaviours = function() {
-		for ( var i in arguments ) {
-			this.behaviours.splice(this.behaviours.indexOf(i), 1);
-		}
-	};
-	Renderizable.prototype.removeAttributes = function() {
-		for ( var i in arguments ) {
-			this.attributes[i] = null;
-		}
-	};
-	Renderizable.prototype.replaceBehaviour = function(out, in_) {
-		this.behaviours[this.behaviours.indexOf(out)] = in_;
-	};
-	Renderizable.prototype.replaceAttribute = function(name, in_) {
-		this.attributes[name] = in_;
-	};
 	/**
 	 * Notifies owner layer about a change in this object
 	 * @method notifyChange
 	 */
 	Renderizable.prototype.notifyChange = function() {
 		this.ownerLayer&&this.ownerLayer.renderizableChanged();
+		return this;
 	};
 	/**
 	 * Notifies owner layer about a change in the zIndex this object
@@ -199,6 +154,7 @@
 	 */
 	Renderizable.prototype.notifyZIndexChange = function() {
 		this.ownerLayer&&this.ownerLayer.zIndexChanged();
+		return this;
 	};
 	/**
 	 * @private
@@ -235,6 +191,7 @@
                 this[i] = properties[i];
             }
         }
+		return this;
     };
 	/**
 	 * Sets the transparency of the object
@@ -248,6 +205,7 @@
 		} else {
 			this._alpha = null;
 		}
+		return this;
 	};
 	/**
 	 * Gets the transparency of the object
@@ -290,6 +248,7 @@
 	 */
 	Renderizable.prototype.clearAnimations = function () {
 		this.animations = new Array();
+		return this;
 	};
 	/**
 	 * Adds a fade in animation to this object
@@ -541,6 +500,7 @@
         this._zIndex = value;
         this.notifyChange();
         this.notifyZIndexChange();
+		return this;
     };
 	/**
 	 * Gets the zIndex of this object
@@ -558,6 +518,7 @@
     Renderizable.prototype.setVisible = function (value) {
         this._visible = value;
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Sets the width of this object
@@ -568,6 +529,7 @@
         this._width = value;
         this._halfWidth = value / 2;
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Sets the height of this object
@@ -578,6 +540,7 @@
         this._height = value;
         this._halfHeight = value / 2;
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Gets the width of this object
@@ -612,6 +575,7 @@
     Renderizable.prototype.setSize = function (width, height) {
         this.setWidth(width);
         this.setHeight(height);
+		return this;
     };
 	/**
 	 * Returns the width and height of this object
@@ -635,6 +599,7 @@
             y: y
         };
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Sets the scale width factor
@@ -648,6 +613,7 @@
 		}
         this._scale.x = x;
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Sets the scale height factor
@@ -661,6 +627,7 @@
 		}
 		this._scale.y = y;
 		this.notifyChange();
+		return this;
 	};
 	/**
 	 * Inverts the object in the x axis
@@ -669,6 +636,7 @@
 	 */
 	Renderizable.prototype.mirror = function () {
 		this.invertX();
+		return this;
 	};
 	/**
 	 * Inverts the object in the x axis
@@ -682,6 +650,7 @@
 		}
         this._scale.x *= -1;
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Inverts the object in the y axis
@@ -695,6 +664,7 @@
 		}
         this._scale.y = -1;
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Returns x coordinate representing the leftmost part of the Object
@@ -797,6 +767,7 @@
 			this.children[i].setLeft();
 		}
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Sets the rightmost coordinates of the Object
@@ -811,8 +782,8 @@
         } else {
             this._x = value - this._halfWidth;
         }
-		this.updateChildrenPosition();
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Sets the topmost coordinates of the Object
@@ -827,8 +798,8 @@
         } else {
             this._y = value + this._halfHeight;
         }
-		this.updateChildrenPosition();
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Sets the bottommost coordinates of the Object
@@ -843,8 +814,8 @@
         } else {
             this._y = value - this._halfHeight;
         }
-		this.updateChildrenPosition();
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Returns an object containing the x and y coordinates of the object
@@ -872,8 +843,8 @@
 		this.prevY = this._y;
 		this._x = x;
 		this._y = y;
-		this.updateChildrenPosition();
 		this.notifyChange();
+		return this;
     };
 	/**
 	 * Returns true if this object moved in the x axis
@@ -893,90 +864,6 @@
 	Renderizable.prototype.movedInY = function () {
 		return this.prevY != this._y;
 	};
-	/**
-	 * Applies the operation of this object to the provided context as composite operation
-	 *
-	 * @method _applyOperation
-	 * @protected
-	 * @param {CanvasRenderingContext2D} context
-	 */
-	Renderizable.prototype._applyOperation = function(context) {
-		if ( this.operation ) {
-			context.globalCompositeOperation = this.operation;
-			context.operationChanged = false;
-		} else if (context.operationChanged) {
-			context.resetOperation();
-		}
-	};
-	/**
-	 * Applies the alpha of this object to the provided context
-	 *
-	 * @method _applyOperation
-	 * @protected
-	 * @param {CanvasRenderingContext2D} context
-	 */
-	Renderizable.prototype._applyAlpha = function(context) {
-		if ( this._alpha != null && this._alpha >= 0 && this._alpha <= 1 ) {
-			context.globalAlpha = this._alpha;
-			context.alphaChanged = true;
-		} else if (context.alphaChanged) {
-			context.resetAlpha();
-		}
-	};
-	/**
-	 * Applies the shadow of this object to the provided context
-	 *
-	 * @method _applyShadow
-	 * @protected
-	 * @param {CanvasRenderingContext2D} context
-	 */
-	Renderizable.prototype._applyShadow = function(context) {
-		if ( this._shadow ) {
-			context.shadowOffsetX = this._shadow.x;
-			context.shadowOffsetY = this._shadow.y;
-			context.shadowColor = this._shadow.color;
-			context.shadowBlur = this._shadow.blur;
-			context.shadowChanged = false;
-		} else if (context.shadowChanged) {
-			context.resetShadow();
-		}
-	};
-	/**
-	 * Applies the translation of this object to the provided context using the camera coordinates or 0
-	 *
-	 * @method _applyTranslation
-	 * @protected
-	 * @param {CanvasRenderingContext2D} context
-	 * @param {int} [cameraX] defaults to 0
-	 * @param {int} [cameraY] defaults to 0
-	 */
-	Renderizable.prototype._applyTranslation = function(context, cameraX, cameraY) {
-		context.translate(this._x - cameraX, this._y - cameraY);
-	};
-	/**
-	 * Applies the rotation of this object to the provided context
-	 *
-	 * @method _applyRotation
-	 * @protected
-	 * @param {CanvasRenderingContext2D} context
-	 */
-	Renderizable.prototype._applyRotation = function(context) {
-		if ( this._rotation ) {
-			context.rotate(this._rotation);
-		}
-	};
-	/**
-	 * Applies the scale factor of this object to the provided context
-	 *
-	 * @method _applyScale
-	 * @protected
-	 * @param {CanvasRenderingContext2D} context
-	 */
-	Renderizable.prototype._applyScale = function(context) {
-		if ( this._scale ) {
-			context.scale(this._scale.x, this._scale.y);
-		}
-	};
     /**
 	 * Offsets the alpha value
 	 *
@@ -986,6 +873,7 @@
     Renderizable.prototype.offsetAlpha = function(offset) {
         this._alpha += offset;
         this.notifyChange();
+		return this;
     };
     /**
 	 * Offsets the rotation
@@ -996,35 +884,8 @@
     Renderizable.prototype.offsetRotation = function(offset) {
         this._rotation += offset;
         this.notifyChange();
+		return this;
     };
-	/**
-	 * Returns whether this object is inside the given rectangle
-	 *
-	 * @method isIn
-	 * @param {float} x0 begining x coordinate
-	 * @param {float} y0 begining y coordinate
-	 * @param {float} x1 final x coordinate
-	 * @param {float} y1 final y coordinate
-	 * @return {Boolean}
-	 */
-    Renderizable.prototype.isIn = function(x0, y0, x1, y1) {
-
-        if (this._rotation) {
-			/* Check using polygon collision */
-			/*
-			 * TODO: We might optimize this. Save the rectangle as a collision area, update it 
-			 * only if rotation has changed and pass it to haveCollided and cache M.collisions.Polygon
-			 */
-            return M.collisions.Polygon.haveCollided(this, new Rectangle(x0, y0, x1, y1));
-        } else {
-            if (this.getBottom() < y0) return false;
-            if (this.getTop() > y1) return false;
-            if (this.getRight() < x0) return false;
-            if (this.getLeft() > x1) return false;
-            return true;
-        }
-
-    }
 	/**
 	 * Sets the rotation angle of this object
 	 *
@@ -1034,6 +895,7 @@
 	Renderizable.prototype.setRotation = function (rotation) {
 		this._rotation = rotation;
 		this.notifyChange();
+		return this;
 	};
 	/**
 	 * Gets the rotation angle of this object
@@ -1053,8 +915,8 @@
 	Renderizable.prototype.setX = function (x) {
 		this.prevX = this._x;
 		this._x = x;
-		this.updateChildrenPosition();
 		this.notifyChange();
+		return this;
 	};
 	/**
 	 * Sets the y coordinate of this object
@@ -1065,18 +927,12 @@
 	Renderizable.prototype.setY = function (y) {
 		this.prevY = this._y;
 		this._y = y;
-		this.updateChildrenPosition();
 		this.notifyChange();
+		return this;
     };
-	Renderizable.prototype.updateChildrenPosition = function () {
-		if ( this.children ) {
-			for ( var i in this.children ) {
-				this.children[i].offset(this.prevX - this._x, this.prevY - this._y);
-			}
-		}
-	};
 	Renderizable.prototype.remove = function () {
 		this.ownerLayer.remove(this);
+		return this;
 	};
 	/**
 	 * Adds the given x and y coordinates to those of the object
@@ -1101,9 +957,10 @@
 		}
 
 		if ( notify ) {
-			this.updateChildrenPosition();
     	    this.notifyChange();
     	}
+		
+		return this;
 
     };
 	/**
@@ -1115,8 +972,8 @@
     Renderizable.prototype.offsetX = function (x) {
 		this.prevX = this._x;
 		this._x += x;
-		this.updateChildrenPosition();
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Adds the given y coordinates to that of the object
@@ -1127,8 +984,8 @@
     Renderizable.prototype.offsetY = function (y) {
 		this.prevY = this._y;
 		this._y += y;
-		this.updateChildrenPosition();
         this.notifyChange();
+		return this;
     };
 	/**
 	 * Centers the object at the given vector2d object
@@ -1138,6 +995,7 @@
 	 */
 	Renderizable.prototype.centerAt = function (vector2d) {
 		this.setLocation(vector2d.x, vector2d.y);
+		return this;
     };
 	/**
 	 * Returns the x coordinate of this object that belongs to it's center
@@ -1157,18 +1015,6 @@
 	 Renderizable.prototype.getY = function () {
         return this._y;
     };
-	/**
-	 * Abstract method. Renders the object
-	 *
-	 * @method onRender
-	 * @param {CanvasRenderingContext2D} context
-	 * @param {HTMLCanvasElement} canvas
-	 * @param {int} cameraX
-	 * @param {int} cameraY
-	 */
-    Renderizable.prototype.onRender = function() {
-		throw new Error("Method onRender must be overriden");
-	};
     /**
 	 * Returns the biggest number between width and height
 	 *
@@ -1192,21 +1038,5 @@
 
 	M.renderers = M.renderers || {};
 	M.renderers.Renderizable = Renderizable;
-
-    function Rectangle(x0, y0, x1, y1) {
-        this.width = x1 - x0;
-        this.height = y1 - y0;
-        this._x = x0 + this.width / 2;
-        this._y = y0 + this.height / 2;
-		this.pivotX = 0;
-		this.pivotY = 0;
-    }
-    Rectangle.prototype.getWidth = function() {
-        return this.width;
-    };
-    Rectangle.prototype.getHeight = function() {
-        return this.height;
-    };
-
 
 })(M, M.effects.visual);

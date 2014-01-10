@@ -13,20 +13,6 @@
 	 */
 	function GameLayer(name, zIndex) {
 		/**
-		 * Object that applies post processing to the layer.
-		 * By default no actions are taken.
-		 * @property buffer
-		 * @type M.postProcess
-		 */
-		this.postProcessing = new M.postProcess.NoPostProcess();
-		/**
-		 * Buffer context where the rendering of this layer takes place
-		 * @property buffer
-		 * @private
-		 * @type CanvasRenderingContext2D
-		 */
-		this.buffer = document.createElement("canvas").getContext("2d");
-		/**
 		 * Array of Renderizables
 		 * @property onRenderList
 		 * @private
@@ -107,16 +93,9 @@
 		 */
 		this._zIndex = zIndex || 0;
 
-		this.result = this.buffer.canvas;
-
-		if ( M.frontBuffer ) {
-			this.setSize(M.frontBuffer.canvas.width, M.frontBuffer.canvas.height);
-		}
-		
 		this.TYPE = M.renderers.TYPES.LAYER;
 
 	}
-
 	/**
 	 * Loops through the animations of the object
 	 * @private
@@ -171,104 +150,6 @@
 		this._onLoopAnimations.push(new M.effects.visual.ContinousFade(this, seconds, fadeOutFirst, min, max));
 		return this;
 	};
-	/**
-	 * Sets the size of the buffer using the given canvas
-	 *
-	 * @method setBufferSize
-	 * @param {HTMLCanvasElement} canvas from where to take size
-	 */
-	GameLayer.prototype.setBufferSize = function(canvas) {
-		if ( ! (canvas instanceof HTMLCanvasElement) ) {
-			throw new Error("setBufferSize is expecting an HTMLCanvasElement as argument");
-		}
-		this.buffer.canvas.width = arguments[0].width;
-		this.buffer.canvas.height = arguments[0].height;
-	};
-	/**
-	 * Sets the antialiasing of the buffer
-	 *
-	 * @method setAntialiasing
-	 * @param {Boolean} value
-	 */
-	GameLayer.prototype.setAntialiasing = function(value) {
-		this.buffer.mozImageSmoothingEnabled = value;
-		this.buffer.webkitImageSmoothingEnabled = value;
-		this.buffer.mozImageSmoothingEnabled = value;
-		this.buffer.webkitImageSmoothingEnabled = value;
-	};
-	/**
-	 * Gets the width of the layer
-	 * @method getWidth
-	 * @return {float} the width
-	 */
-	GameLayer.prototype.getWidth = function() {
-		return this.buffer.canvas.width;
-	};
-	/**
-	 * Gets the height of the layer
-	 * @method getHeight
-	 * @return {float} the height
-	 */
-	GameLayer.prototype.getHeight = function() {
-		return this.buffer.canvas.height;
-	};
-	/**
-	 * Sets the width of the layer
-	 * @method setWidth
-	 * @param {float} value the width
-	 */
-	GameLayer.prototype.setWidth = function(value) {
-		this.buffer.canvas.width = value;
-	};
-	/**
-	 * Sets the height of the layer
-	 * @method setHeight
-	 * @param {float} value the height
-	 */
-	GameLayer.prototype.setHeight = function(value) {
-		this.buffer.canvas.height = value;
-	};
-	GameLayer.prototype.setSize = function(width, height) {
-		this.setWidth(width);
-		this.setHeight(height);
-	};
-	/**
-	 * Gets the center of the layer
-	 * @method getCenter
-	 * @return {Object} object containing x and y
-	 */
-	GameLayer.prototype.getCenter = function() {
-		return new M.math2d.Vector2d( this.buffer.canvas.width / 2, this.buffer.canvas.height / 2 );
-	};
-	/**
-	 * Clears the buffer
-	 * @method clearUsingDefault
-	 * @param {HTMLContext2d} buffer the context to clear
-	 * @param {CanvasRenderingContext2D} canvas the canvas to clear
-	 */
-	GameLayer.prototype.clearUsingDefault = function(buffer, canvas) {
-		buffer.clearRect(0,0, canvas.width, canvas.height);
-	};
-	/**
-	 * Clears the buffer using a fill color
-	 * @method clearUsingFillColor
-	 * @param {HTMLContext2d} buffer the context to clear
-	 * @param {CanvasRenderingContext2D} canvas the canvas to clear
-	 */
-	GameLayer.prototype.clearUsingFillColor = function(buffer, canvas) {
-		buffer.fillStyle = this.clearColor;
-		buffer.fillRect(0,0, canvas.width, canvas.height);
-	};
-	/**
-	 * Clears the buffer using an image
-	 * @method clearUsingImage
-	 * @param {HTMLContext2d} buffer the context to clear
-	 * @param {CanvasRenderingContext2D} canvas the canvas to clear
-	 */
-	GameLayer.prototype.clearUsingImage = function(buffer, canvas) {
-		buffer.drawImage(this.clearImage, 0, 0);
-	};
-	GameLayer.prototype.clear = GameLayer.prototype.clearUsingDefault;
 	/**
 	 * Loops through every renderizable and renderizes it if it is visible
 	 * @method onLoop
@@ -429,24 +310,6 @@
 		}
 	};
 	/**
-	 * Gets the contents of this layer as an image in base64
-	 * @method getAsBase64Image
-	 * @return {String} a string representing an image in base64
-	 */
-	GameLayer.prototype.getAsBase64Image = function() {
-		return this.buffer.canvas.toDataURL();
-	};
-	/**
-	 * Gets the contents of this layer as an html image
-	 * @method getAsImage
-	 * @return {HTMLImageElement} an image element with the result of this layer
-	 */
-	GameLayer.prototype.getAsImage = function() {
-		var img = new Image();
-		img.src = this.getAsBase64Image();
-		return img;
-	};
-	/**
 	 * Gets the element matching the provided key
 	 * @method get
 	 * @param {String} key
@@ -549,41 +412,6 @@
 	GameLayer.prototype.removeAll = function() {
 		this.onRenderList = [];
 	};
-	/**
-	 * Sets the background of the buffer
-	 *
-	 * @method setBackground
-	 * @param {String} background a color, sprite name or null
-	 * @example
-			this.setBackground("black");
-			this.setBackground("rgb(0, 100, 100)");
-			this.setBackground("skySprite");
-			this.setBackground(); //sets default background
-			this.setBackground(""); //sets default background
-	 */
-	GameLayer.prototype.setBackground = function(background) {
-		if ( !background == "" && typeof background == "string" ) {
-			if ( M.sprites[background] ) {
-				this.clearImage = M.sprites[background]._image;
-				this.clear = this.clearUsingImage;
-			} else {
-				this.clearColor = background;
-				this.clear = this.clearUsingFillColor;
-			}
-		} else {
-			this.clear = this.clearUsingDefault;
-		}
-	};
-	/**
-	 * Gets the background of the buffer
-	 *
-	 * @method getBackground
-	 * @return {String} a css string representing the background
-	 */
-	GameLayer.prototype.getBackground = function() {
-		return this.buffer.canvas.getPropertyValue("background");
-	};
-
 
 	M.GameLayer = M.Layer = GameLayer;
 

@@ -52,6 +52,7 @@
 		 * @private 
 		 */
 		this._halfViewportWidth = 0;
+		
 	}
 	/**
 	 * Sets viewport width, hight and halfs sizes
@@ -60,10 +61,13 @@
 	 * @param {int} height
 	 */
 	Camera.prototype.setViewport = function(width, height) {
+	
 		this.viewportWidth = width;
 		this.viewportHeight = height;
+		
 		this._halfViewportWidth = width / 2;
 		this._halfViewportHeight = height / 2;
+		
 	}
 	/**
 	 * Centers the camera at the given Renderizable
@@ -71,8 +75,7 @@
 	 * @param {renderers.Renderizable} renderizable
 	 */
 	Camera.prototype.centerAtRenderizable = function(renderizable) {
-		this.x = renderizable._x - this._halfViewportWidth;
-		this.y = renderizable._y - this._halfViewportHeight;
+		this.centerAt(renderizable._x, renderizable._y);
 	};
 	/**
 	 * Centers the camera at the given coordinates
@@ -81,8 +84,8 @@
 	 * @param {y} integer
 	 */
 	Camera.prototype.centerAt = function(x, y) {
-		this.x = x - this._halfViewportWidth;
-		this.y = y - this._halfViewportHeight;
+		this._x = x - this._halfViewportWidth;
+		this._y = y - this._halfViewportHeight;
 		M.redrawAllLayers();
 	};
 
@@ -126,6 +129,30 @@
 
 	Camera.prototype.getRightFromLayer = function(layer) {
 		return this.getLeftFromLayer(layer) + this.viewportWidth;
+	};
+	/**
+	 * We use Square collision detection to determine if the
+	 * object is visible or not
+	 */
+	Camera.prototype.canSee = function(renderizable) {
+		
+		if ( renderizable._alpha == 0 || !renderizable._visible ) return false;
+		
+		var sizeObj = 0;
+		
+		if ( renderizable._halfWidth > renderizable._halfHeight ) {
+			sizeObj = renderizable._halfWidth;
+		} else {
+			sizeObj = renderizable._halfHeight;
+		}
+		
+		if ( this._y + this.viewportHeight < renderizable._y - sizeObj ) return false;
+		if ( this._y - this.viewportHeight > renderizable._y + sizeObj ) return false;
+		if ( this._x + this.viewportWidth < renderizable._x - sizeObj ) return false;
+		if ( this._x - this.viewportWidth > renderizable._x + sizeObj ) return false;
+		
+		return true;
+		
 	};
 	
 	M.Camera = Camera;

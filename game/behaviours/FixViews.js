@@ -21,8 +21,9 @@
 						y: currentView.getY()
 					}
 				}
+				
 				if ( currentView._initialRotation == undefined ) {
-					currentView._initialRotation = currentView.getRotation()
+					currentView._initialRotation = currentView.getRotation();
 				}
 				
 				currentView.setX(location.x + currentView._initialLocation.x);
@@ -30,6 +31,8 @@
 				currentView.setRotation(rotation + currentView._initialRotation);
 				
 			}
+		
+		// M.renderer.camera.centerAtRenderizable(views.get("base"));
 		
 		// }
 	

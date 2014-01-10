@@ -37,7 +37,6 @@ function main() {
 				tree.shows("tree").as("sprite").setImage("tree");
 				tree.view("tree").setLocation(M.random.integer(0, 640), M.random.integer(0, 480));
 				tree.has("collisionGroup", 0);
-				// tree.does("collide");
 				terrainLayer.push(tree);
 			}
 		
@@ -45,15 +44,13 @@ function main() {
 
 			// for ( var i = 0; i < 1; i++ ) {
 				tank = M.game.entities.createTank();
-				tank.attribute("location").set(M.random.integer(0, 640), M.random.integer(0, 480));
-				// tank.attribute("location").set(100, 100);
+				// tank.attribute("location").set(M.random.integer(0, 640), M.random.integer(0, 480));
 				layer.push(tank);
-			// }
+			// }			
 			
-			// M.renderer.camera.viewport.x = 100;
-			// M.renderer.camera.viewport.y = 100;
-			// M.renderer.camera.viewportWidth = 300;
-			// M.renderer.camera.viewportHeight = 300;
+			// M.renderer.camera.setViewport(300, 300);
+			
+			layer.push(object);
 			
 			M.plugins.Debug.enable();
 			

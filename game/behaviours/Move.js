@@ -6,7 +6,7 @@
 			direction = attributes.get("direction"),
 			location = attributes.get("location");
 		
-		if ( speed > 0 ) {
+		if ( speed != 0 ) {
 		
 			location.prevX = location.x;
 			location.prevY = location.y;
@@ -15,7 +15,7 @@
 			location.y += speed * direction.y;
 			
 		}
-		
+				
 	});
 
 })(M);

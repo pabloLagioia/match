@@ -38,7 +38,6 @@
 		this.length++;
 
 	};
-	SimpleMap.prototype.push = SimpleMap.prototype.set;
 	/**
 	 * Gets the item that matches the given key
 	 * @method get
@@ -100,6 +99,3 @@
 	namespace.SimpleMap = SimpleMap;
 
 })(window);
-
-var m = new SimpleMap
-m.push("pedo", {a: 100})

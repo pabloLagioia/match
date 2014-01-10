@@ -180,13 +180,12 @@
 	StandardEntityRenderer.prototype.clear = function(context) {
 		context.clearRect(0,0, context.canvas.width, context.canvas.height);
 	};
-	
 	/**
 	 * Renders the contents of the layers to the game canvas without using a middle buffer. This may result in flickering
 	 * in some systems and does not allow applying properties to layers
 	 * @method renderSingleBuffer
 	 * @param {Array} gameLayerList array of game layers
-	 * @param {CanvasRenderingContext2D} fronCanvas the canvas attached to the document where the game takes place
+	 * @param {CanvasRenderingContext2D} frontCanvas the canvas attached to the document where the game takes place
 	 * @param {OnLoopProperties} p useful objects for performance increase
 	 */
 	StandardEntityRenderer.prototype.renderSingleBuffer = function(gameLayerList, frontCanvas, p) {
@@ -209,7 +208,7 @@
 	 * Renders the contents of the layers to the game canvas using a middle buffer to avoid flickering. Enables the use of layer properties
 	 * @method renderDoubleBuffer
 	 * @param {Array} gameLayerList array of game layers
-	 * @param {CanvasRenderingContext2D} fronCanvas the canvas attached to the document where the game takes place
+	 * @param {CanvasRenderingContext2D} frontCanvas the canvas attached to the document where the game takes place
 	 * @param {OnLoopProperties} p useful objects for performance increase
 	 */
 	StandardEntityRenderer.prototype.renderDoubleBuffer = function(gameLayerList, frontCanvas, p) {
@@ -298,21 +297,31 @@
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
 		
-		var pivotX = renderizable.pivotX || -renderizable._halfWidth,
-			pivotY = renderizable.pivotY || -renderizable._halfHeight;
+		var pivotX, pivotY;
+		
+		if ( renderizable.pivotX != null ) {
+			pivotX = renderizable.pivotX;
+		} else {
+			pivotX = -renderizable._halfWidth;
+		}
+		if ( renderizable.pivotY != null ) {
+			pivotY = renderizable.pivotY;
+		} else {
+			pivotY = -renderizable._halfHeight;
+		}
 
 		if ( renderizable._rotation || renderizable._scale ) {
 		
 			context.save();
 
-			this._applyTranslation(renderizable, context, cameraX, cameraY);
+			context.translate(renderizable._x - cameraX, renderizable._y - cameraY);
 			this._applyRotation(renderizable, context);
 			this._applyScale(renderizable, context);
 			
 			if ( renderizable._fillStyle ) {
 				context.fillStyle = renderizable._fillStyle;
 			}
-
+			
 			context.fillRect( pivotX, pivotY, renderizable._width, renderizable._height );
 
 			if ( renderizable._strokeStyle ) {
@@ -332,9 +341,9 @@
 			if ( renderizable._fillStyle ) {
 				context.fillStyle = renderizable._fillStyle;
 			}
-		
+			
 			context.fillRect( renderizable._x + pivotX, renderizable._y + pivotY, renderizable._width, renderizable._height );
-
+			
 			if ( renderizable._strokeStyle ) {
 
 				if ( renderizable._lineWidth ) {
@@ -342,7 +351,7 @@
 				}
 
 				context.strokeStyle = renderizable._strokeStyle;
-				context.strokeRect( renderizable._x + pivotX, renderizable._y + pivotY, renderizable._width, renderizable._height );
+				context.strokeRect( renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight, renderizable._width, renderizable._height );
 
 			}
 
@@ -516,7 +525,7 @@
 			
 		} else {
 		
-			context.drawImage( renderizable._image, renderizable.currentFrame.x, renderizable.currentFrame.y, renderizable.currentFrame.width, renderizable.currentFrame.height, renderizable._x + x, renderizable._y + y, renderizable.oW || renderizable.currentFrame.width, renderizable.oH || renderizable.currentFrame.height );
+			context.drawImage( renderizable._image, renderizable.currentFrame.x, renderizable.currentFrame.y, renderizable.currentFrame.width, renderizable.currentFrame.height, renderizable._x + x - cameraX, renderizable._y + y - cameraY, renderizable.oW || renderizable.currentFrame.width, renderizable.oH || renderizable.currentFrame.height );
 
 		}
 
@@ -525,13 +534,9 @@
 	};
 	StandardEntityRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight) {
 	
-		if ( layer.needsRedraw ) {
+		// if ( layer.needsRedraw ) {
 
-			var cameraX0 = cameraX * layer.parrallaxFactor.x,
-				cameraY0 = cameraX * layer.parrallaxFactor.y,
-				cameraX1 = cameraX0 + viewportWidth,
-				cameraY1 = cameraY0 + viewportHeight,
-				current,
+			var current,
 				currentView,
 				currentViews;
 
@@ -546,7 +551,7 @@
 			
 					currentView = currentViews[j];
 			
-					if ( this.isVisible(currentView, cameraX0, cameraY0, cameraX1, cameraY1) ) {
+					if ( this.camera.canSee(currentView) ) {
 					
 						this.render(currentView, this.backBuffer, cameraX, cameraY);
 					
@@ -558,9 +563,10 @@
 
 			// layer.needsRedraw = false;
 
+			// this.frontBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
 			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
 
-		}
+		// }
 
 		if ( this.needsSorting ) {
 			this.sort();
@@ -568,34 +574,6 @@
 		}
 
 	};
-	/**
-	 * Returns whether this object is visible and is inside the given viewport
-	 *
-	 * @method isVisible
-	 * @param {float} cameraX0 the left coordinate of the camera
-	 * @param {float} cameraY0 the top coordinate of the camera
-	 * @param {float} cameraX1 the right coordinate of the viewport
-	 * @param {float} cameraY1 the bottom coordinate of the viewport
-	 * @return {Boolean}
-	 */
-    StandardEntityRenderer.prototype.isVisible = function (object, cameraX0, cameraY0, cameraX1, cameraY1) {
-    	
-		if ( object._alpha == 0 || !object._visible ) return false;
-    	
-    	var insideViewport = object.isIn(cameraX0, cameraY0, cameraX1, cameraY1);
-
-    	if ( object.onOutsideViewport ) {
-			if ( !(object._raisedNotVisible && insideViewport) ) {
-				object.onOutsideViewport();
-				object._raisedNotVisible = true;
-			} else {
-				object._raisedNotVisible = false;
-			}
-		}
-
-		return insideViewport; 
-    
-    };
 	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY) {
 
 		var types = M.renderers.TYPES;
@@ -619,14 +597,101 @@
 			default:
 				throw new Error("Unable to render object of type " + object.TYPE);
 		}
-		
-		if ( object.children ) {
-			for ( var i = 0, l = object.children.length; i < l; i++ ) {
-				this.render(object.children[i], context, cameraX, cameraY);
-			}
-		}
 
 	};
+	/**
+	 * Sets the antialiasing of the buffer
+	 *
+	 * @method setAntialiasing
+	 * @param {Boolean} value
+	 */
+	StandardEntityRenderer.prototype.setAntialiasing = function(value) {
+		this.frontBuffer.mozImageSmoothingEnabled = value;
+		this.frontBuffer.webkitImageSmoothingEnabled = value;
+		this.frontBuffer.imageSmoothingEnabled = value;
+		
+		this.backBuffer.mozImageSmoothingEnabled = value;
+		this.backBuffer.webkitImageSmoothingEnabled = value;
+		this.backBuffer.imageSmoothingEnabled = value;		
+	};
+	StandardEntityRenderer.prototype._getImageRenderingStyle = function() {
+		var style = document.getElementById("match-image-quality");
+		if ( style == undefined ) {
+			style = document.createElement("style");
+			style.setAttribute("id", "match-image-quality");
+			style.type = "text/css";
+			document.head.appendChild(style);
+		}
+		return style;
+	};
+	StandardEntityRenderer.prototype.prioritizeQuality = function() {
+		this.setAntialiasing(true);
+		this._getImageRenderingStyle().innerHTML = "canvas { -ms-interpolation-mode: bicubic; image-rendering: optimizeQuality; }";
+	};
+	StandardEntityRenderer.prototype.prioritizeSpeed = function() {
+		this.setAntialiasing(false);
+		this._getImageRenderingStyle().innerHTML = "canvas { -ms-interpolation-mode: nearest-neighbor; image-rendering: optimizeSpeed; }";
+	};
+	/**
+	 * Gets the center of the layer
+	 * @method getCenter
+	 * @return {Object} object containing x and y
+	 */
+	StandardEntityRenderer.prototype.getSceneCenter = function() {
+		return new M.math2d.Vector2d( this.frontBuffer.canvas.width / 2, this.frontBuffer.canvas.height / 2 );
+	};
+	/**
+	 * Gets the contents of this layer as an image in base64
+	 * @method getAsBase64Image
+	 * @return {String} a string representing an image in base64
+	 */
+	StandardEntityRenderer.prototype.getAsBase64Image = function() {
+		return this.frontBuffer.canvas.toDataURL();
+	};
+	/**
+	 * Gets the contents of this layer as an html image
+	 * @method getAsImage
+	 * @return {HTMLImageElement} an image element with the result of this layer
+	 */
+	StandardEntityRenderer.prototype.getAsImage = function() {
+		var img = new Image();
+		img.src = this.getAsBase64Image();
+		return img;
+	};
+	// /**
+	 // * Sets the background of the buffer
+	 // *
+	 // * @method setBackground
+	 // * @param {String} background a color, sprite name or null
+	 // * @example
+			// this.setBackground("black");
+			// this.setBackground("rgb(0, 100, 100)");
+			// this.setBackground("skySprite");
+			// this.setBackground(); //sets default background
+			// this.setBackground(""); //sets default background
+	 // */
+	// GameLayer.prototype.setBackground = function(background) {
+		// if ( !background == "" && typeof background == "string" ) {
+			// if ( M.sprites[background] ) {
+				// this.clearImage = M.sprites[background]._image;
+				// this.clear = this.clearUsingImage;
+			// } else {
+				// this.clearColor = background;
+				// this.clear = this.clearUsingFillColor;
+			// }
+		// } else {
+			// this.clear = this.clearUsingDefault;
+		// }
+	// };
+	// /**
+	 // * Gets the background of the buffer
+	 // *
+	 // * @method getBackground
+	 // * @return {String} a css string representing the background
+	 // */
+	// GameLayer.prototype.getBackground = function() {
+		// return this.buffer.canvas.getPropertyValue("background");
+	// };
 
 	M.extend(StandardEntityRenderer, StandardRenderer);
 

@@ -18,7 +18,7 @@
 			up: "up", left: "left", right: "right", down: "down",
 			rotateTurretLeft: "a", rotateTurretRight: "s"
 		});
-		tank.has("collisionGroup", 0);	
+		tank.has("collisionGroup", 0);
 
 		tank.shows("base").as("rectangle").set({
 			x: 0, y: 0, color: "brown", width: 65, height: 100
@@ -32,11 +32,11 @@
 		}));
 		tank.shows("turretBase", new M.renderers.Rectangle({
 			x: 0, y: 0, color: "yellow", width: 40, height: 55,
-			pivotX: 0, pivotY: -20
+			pivotY: -20
 		}));
 		tank.shows("cannon", new M.renderers.Rectangle({
 			x: 0, y: 0, color: "gray", width: 10, height: 70,
-			pivotX: 0, pivotY: -90
+			pivotY: -90
 		}));
 		
 		// tank.does("monitorAttributes");
@@ -53,12 +53,12 @@
 		});
 		tank.does("accelerate", function(e, a, v, input) {
 			if ( a.get("accelerating") ) {
-				a.push("speed", a.get("speed") + a.get("acceleration"));
+				a.set("speed", a.get("speed") + a.get("acceleration"));
 			}
 		});
 		tank.does("deccelerate", function(e, a, v, input) {
 			if ( a.get("deccelerating") ) {
-				a.push("speed", a.get("speed") - a.get("decceleration"));
+				a.set("speed", a.get("speed") - a.get("decceleration"));
 			}
 		});
 		tank.does("listenToKeyboard", function(e, a, v, input) {
@@ -67,36 +67,36 @@
 				mappings = a.get("keyboardMapping");
 				
 			if ( keysDown[mappings.up] ) {
-				a.push("accelerating", true);
-				a.push("deccelerating", false);
+				a.set("accelerating", true);
+				a.set("deccelerating", false);
 			} else if ( keysDown[mappings.down] ) {
-				a.push("deccelerating", true);
-				a.push("accelerating", false);
+				a.set("deccelerating", true);
+				a.set("accelerating", false);
 			} else {
-				a.push("accelerating", false);
-				a.push("deccelerating", false);
+				a.set("accelerating", false);
+				a.set("deccelerating", false);
 			}
 			if ( keysDown[mappings.left] ) {
 				var	rotationSpeed = a.get("rotationSpeed"),
 					rotation = a.get("rotation") - rotationSpeed;
-				a.push("rotation", rotation);
-				a.push("direction", M.math2d.getRotatedVertex(a.get("direction"), -rotationSpeed));
+				a.set("rotation", rotation);
+				a.set("direction", M.math2d.getRotatedVertex(a.get("direction"), -rotationSpeed));
 			} else if ( keysDown[mappings.right] ) {
 				var	rotationSpeed = a.get("rotationSpeed"),
 					rotation = a.get("rotation") + rotationSpeed;
-				a.push("rotation", rotation);
-				a.push("direction", M.math2d.getRotatedVertex(a.get("direction"), rotationSpeed));
+				a.set("rotation", rotation);
+				a.set("direction", M.math2d.getRotatedVertex(a.get("direction"), rotationSpeed));
 			}
 			if ( keysDown[mappings.rotateTurretRight] ) {
 				var	rotationSpeed = a.get("turretRotationSpeed"),
 					rotation = a.get("turretRotation") - rotationSpeed;
-				a.push("turretRotation", rotation);
-				a.push("turretDirection", M.math2d.getRotatedVertex(a.get("turretDirection"), -rotationSpeed));
+				a.set("turretRotation", rotation);
+				a.set("turretDirection", M.math2d.getRotatedVertex(a.get("turretDirection"), -rotationSpeed));
 			} else if ( keysDown[mappings.rotateTurretLeft] ) {
 				var	rotationSpeed = a.get("turretRotationSpeed"),
 					rotation = a.get("turretRotation") + rotationSpeed;
-				a.push("turretRotation", rotation);
-				a.push("turretDirection", M.math2d.getRotatedVertex(a.get("turretDirection"), rotationSpeed));
+				a.set("turretRotation", rotation);
+				a.set("turretDirection", M.math2d.getRotatedVertex(a.get("turretDirection"), rotationSpeed));
 			}
 
 		});
