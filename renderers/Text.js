@@ -3,6 +3,18 @@
  * @namespace renderers
  */
 (function(namespace, M, Renderizable) {
+
+	var textMeasuringDiv = document.createElement("div");
+		textMeasuringDiv.setAttribute("id", "match-text-measuring");
+		textMeasuringDiv.style.setProperty("visibility", "hidden");
+		textMeasuringDiv.style.setProperty("display", "inline-block");
+		textMeasuringDiv.style.setProperty("position", "absolute");
+
+	document.addEventListener( "DOMContentLoaded", function() {
+		document.body.appendChild(textMeasuringDiv);
+	});
+
+
 	/**
 	 * @class Text
 	 * @constructor
@@ -87,7 +99,7 @@
 		 * @example
 				this._textAlign = "justify";
 		 */
-		this._textAlign = "center";
+		this._textAlign = "left";
 		/**
 		 * Text baseline
 		 * @private
@@ -105,7 +117,7 @@
 		 * @example
 				this._textBaseline = "hanging";
 		 */
-		this._textBaseline = "middle";
+		this._textBaseline = "top";
 		/**
 		 * Text
 		 * @private
@@ -116,6 +128,11 @@
 				this._textBaseline = "Hellow World!";
 		 */
 		this._text = "";
+
+		this._width = 0;
+		this._height = 0;
+
+		this._changed = false;
 		
 		this.TYPE = M.renderers.TYPES.TEXT;
 
@@ -147,20 +164,23 @@
 	 */
 	Text.prototype.getHeight = function() {
 		
-		if ( this._text == this._cachedText2 )  return this._height;
+		if ( this._changed ) {
+
+			textMeasuringDiv.style.setProperty("font-size", this._size);
+			textMeasuringDiv.style.setProperty("font-family", this._family);
+			textMeasuringDiv.style.setProperty("font-variant", this._variant);
+			textMeasuringDiv.style.setProperty("font-weight", this._weight);
+			textMeasuringDiv.style.setProperty("font-style", this._style);
+			textMeasuringDiv.innerHTML = this._text;
+
+			this._width = textMeasuringDiv.offsetWidth;
+			this._height = textMeasuringDiv.offsetHeight;
 		
-		var d = document.createElement("span"),
-			height;
-		d.font = this._style + this._variant + this._weight + this._size + this._family;
-		d.textContent = this._text;
-		document.body.appendChild(d);
-		height = d.offsetHeight;
-		document.body.removeChild(d);
-		
-		this._height = height;
-		this._cachedText2 = this._text;
-		
-		return height;
+			this._changed = false;
+
+		}
+
+		return this._height;
 
 	};
 	/*
@@ -175,12 +195,14 @@
 	Text.prototype.setAlignment = function( horizontal, vertical ) {
 		this.setHorizontalAlign(horizontal);
 		this.setVerticalAlign(vertical);
+		this._changed = true;
 	};
 	/**
 	 * @deprecated
 	 */
 	Text.prototype.setHorizontalAlign = function(value) {
 		this._textAlign = value;
+		this._changed = true;
 		this.notifyChange();
 	};
 	/**
@@ -188,6 +210,7 @@
 	 */
 	Text.prototype.setVerticalAlign = function(value) {
 		this._textBaseline = value;
+		this._changed = true;
 		this.notifyChange();
 	};
 	/**
@@ -197,23 +220,23 @@
 	 */
 	Text.prototype.getWidth = function() {
 
-		if ( this._text == this._cachedText ) return this._width;
+		if ( this._changed ) {
 
-		var width,
-			context = M.offScreenContext;
+			textMeasuringDiv.style.setProperty("font-size", this._size);
+			textMeasuringDiv.style.setProperty("font-family", this._family);
+			textMeasuringDiv.style.setProperty("font-variant", this._variant);
+			textMeasuringDiv.style.setProperty("font-weight", this._weight);
+			textMeasuringDiv.style.setProperty("font-style", this._style);
+			textMeasuringDiv.innerHTML = this._text;
 
-		context.save();
-		context.font = this._style + this._variant + this._weight + this._size + this._family;
-		context.fillStyle = this._fillStyle;
+			this._width = textMeasuringDiv.offsetWidth;
+			this._height = textMeasuringDiv.offsetHeight;
+		
+			this._changed = false;
 
-		width = context.measureText(this._text).width;
+		}
 
-		context.restore();
-
-		this._width = width;
-		this._cachedText = this._text;
-
-		return width;
+		return this._width;
 
 	};
 	/**
@@ -226,6 +249,7 @@
 	 */
 	Text.prototype.setFamily = function(value) {
 		this._family = value;
+		this._changed = true;
 		this.notifyChange();
 	};
 	/**
@@ -238,6 +262,7 @@
 	 */
 	Text.prototype.setSize = function(value) {
 		this._size = parseInt(value) + "px ";
+		this._changed = true;
 		this.notifyChange();
 	};
 	/**
@@ -256,6 +281,7 @@
 	 */
 	Text.prototype.setWeight = function(value) {
 		this._weight = value + " ";
+		this._changed = true;
 		this.notifyChange();
 	};
 	/**
@@ -274,6 +300,7 @@
 		} else {
 			this.setWeight("");
 		}
+		this._changed = true;
 	};
 	/**
 	 * Sets the font variant
@@ -287,6 +314,7 @@
 	 */
 	Text.prototype.setVariant = function(value) {
 		this._variant = value + " ";
+		this._changed = true;
 		this.notifyChange();
 	};
 	/**
@@ -303,6 +331,7 @@
 	 */
 	Text.prototype.setStyle = function(value) {
 		this._style = value + " ";
+		this._changed = true;
 		this.notifyChange();
 	};
 	/**
@@ -362,6 +391,7 @@
 			}
 			this.setShadow( x, y, color, blur );
 		}
+		this._changed = true;
 	};
 	/**
 	 * Gets the font size
@@ -435,6 +465,7 @@
 			this.multiLine = value.split("\n");
 		}
 		this._text = value;
+		this._changed = true;
 		this.notifyChange();
 	};
 	/**

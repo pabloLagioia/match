@@ -74,6 +74,8 @@
 		 */
 		this._endAngle = 6.28;
 
+		this.TYPE = M.renderers.TYPES.CIRCLE;
+
 		this.set( properties );
 
 	}

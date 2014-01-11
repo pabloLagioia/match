@@ -22,9 +22,11 @@
 						
 						if ( collisionHandler.haveCollided(entity.views._values[entityView], current.views._values[view]) ) {
 
-							var location = entity.attribute("location");
+							// var location = entity.attribute("location");
 							
-							location.set(location.prevX, location.prevY);
+							// location.set(location.prevX, location.prevY);
+
+							entity.attributes.set("collided", true);
 
 							return;
 						
@@ -38,7 +40,7 @@
 			}
 		}
 		
-		// attributes.push("collided", null);
+		attributes.push("collided", false);
 		
 	});
 

@@ -98,14 +98,14 @@
 		 * @property animations
 		 * @type ArrayList
 		 */
-        this.animations = new M.ArrayList();
+        this.animations = [];
 		/**
 		 * Array that contains chained animations for this object
 		 * @private
 		 * @property chainedAnimations
 		 * @type ArrayList
 		 */
-        this.chainedAnimations = new M.ArrayList();
+        this.chainedAnimations = [];
 		/**
 		 * Index of the behaviour that's being executed at the moment
 		 * @private
@@ -119,7 +119,7 @@
 		 * @property _onLoopTimers
 		 * @type Array
 		 */
-        this._onLoopTimers = new M.ArrayList();
+        this._onLoopTimers = [];
 		/**
 		 * object transparency
 		 * @private
@@ -763,9 +763,6 @@
         } else {
             this._x = value + this._halfWidth;
         }
-		for ( var i = 0; i < this.children.length; i++ ) {
-			this.children[i].setLeft();
-		}
         this.notifyChange();
 		return this;
     };

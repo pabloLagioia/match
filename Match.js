@@ -208,7 +208,7 @@ var M = window.M || {},
 		this._gameObjects = [];
 		/**
 		 * Cache used for retrieving elements from onLoopList faster
-		 * @property offScreenContext
+		 * @property cache
 		 * @private
 		 * @type Object
 		 */
@@ -236,6 +236,7 @@ var M = window.M || {},
 			debug: false,
 			time: 0
 		};
+
 		/**
 		 * Object that contains information about the current browser
 		 * @property browser
