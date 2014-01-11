@@ -1185,7 +1185,7 @@ var M = window.M || {},
 				child.prototype[m] = parent.prototype[m];
 			} else if ( !child.prototype[parent.name + m]) {
 				//Cammel case method name
-				child.prototype[parent.name + m.substr(0, 1).toUpperCase() + m.substr(1)] = parent.prototype[m];
+				child.prototype[parent.name.substr(0, 1).toLowerCase() + parent.name.substr(1) + m.substr(0, 1).toUpperCase() + m.substr(1)] = parent.prototype[m];
 			}
 
 		}

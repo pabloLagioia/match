@@ -18,7 +18,7 @@
 		this.views = views;
 	}
 	ShowsAs.prototype.as = function(renderizableName) {
-		var value = M.renderers[renderizableName.charAt(0).toUpperCase() + renderizableName.substr(1)];
+		var value = M.renderizables[renderizableName.charAt(0).toUpperCase() + renderizableName.substr(1)];
 		if ( typeof value == "function" ) {
 			value = new value;
 		}

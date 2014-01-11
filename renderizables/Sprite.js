@@ -415,4 +415,4 @@
 
 	namespace.Sprite = Sprite;
 
-})(Match.renderers, Match, Match.renderers.Renderizable, Match.sprites.assets);
+})(Match.renderizables, Match, Match.renderizables.Renderizable, Match.sprites.assets);

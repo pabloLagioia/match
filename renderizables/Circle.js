@@ -383,4 +383,4 @@
 
 	namespace.Circle = Circle;
 
-})(window.Match.renderers, window.Match, window.Match.renderers.Renderizable);
+})(Match.renderizables, Match, Match.renderizables.Renderizable);
