@@ -1,8 +1,8 @@
-(function (StandardRenderer) {
+(function (Renderer) {
 	
 	function StandardEntityRenderer(canvas) {
 
-		this.extendsStandardRenderer(canvas);
+		this.extendsRenderer(canvas);
 
 		this.frontBuffer = this.canvas.getContext("2d");
 		
@@ -456,12 +456,11 @@
 		} else {
 
 			context.beginPath();
-			//TODO: Cache radius / 2 as halfRadius in Circle
-			context.arc( renderizable._x - renderizable._radius / 2, renderizable._y - renderizable._radius / 2, renderizable._radius, renderizable._startAngle, renderizable._endAngle, false);
+			context.arc( renderizable._x, renderizable._y, renderizable._radius, renderizable._startAngle, renderizable._endAngle, false);
 			context.closePath();
 
 			if ( renderizable._fillStyle ) {
-				context.fillStyle = this._fillStyle;
+				context.fillStyle = renderizable._fillStyle;
 				context.fill();
 			}
 
@@ -693,8 +692,8 @@
 		// return this.buffer.canvas.getPropertyValue("background");
 	// };
 
-	M.extend(StandardEntityRenderer, StandardRenderer);
+	M.extend(StandardEntityRenderer, Renderer);
 
 	M.renderers.StandardEntityRenderer = StandardEntityRenderer;
 
-})(M.renderers.StandardRenderer);
+})(M.renderers.Renderer);
