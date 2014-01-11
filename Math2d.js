@@ -102,7 +102,18 @@
 	 * @return {Vector2d}
 	 */
 	Math2d.prototype.getRotatedVertex = function(vertex, rotation) {
-		return new Vector2d( vertex.x * this.math.cos(rotation) - vertex.y * this.math.sin(rotation), vertex.y * this.math.cos(rotation) + vertex.x * this.math.sin(rotation) );
+		return this.getRotatedVertexCoords(vertex.x, vertex.y, rotation);
+	};
+	/*
+	 * Returns the vector rotated
+	 * @method getRotatedVertexCoords
+	 * @param {float} x
+	 * @param {float} y
+	 * @param {float} rotation
+	 * @return {Vector2d}
+	 */
+	Math2d.prototype.getRotatedVertexCoords = function(x, y, rotation) {
+		return new Vector2d( x * this.math.cos(rotation) - y * this.math.sin(rotation), y * this.math.cos(rotation) + x * this.math.sin(rotation) );
 	};
    /**
 	* Returns the magnitude of a vector

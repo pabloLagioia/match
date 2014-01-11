@@ -554,6 +554,49 @@
             return this._width;
         }
     };
+    Renderizable.prototype.getBoundingHalfWidth = function () {
+    	
+    	if ( this._rotation == 0 ) {
+    		return this._halfWidth;
+    	}
+
+		var halfWidth = this._halfWidth,
+			halfHeight = this._halfHeight,
+			math2d = M.math2d
+			math = Math,
+			v1 = math2d.getRotatedVertexCoords(-halfWidth, -halfHeight, this._rotation),
+			v2 = math2d.getRotatedVertexCoords(halfWidth, -halfHeight, this._rotation),
+			v3 = math2d.getRotatedVertexCoords(halfWidth, halfHeight, this._rotation),
+			v4 = math2d.getRotatedVertexCoords(-halfWidth, halfHeight, this._rotation),
+			maxX = math.max(v1.x, v2.x, v3.x, v4.x);
+
+		return math.abs(maxX);
+    };
+    Renderizable.prototype.getBoundingWidth = function () {
+    	return this.getBoundingHalfWidth() * 2;
+    };
+    Renderizable.prototype.getBoundingHalfHeight = function () {
+
+    	if ( this._rotation == 0 ) {
+    		return this._halfHeight;
+    	}
+
+		var halfWidth = this._halfWidth,
+			halfHeight = this._halfHeight,
+			math2d = M.math2d
+			math = Math,
+			v1 = math2d.getRotatedVertexCoords(-halfWidth, -halfHeight, this._rotation),
+			v2 = math2d.getRotatedVertexCoords(halfWidth, -halfHeight, this._rotation),
+			v3 = math2d.getRotatedVertexCoords(halfWidth, halfHeight, this._rotation),
+			v4 = math2d.getRotatedVertexCoords(-halfWidth, halfHeight, this._rotation),
+			maxY = math.max(v1.y, v2.y, v3.y, v4.y);
+
+		return math.abs(maxY);
+
+    };
+    Renderizable.prototype.getBoundingHeight = function () {
+    	return this.getBoundingHalfHeight() * 2;
+    };
 	/**
 	 * Gets the height of this object
 	 * @method getHeight
@@ -677,14 +720,14 @@
             if (this.pivotX != undefined) {
                 return this._x + this.pivotX - this._width * this._scale.x;
             } else {
-                return this._x - this._halfWidth * this._scale.x;
+                return this._x - this.getBoundingHalfWidth() * this._scale.x;
             }
         } else {
             if (this.pivotX != undefined) {
                 return this._x + this.pivotX - this._width;
-            } else {
-                return this._x - this._halfWidth;
-            }
+        	} else {
+        		return this._x - this.getBoundingHalfWidth();
+        	}
         }
     };
 	/**
@@ -698,13 +741,13 @@
             if (this.pivotX != undefined) {
                 return this._x + this.pivotX + this._width * this._scale.x;
             } else {
-                return this._x + this._halfWidth * this._scale.x;
+                return this._x + this.getBoundingHalfWidth() * this._scale.x;
             }
         } else {
             if (this.pivotX != undefined) {
                 return this._x + this.pivotX + this._width;
-            } else {
-                return this._x + this._halfWidth;
+        	} else {
+        		return this._x + this.getBoundingHalfWidth();
             }
         }
     };
@@ -719,13 +762,13 @@
             if (this.pivotY != undefined) {
                 return this._y + this.pivotY - this._height * this._scale.y;
             } else {
-                return this._y - this._halfHeight * this._scale.y;
+                return this._y - this.getBoundingHalfHeight() * this._scale.y;
             }
         } else {
             if (this.pivotY != undefined) {
                 return this._y + this.pivotY - this._height;
-            } else {
-                return this._y - this._halfHeight;
+        	} else {
+        		return this._y - this.getBoundingHalfHeight();
             }
         }
     };
@@ -740,14 +783,14 @@
             if (this.pivotY != undefined) {
                 return this._y + this.pivotY + this._height * this._scale.y;
             } else {
-                return this._y + this._halfHeight * this._scale.y;
+                return this._y + this.getBoundingHalfHeight() * this._scale.y;
             }
         } else {
             if (this.pivotY != undefined) {
                 return this._y + this.pivotY + this._height;
-            } else {
-                return this._y + this._halfHeight;
-            }
+        	} else {
+        		return this._y + this.getBoundingHalfHeight();
+        	}
         }
     };
 	/**
@@ -759,9 +802,9 @@
     Renderizable.prototype.setLeft = function (value) {
 		this._prevX = this._x;
         if (this._scale) {
-            this._x = value + this._halfWidth * this._scale.x;
+            this._x = value + this.getBoundingHalfWidth() * this._scale.x;
         } else {
-            this._x = value + this._halfWidth;
+            this._x = value + this.getBoundingHalfWidth();
         }
         this.notifyChange();
 		return this;
@@ -775,9 +818,9 @@
     Renderizable.prototype.setRight = function (value) {
 		this._prevX = this._x;
         if (this._scale) {
-            this._x = value - this._halfWidth * this._scale.x;
+            this._x = value - this.getBoundingHalfWidth() * this._scale.x;
         } else {
-            this._x = value - this._halfWidth;
+            this._x = value - this.getBoundingHalfWidth();
         }
         this.notifyChange();
 		return this;
@@ -791,9 +834,9 @@
     Renderizable.prototype.setTop = function (value) {
 		this._prevY = this._y;
         if (this._scale) {
-            this._y = value + this._halfHeight * this._scale.y;
+            this._y = value + this.getBoundingHalfHeight() * this._scale.y;
         } else {
-            this._y = value + this._halfHeight;
+            this._y = value + this.getBoundingHalfHeight();
         }
         this.notifyChange();
 		return this;
@@ -807,9 +850,9 @@
     Renderizable.prototype.setBottom = function (value) {
 		this._prevY = this._y;
         if (this._scale) {
-            this._y = value - this._halfHeight * this._scale.y;
+            this._y = value - this.getBoundingHalfHeight() * this._scale.y;
         } else {
-            this._y = value - this._halfHeight;
+            this._y = value - this.getBoundingHalfHeight();
         }
         this.notifyChange();
 		return this;
