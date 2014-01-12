@@ -114,6 +114,8 @@
 		this._fillStyle = value;
 		this.notifyChange();
 	};
+	Rectangle.prototype.setFill = Rectangle.prototype.setFillStyle;
+	Rectangle.prototype.getFill = Rectangle.prototype.setFillStyle;
 	Rectangle.prototype.setColor = Rectangle.prototype.setFillStyle;
 	Rectangle.prototype.getColor = Rectangle.prototype.getFillStyle;
 	/**

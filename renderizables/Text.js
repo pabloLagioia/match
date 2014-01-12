@@ -345,6 +345,10 @@
 		this._fillStyle = value;
 		this.notifyChange();
 	};
+	Text.prototype.setFill = Text.prototype.setFillStyle;
+	Text.prototype.getFill = Text.prototype.getFillStyle;
+	Text.prototype.setColor = Text.prototype.setFillStyle;
+	Text.prototype.getColor = Text.prototype.getFillStyle;
 	/**
 	 * Applies the css style by the given selector to the text object.
 	 * Valid css values: color, font-family, font-size, font-style, font-variant, font-weight, text-shadow
