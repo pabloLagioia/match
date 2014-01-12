@@ -93,6 +93,8 @@
 		 */
 		this._zIndex = zIndex || 0;
 
+		this.background = "#fff";
+
 		this.TYPE = M.renderizables.TYPES.LAYER;
 
 	}

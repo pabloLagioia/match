@@ -164,6 +164,16 @@
 	Circle.prototype.getFillStyle = function() {
 		return this._fillStyle;
 	};
+	Circle.prototype.setSize = function(size) {
+		return this.setRadius(size / 2);
+	};
+	Circle.prototype.getSize = function() {
+		return this._radius * 2;
+	};
+	Circle.prototype.setFill = Circle.prototype.setFillStyle;
+	Circle.prototype.getFill = Circle.prototype.setFillStyle;
+	Circle.prototype.setColor = Circle.prototype.setFillStyle;
+	Circle.prototype.getColor = Circle.prototype.getFillStyle;
 	/**
 	 * Sets the line width used to stroke the circle
 	 *

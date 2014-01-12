@@ -539,7 +539,16 @@
 				currentView,
 				currentViews;
 
-			this.backBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
+			if ( layer.background ) {
+				if ( layer.background.src ) {
+					this.backBuffer.drawImage(layer.background, 0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
+				} else {
+					this.backBuffer.fillStyle = layer.background;
+					this.backBuffer.fillRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
+				}
+			} else {
+				this.backBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
+			}
 
 			for ( var i = 0, l = layer.onRenderList.length; i < l; i++ ) {
 
@@ -562,7 +571,6 @@
 
 			// layer.needsRedraw = false;
 
-			// this.frontBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
 			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
 
 		// }

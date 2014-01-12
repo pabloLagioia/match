@@ -114,10 +114,6 @@
 		this._fillStyle = value;
 		this.notifyChange();
 	};
-	Rectangle.prototype.setFill = Rectangle.prototype.setFillStyle;
-	Rectangle.prototype.getFill = Rectangle.prototype.setFillStyle;
-	Rectangle.prototype.setColor = Rectangle.prototype.setFillStyle;
-	Rectangle.prototype.getColor = Rectangle.prototype.getFillStyle;
 	/**
 	 * Sets the style used to stroke the rectangle
 	 *
@@ -167,6 +163,10 @@
 	Rectangle.prototype.getFillStyle = function() {
 		return this._fillStyle;
 	};
+	Rectangle.prototype.setFill = Rectangle.prototype.setFillStyle;
+	Rectangle.prototype.getFill = Rectangle.prototype.setFillStyle;
+	Rectangle.prototype.setColor = Rectangle.prototype.setFillStyle;
+	Rectangle.prototype.getColor = Rectangle.prototype.getFillStyle;
 	/**
 	 * Gets the stroke style
 	 * @method getStrokeStyle

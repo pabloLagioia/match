@@ -103,6 +103,9 @@
 		this.isPlaying = false;
 
 	};
+	Sprite.prototype.getImage = function() {
+		return this._image;
+	};
 	Sprite.prototype.setFillStyle = Sprite.prototype.setImage;
 	Sprite.prototype.getFillStyle = Sprite.prototype.getImage;
 	Sprite.prototype.setFill = Sprite.prototype.setImage;

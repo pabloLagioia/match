@@ -686,6 +686,29 @@
 		this.notifyChange();
 		return this;
 	};
+    Renderizable.prototype.offsetScale = function (x, y) {
+    	this.offsetScaleX(x);
+    	this.offsetScaleY(y);
+    	return this;
+    };
+    Renderizable.prototype.offsetScaleX = function (x) {
+    	return this.setScaleX(this.getScaleX() + x);
+    };
+    Renderizable.prototype.offsetScaleY = function (y) {
+    	return this.setScaleY(this.getScaleY() + y);
+    };
+    Renderizable.prototype.getScaleX = function () {
+	if ( !this._scale ) {
+			return 1;
+		}
+		return this._scale.x;
+	};
+    Renderizable.prototype.getScaleY = function () {
+		if ( !this._scale ) {
+			return 1;
+		}
+		return this._scale.y;
+	};
 	/**
 	 * Inverts the object in the x axis
 	 * Note: Works exactly as invertX
