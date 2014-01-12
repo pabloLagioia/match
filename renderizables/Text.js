@@ -134,7 +134,7 @@
 
 		this._changed = false;
 		
-		this.TYPE = M.renderers.TYPES.TEXT;
+		this.TYPE = M.renderizables.TYPES.TEXT;
 
 		this.set( properties );
 

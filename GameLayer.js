@@ -93,7 +93,7 @@
 		 */
 		this._zIndex = zIndex || 0;
 
-		this.TYPE = M.renderers.TYPES.LAYER;
+		this.TYPE = M.renderizables.TYPES.LAYER;
 
 	}
 	/**

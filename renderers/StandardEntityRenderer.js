@@ -575,7 +575,7 @@
 	};
 	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY) {
 
-		var types = M.renderers.TYPES;
+		var types = M.renderizables.TYPES;
 		
 		switch ( object.TYPE ) {
 			case types.SPRITE:

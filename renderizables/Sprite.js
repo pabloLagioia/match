@@ -68,7 +68,7 @@
 		
 		this.setLocation(x || 0, y || 0);
 		
-		this.TYPE = M.renderers.TYPES.SPRITE;
+		this.TYPE = M.renderizables.TYPES.SPRITE;
 		
 	}
 

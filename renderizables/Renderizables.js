@@ -4,7 +4,7 @@
  */
 (function(M) {
 
-	M.renderers = {
+	M.renderizables = {
 		TYPES: {
 			SPRITE: 0,
 			LAYER: 1,

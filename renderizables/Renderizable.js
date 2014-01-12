@@ -1076,7 +1076,6 @@
 
     M.extend(Renderizable, M.GameObject);
 
-	M.renderizables = M.renderers || {};
 	M.renderizables.Renderizable = Renderizable;
 
 })(Match, Match.effects.visual);

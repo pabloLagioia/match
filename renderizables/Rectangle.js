@@ -49,7 +49,7 @@
 		 */
 		this._lineWidth = null;
 
-		this.TYPE = M.renderers.TYPES.RECTANGLE;
+		this.TYPE = M.renderizables.TYPES.RECTANGLE;
 
 		this.set( properties );
 
