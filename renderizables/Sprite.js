@@ -267,59 +267,9 @@
 		index = index || 0;
         this._frameIndex = index;
         this.currentFrame = this._image.frames[index];
+        this._halfWidth = this.currentFrame.halfWidth;
+        this._halfHeight = this.currentFrame.halfHeight;
     };
-	/**
-	 * Returns y coordinate representing the topmost part of the Object
-	 *
-	 * @method getTop
-	 * @return {float} the coordinates to top of the object
-	 */
-	Sprite.prototype.getTop = function() {
-		if ( this._scale ) {
-			return this._y - this.currentFrame.halfHeight * this._scale.y;
-		} else {
-			return this._y - this.currentFrame.halfHeight;
-		}
-	};
-	/**
-	 * Returns y coordinate representing the bottommost part of the Object
-	 *
-	 * @method getBottom
-	 * @return {float} the coordinates to bottom of the object
-	 */
-	Sprite.prototype.getBottom = function() {
-		if ( this._scale ) {
-			return this._y + this.currentFrame.halfHeight * this._scale.y;
-		} else {
-			return this._y + this.currentFrame.halfHeight;
-		}
-	};
-	/**
-	 * Returns x coordinate representing the leftmost part of the Object
-	 *
-	 * @method getLeft
-	 * @return {float} the coordinates to left of the object
-	 */
-	Sprite.prototype.getLeft = function() {
-		if ( this._scale ) {
-			return this._x - this.currentFrame.halfWidth * this._scale.x;
-		} else {
-			return this._x - this.currentFrame.halfWidth;
-		}
-	};
-	/**
-	 * Returns x coordinate representing the rightmost part of the Object
-	 *
-	 * @method getRight
-	 * @return {float} the coordinates to right of the object
-	 */
-	Sprite.prototype.getRight = function() {
-		if ( this._scale ) {
-			return this._x + this.currentFrame.halfWidth * this._scale.x;
-		} else {
-			return this._x + this.currentFrame.halfWidth;
-		}
-	};
 	/**
 	 * Gets the width of this object
 	 * @method getWidth

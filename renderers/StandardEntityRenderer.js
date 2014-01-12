@@ -393,13 +393,13 @@
 			this._applyRotation(renderizable, context);
 			this._applyScale(renderizable, context);
 
-			this.fillText(renderizable, context, 0, 0);
+			this.fillText(renderizable, context, -renderizable._halfWidth, -renderizable._halfHeight);
 
 			context.restore();
 
 		} else {
 
-			this.fillText(renderizable, context, renderizable._x, renderizable._y);
+			this.fillText(renderizable, context, renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight);
 
 		}
 

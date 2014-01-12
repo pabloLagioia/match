@@ -129,9 +129,6 @@
 		 */
 		this._text = "";
 
-		this._width = 0;
-		this._height = 0;
-
 		this._changed = false;
 		
 		this.TYPE = M.renderizables.TYPES.TEXT;
@@ -139,23 +136,17 @@
 		this.set( properties );
 
 	}
-	/**
-	 * Returns x coordinate representing the rightmost part of the Object
-	 *
-	 * @method getRight
-	 * @return {float} the coordinates to right of the object
-	 */
-	Text.prototype.getRight = function() {
-		return this._x + this.getWidth();
+	Text.prototype.getBoundingHalfWidth = function () {
+		//Calculate and cache internal halfWidth and halfHeight which are needed for bounding method
+		this.getWidth();
+		this.getHeight();
+		return this.renderizableGetBoundingHalfWidth();
 	};
-	/**
-	 * Returns y coordinate representing the bottommost part of the Object
-	 *
-	 * @method getBottom
-	 * @return {float} the coordinates to bottom of the object
-	 */
-	Text.prototype.getBottom = function() {
-		return this._y + this.getHeight();
+	Text.prototype.getBoundingHalfHeigth = function () {
+		//Calculate and cache internal halfWidth and halfHeight which are needed for bounding method
+		this.getWidth();
+		this.getHeight();
+		return this.renderizableGetBoundingHalfHeight();
 	};
 	/**
 	 * Gets the height of this object
@@ -175,6 +166,8 @@
 
 			this._width = textMeasuringDiv.offsetWidth;
 			this._height = textMeasuringDiv.offsetHeight;
+			this._halfWidth = this._width / 2;
+			this._halfHeight = this._height / 2;
 		
 			this._changed = false;
 
@@ -231,6 +224,8 @@
 
 			this._width = textMeasuringDiv.offsetWidth;
 			this._height = textMeasuringDiv.offsetHeight;
+			this._halfWidth = this._width / 2;
+			this._halfHeight = this._height / 2;
 		
 			this._changed = false;
 

@@ -135,6 +135,14 @@
 		 */
 		this.onwerLayer = null;
 
+		this._math = Math;
+		this._math2d = M.math2d;
+		
+		this._cachedRotationForBoundingHalfWidth = 0;
+		this._cachedRotationForBoundingHalfHeight = 0;
+		this._cachedBoundingHalfWidth = null;
+		this._cachedBoundingHalfHeight = null;
+		
 		this._raisedNotVisible = false;
 
         this.set(properties);
@@ -556,42 +564,48 @@
     };
     Renderizable.prototype.getBoundingHalfWidth = function () {
     	
-    	if ( this._rotation == 0 ) {
+    	if ( !this._rotation ) {
     		return this._halfWidth;
+    	} else if ( this._cachedRotationForBoundingHalfWidth == this._rotation ) {
+    		return this._cachedBoundingHalfWidth;
     	}
 
 		var halfWidth = this._halfWidth,
 			halfHeight = this._halfHeight,
-			math2d = M.math2d
-			math = Math,
-			v1 = math2d.getRotatedVertexCoords(-halfWidth, -halfHeight, this._rotation),
-			v2 = math2d.getRotatedVertexCoords(halfWidth, -halfHeight, this._rotation),
-			v3 = math2d.getRotatedVertexCoords(halfWidth, halfHeight, this._rotation),
-			v4 = math2d.getRotatedVertexCoords(-halfWidth, halfHeight, this._rotation),
-			maxX = math.max(v1.x, v2.x, v3.x, v4.x);
+			v1 = this._math2d.getRotatedVertexCoordsX(-halfWidth, -halfHeight, this._rotation),
+			v2 = this._math2d.getRotatedVertexCoordsX(halfWidth, -halfHeight, this._rotation),
+			v3 = this._math2d.getRotatedVertexCoordsX(halfWidth, halfHeight, this._rotation),
+			v4 = this._math2d.getRotatedVertexCoordsX(-halfWidth, halfHeight, this._rotation),
+			maxX = this._math.max(v1, v2, v3, v4);
 
-		return math.abs(maxX);
+		this._cachedBoundingHalfWidth = this._math.abs(maxX);
+		this._cachedRotationForBoundingHalfWidth = this._rotation;
+
+		return this._cachedBoundingHalfWidth;
     };
     Renderizable.prototype.getBoundingWidth = function () {
     	return this.getBoundingHalfWidth() * 2;
     };
     Renderizable.prototype.getBoundingHalfHeight = function () {
 
-    	if ( this._rotation == 0 ) {
+    	if ( !this._rotation ) {
     		return this._halfHeight;
+    	} else if ( this._cachedRotationForBoundingHalfHeight == this._rotation ) {
+    		return this._cachedBoundingHalfHeight;
     	}
 
 		var halfWidth = this._halfWidth,
 			halfHeight = this._halfHeight,
-			math2d = M.math2d
-			math = Math,
-			v1 = math2d.getRotatedVertexCoords(-halfWidth, -halfHeight, this._rotation),
-			v2 = math2d.getRotatedVertexCoords(halfWidth, -halfHeight, this._rotation),
-			v3 = math2d.getRotatedVertexCoords(halfWidth, halfHeight, this._rotation),
-			v4 = math2d.getRotatedVertexCoords(-halfWidth, halfHeight, this._rotation),
-			maxY = math.max(v1.y, v2.y, v3.y, v4.y);
+			v1 = this._math2d.getRotatedVertexCoordsY(-halfWidth, -halfHeight, this._rotation),
+			v2 = this._math2d.getRotatedVertexCoordsY(halfWidth, -halfHeight, this._rotation),
+			v3 = this._math2d.getRotatedVertexCoordsY(halfWidth, halfHeight, this._rotation),
+			v4 = this._math2d.getRotatedVertexCoordsY(-halfWidth, halfHeight, this._rotation),
+			maxY = this._math.max(v1, v2, v3, v4);
 
-		return math.abs(maxY);
+		this._cachedBoundingHalfHeight = this._math.abs(maxY);
+		this._cachedRotationForBoundingHalfHeight = this._rotation;
+
+		return this._cachedBoundingHalfHeight;
 
     };
     Renderizable.prototype.getBoundingHeight = function () {
@@ -922,9 +936,7 @@
 	 * @param {float} offset
 	 */
     Renderizable.prototype.offsetRotation = function(offset) {
-        this._rotation += offset;
-        this.notifyChange();
-		return this;
+        return this.setRotation(this._rotation + offset);
     };
 	/**
 	 * Sets the rotation angle of this object
