@@ -50,7 +50,7 @@ function main() {
 			
 			// M.renderer.camera.setViewport(300, 300);
 			
-			layer.push(object);
+			// layer.push(object);
 			
 			M.plugins.Debug.enable();
 			

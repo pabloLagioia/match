@@ -7,11 +7,14 @@ function main() {
 		fill: "red", x: M.renderer.getCenter().x, y: M.renderer.getCenter().y, size: 50
 	});
 
+	object.has("direction").set(1,1);
 	object.has("scaleData");
 	object.has("spinAroundSpeed");
 
 	object.does("spinAround");
 	object.does("scaleUpAndDownUsingScaleData");
+	object.does("bounce");
+	object.does("stickToCanvas");
 
 	layer.push(object);
 

@@ -30,6 +30,18 @@
 		this.canvas.height = height;
 	};
 	/**
+	 * @method getWidth
+	 */
+	Renderer.prototype.getWidth = function() {
+		return this.canvas.width;
+	};
+	/**
+	 * @method getHeight
+	 */
+	Renderer.prototype.getHeight = function() {
+		return this.canvas.height;
+	};
+	/**
 	 * @method adjustTo
 	 * Stretches canvas to the given values.
 	 */

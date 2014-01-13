@@ -234,7 +234,8 @@ var M = window.M || {},
 			offScreenContext: this.offScreenContext,
 			offScreenCanvas: this.offScreenCanvas,
 			debug: false,
-			time: 0
+			time: 0,
+			m: this
 		};
 
 		/**
@@ -443,14 +444,10 @@ var M = window.M || {},
 
 			var node = nodes[i];
 
-			this._applyInput(p, node);
+			// this._applyInput(p, node);
 
 			if (node.onLoop) {
 				node.onLoop(p);
-			}
-
-			if ( node.children ) {
-				this.updateGameObjects(node.children, p);
 			}
 
 		}

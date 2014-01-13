@@ -382,8 +382,17 @@
 		context.textBaseline = renderizable._textBaseline;
 
 		context.fillStyle = renderizable._fillStyle;
+		
+		context.fillRect( renderizable._x, renderizable._y, 2, 2 );
 
 		this._applyShadow(renderizable, context);
+
+		if ( renderizable._halfWidth == 0 ) {
+			renderizable.getWidth();
+		}
+		if ( renderizable._halfHeight == 0 ) {
+			renderizable.getHeight();
+		}
 
 		if ( renderizable._rotation || renderizable._scale ) {
 
@@ -406,6 +415,7 @@
 	};
 	StandardEntityRenderer.prototype.fillText = function(renderer, context, x , y) {
 
+		
 		if ( renderer.multiLine ) {
 			for ( var i = 0; i < renderer.multiLine.length; i++ ) {
 				context.fillText( renderer.multiLine[i], x, y + i * renderer.getHeight() );
@@ -492,23 +502,14 @@
 	StandardEntityRenderer.prototype.renderSprite = function( renderizable, context, cameraX, cameraY ) {
 
 		if ( ! renderizable._image ) return;
+		
+		renderizable._animate();
 
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
-		
-		var x, y;
 
-		if ( renderizable.pivotX ) {
-			x = renderizable.pivotX;
-		} else {
-			x = -renderizable.oHW || -renderizable.currentFrame.halfWidth;
-		}
-
-		if ( renderizable.pivotY ) {
-			y = renderizable.pivotY;
-		} else {
-			y = -renderizable.oHH || -renderizable.currentFrame.halfHeight;
-		}
+		var fX = renderizable.currentFrame.x,
+			fY = renderizable.currentFrame.y;
 
 		if ( renderizable._rotation || renderizable._scale ) {
 		
@@ -518,17 +519,15 @@
 			this._applyRotation(renderizable, context);
 			this._applyScale(renderizable, context);
 
-			context.drawImage( renderizable._image, renderizable.currentFrame.x, renderizable.currentFrame.y, renderizable.currentFrame.width, renderizable.currentFrame.height, x, y, renderizable.oW || renderizable.currentFrame.width, renderizable.oH || renderizable.currentFrame.height );
+			context.drawImage( renderizable._image, fX, fY, renderizable._width, renderizable._height, -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
 
 			context.restore();
 			
 		} else {
 		
-			context.drawImage( renderizable._image, renderizable.currentFrame.x, renderizable.currentFrame.y, renderizable.currentFrame.width, renderizable.currentFrame.height, renderizable._x + x - cameraX, renderizable._y + y - cameraY, renderizable.oW || renderizable.currentFrame.width, renderizable.oH || renderizable.currentFrame.height );
+			context.drawImage( renderizable._image, fX, fY, renderizable._width, renderizable._height, renderizable._x + renderizable._halfWidth - cameraX, renderizable._y + renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
 
 		}
-
-		this._applyShadow(context);
 
 	};
 	StandardEntityRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight) {

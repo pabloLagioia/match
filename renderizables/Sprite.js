@@ -176,7 +176,7 @@
 
 				if ( this._frameIndex < this._animation.frames.length - 1 ) {
 
-					this._frameIndex++;
+					this.setFrameIndex(this._frameIndex + 1);
 
 				} else {
 
@@ -184,11 +184,11 @@
 
 						if ( this._frameIndex == 0 ) {
 
-							this._frameIndex = 1;
+							this.setFrameIndex(1);
 
 						} else {
 
-							this._frameIndex = 0;
+							this.setFrameIndex(0);
 
 						}
 
@@ -251,18 +251,7 @@
 	Sprite.prototype.onLoop = function(p) {
         this._loopThroughAnimations();
         this._loopThroughTimers();
-        for ( var i = 0; i < this.behaviours.size; i++ ) {
-        	this.behaviours._list[i](this, this.attributes);
-        }
-        if (this.onUpdate) this.onUpdate(p);
 		this._animate();
-	};
-	Sprite.prototype.setSize = function(width, height) {
-		this.oW = width;
-		this.oH = height;
-		this.oHW = width / 2;
-		this.oHH = height / 2;
-		this.notifyChange();
 	};
     /**
 	 * Sets the index of the frame to render
@@ -274,89 +263,11 @@
 		index = index || 0;
         this._frameIndex = index;
         this.currentFrame = this._image.frames[index];
+        this._width = this.currentFrame.width;
+        this._height = this.currentFrame.height;
         this._halfWidth = this.currentFrame.halfWidth;
         this._halfHeight = this.currentFrame.halfHeight;
     };
-	/**
-	 * Gets the width of this object
-	 * @method getWidth
-	 * @return {float} the width
-	 */
-	Sprite.prototype.getWidth = function() {
-		if ( this._scale ) {
-			return this.currentFrame.width * this._scale.x;
-		} else {
-			return this.currentFrame.width;
-		}
-	};
-	/**
-	 * Gets the height of this object
-	 * @method getHeight
-	 * @return {float} the height
-	 */
-	Sprite.prototype.getHeight = function() {
-		if ( this._scale ) {
-			return this.currentFrame.height * this._scale.y;
-		} else {
-			return this.currentFrame.height;
-		}
-	};
-	/**
-	 * Sets the leftmost coordinates of the Object
-	 *
-	 * @method setLeft
-	 * @param {float} value the coordinates to left of the object
-	 */
-	Sprite.prototype.setLeft = function(value) {
-		if ( this._scale ) {
-			this._x = value + this.currentFrame.halfWidth * this._scale.x;
-		} else {
-			this._x = value + this.currentFrame.halfWidth;
-		}
-		this.notifyChange();
-	};
-	/**
-	 * Sets the rightmost coordinates of the Object
-	 *
-	 * @method setRight
-	 * @param {float} value the coordinates to right of the object
-	 */
-	Sprite.prototype.setRight = function(value) {
-		if ( this._scale ) {
-			this._x = value - this.currentFrame.halfWidth * this._scale.x;
-		} else {
-			this._x = value - this.currentFrame.halfWidth;
-		}
-		this.notifyChange();
-	};
-	/**
-	 * Sets the topmost coordinates of the Object
-	 *
-	 * @method setTop
-	 * @param {float} value the coordinates to top of the object
-	 */
-	Sprite.prototype.setTop = function(value) {
-		if ( this._scale ) {
-			this._y = value + this.currentFrame.halfHeight * this._scale.y;
-		} else {
-			this._y = value + this.currentFrame.halfHeight;
-		}
-		this.notifyChange();
-	};
-	/**
-	 * Sets the bottommost coordinates of the Object
-	 *
-	 * @method setBottom
-	 * @param {float} value the coordinates to bottom of the object
-	 */
-	Sprite.prototype.setBottom = function(value) {
-		if ( this._scale ) {
-			this._y = value - this.currentFrame.halfHeight * this._scale.y;
-		} else {
-			this._y = value - this.currentFrame.halfHeight;
-		}
-		this.notifyChange();
-	};
 	/**
 	 * Returns the constructor's name
 	 *

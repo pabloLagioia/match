@@ -26,18 +26,18 @@
 		tank.shows("leftFuelTank").as("rectangle").set({
 			x: 0, y: 0, color: "orange", width: 25, height: 10,	pivotX: -28, pivotY: 40
 		});
-		tank.shows("rightfuelTank", new M.renderers.Rectangle({
+		tank.shows("rightfuelTank").as("rectangle").set({
 			x: 0, y: 0, color: "orange", width: 25, height: 10,
 			pivotX: 3, pivotY: 40
-		}));
-		tank.shows("turretBase", new M.renderers.Rectangle({
+		});
+		tank.shows("turretBase").as("rectangle").set({
 			x: 0, y: 0, color: "yellow", width: 40, height: 55,
 			pivotY: -20
-		}));
-		tank.shows("cannon", new M.renderers.Rectangle({
+		});
+		tank.shows("cannon").as("rectangle").set({
 			x: 0, y: 0, color: "gray", width: 10, height: 70,
 			pivotY: -90
-		}));
+		});
 		
 		// tank.does("monitorAttributes");
 		tank.does("fixViews");
