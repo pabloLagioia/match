@@ -146,10 +146,17 @@
 			sizeObj = renderizable._halfHeight;
 		}
 		
-		if ( this._y + this.viewportHeight < renderizable._y - sizeObj ) return false;
-		if ( this._y - this.viewportHeight > renderizable._y + sizeObj ) return false;
-		if ( this._x + this.viewportWidth < renderizable._x - sizeObj ) return false;
-		if ( this._x - this.viewportWidth > renderizable._x + sizeObj ) return false;
+		// if ( this._y + this.viewportHeight < renderizable._y - sizeObj ) return false;
+		// if ( this._y - this.viewportHeight > renderizable._y + sizeObj ) return false;
+		// if ( this._x + this.viewportWidth < renderizable._x - sizeObj ) return false;
+		// if ( this._x - this.viewportWidth > renderizable._x + sizeObj ) return false;
+		
+		//This is more precize but takes more processing time if the object is rotating constantly
+		//We should make sure this is less expensive than rendering an object
+		if ( this._y + this.viewportHeight < renderizable.getTop() ) return false;
+		if ( this._y - this.viewportHeight > renderizable.getBottom() ) return false;
+		if ( this._x + this.viewportWidth < renderizable.getLeft() ) return false;
+		if ( this._x - this.viewportWidth > renderizable.getRight() ) return false;
 		
 		return true;
 		

@@ -27,7 +27,7 @@
 	};
 
 	function Entity() {
-		this.attributes = new SimpleMap();
+		this.attributes = new EventSimpleMap();
 		this.behaviours = new SimpleMap();
 		this.views = new SimpleMap();
 	}

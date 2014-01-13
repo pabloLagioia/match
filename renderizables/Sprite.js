@@ -102,6 +102,8 @@
 		this._animation = null;
 		this.isPlaying = false;
 
+		return this;
+
 	};
 	Sprite.prototype.getImage = function() {
 		return this._image;

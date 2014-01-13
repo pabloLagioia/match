@@ -25,8 +25,7 @@ function main() {
 			for ( var column = 0; column < tilesX; column++ ) {
 				for ( var row = 0; row < tilesY; row++ ) {
 					var viewId = "tile" + column + ":" + row;
-					terrain.shows(viewId).as("sprite").setImage("grass");
-					terrain.view(viewId).setLocation(column * tileW + tileHW, row * tileH + tileHH);
+					terrain.shows(viewId).as("sprite").setImage("grass").setLocation(column * tileW + tileHW, row * tileH + tileHH);
 				}
 			}
 			
@@ -34,25 +33,36 @@ function main() {
 			
 			for ( var i = 0; i < M.random.integer(2, 3); i++ ) {
 				var tree = new M.Entity();
-				tree.shows("tree").as("sprite").setImage("tree");
-				tree.view("tree").setLocation(M.random.integer(0, 640), M.random.integer(0, 480));
+				tree.shows("tree").as("sprite").setImage("tree").setLocation(M.random.integer(0, 640), M.random.integer(0, 480));
 				tree.has("collisionGroup", 0);
 				terrainLayer.push(tree);
 			}
 		
 			var layer = M.createLayer();
 
-			// for ( var i = 0; i < 1; i++ ) {
+			for ( var i = 0; i < 1; i++ ) {
 				tank = M.game.entities.createTank();
-				// tank.attribute("location").set(M.random.integer(0, 640), M.random.integer(0, 480));
+
 				layer.push(tank);
-			// }			
-			
-			// M.renderer.camera.setViewport(300, 300);
-			
-			// layer.push(object);
-			
-			M.plugins.Debug.enable();
+			}
+
+			// var obj = new M.Entity();
+			// obj.shows("base").as("rectangle").set({
+			// 	x: 350, y: 150, width: 50, height: 50, color: "red"
+			// });
+			// obj.shows("cannon").as("rectangle").set({
+			// 	x: 350, y: 150, width: 30, height: 25, color: "orange", pivotY: -50
+			// });
+			// obj.shows("center").as("rectangle").set({
+			// 	x: 350, y: 150, width: 1, height: 1, color: "black"
+			// });
+
+			// obj.has("spinAroundSpeed", 0.01);
+			// obj.does("spinAround");
+
+			// layer.push(obj);
+
+			M.renderer.camera.setViewport(300, 300);
 			
 		},
 		

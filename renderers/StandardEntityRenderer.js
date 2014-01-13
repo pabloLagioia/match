@@ -42,12 +42,6 @@
 		this.shadowChanged = false;
 
 		this.compositeOperation = this.DEFAULT_COMPOSITE_OPERATION;
-		
-		this.SPRITE = 0;
-		this.LAYER = 1;
-		this.TEXT = 2;
-		this.RECTANGLE = 3;
-		this.CIRCLE = 4;
 
 		this.camera = new M.Camera();
 
@@ -522,10 +516,10 @@
 			context.drawImage( renderizable._image, fX, fY, renderizable._width, renderizable._height, -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
 
 			context.restore();
-			
+
 		} else {
-		
-			context.drawImage( renderizable._image, fX, fY, renderizable._width, renderizable._height, renderizable._x + renderizable._halfWidth - cameraX, renderizable._y + renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
+
+			context.drawImage( renderizable._image, fX, fY, renderizable._width, renderizable._height, renderizable._x - renderizable._halfWidth - cameraX, renderizable._y - renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
 
 		}
 

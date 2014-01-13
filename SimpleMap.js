@@ -33,9 +33,8 @@
 		} else {
 			var valueIndex = this._values.push(value) - 1;
 			this._keys[key] = valueIndex;
+			this.length++;
 		}
-
-		this.length++;
 
 	};
 	/**

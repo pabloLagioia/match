@@ -631,7 +631,11 @@
 	 */
     Renderizable.prototype.setSize = function (width, height) {
         this.setWidth(width);
-        this.setHeight(height);
+		if ( height == undefined )  {
+			this.setHeight(width);
+		} else {
+			this.setHeight(height);
+		}
 		return this;
     };
 	/**
@@ -725,7 +729,6 @@
     Renderizable.prototype.invertX = function () {
 		if ( !this._scale ) {
 			this._scale = new Object();
-			this._scale.x = 1;
 			this._scale.y = 1;
 		}
         this._scale.x *= -1;
@@ -740,7 +743,6 @@
 		if ( !this._scale ) {
 			this._scale = new Object();
 			this._scale.x = 1;
-			this._scale.y = 1;
 		}
         this._scale.y = -1;
         this.notifyChange();
@@ -755,13 +757,13 @@
     Renderizable.prototype.getLeft = function () {
         if (this._scale) {
             if (this.pivotX != undefined) {
-                return this._x + this.pivotX - this._width * this._scale.x;
+                return this._x + this.pivotX - this.getBoundingWidth() * this._scale.x;
             } else {
                 return this._x - this.getBoundingHalfWidth() * this._scale.x;
             }
         } else {
             if (this.pivotX != undefined) {
-                return this._x + this.pivotX - this._width;
+                return this._x + this.pivotX - this.getBoundingWidth();
         	} else {
         		return this._x - this.getBoundingHalfWidth();
         	}
@@ -776,13 +778,13 @@
     Renderizable.prototype.getRight = function () {
         if (this._scale) {
             if (this.pivotX != undefined) {
-                return this._x + this.pivotX + this._width * this._scale.x;
+                return this._x + this.pivotX + this.getBoundingWidth() * this._scale.x;
             } else {
                 return this._x + this.getBoundingHalfWidth() * this._scale.x;
             }
         } else {
             if (this.pivotX != undefined) {
-                return this._x + this.pivotX + this._width;
+                return this._x + this.pivotX + this.getBoundingWidth();
         	} else {
         		return this._x + this.getBoundingHalfWidth();
             }
@@ -797,13 +799,13 @@
     Renderizable.prototype.getTop = function () {
         if (this._scale) {
             if (this.pivotY != undefined) {
-                return this._y + this.pivotY - this._height * this._scale.y;
+                return this._y + this.pivotY - this.getBoundingHeight() * this._scale.y;
             } else {
                 return this._y - this.getBoundingHalfHeight() * this._scale.y;
             }
         } else {
             if (this.pivotY != undefined) {
-                return this._y + this.pivotY - this._height;
+                return this._y + this.pivotY - this.getBoundingHeight();
         	} else {
         		return this._y - this.getBoundingHalfHeight();
             }
@@ -818,13 +820,13 @@
     Renderizable.prototype.getBottom = function () {
         if (this._scale) {
             if (this.pivotY != undefined) {
-                return this._y + this.pivotY + this._height * this._scale.y;
+                return this._y + this.pivotY + this.getBoundingHeight() * this._scale.y;
             } else {
                 return this._y + this.getBoundingHalfHeight() * this._scale.y;
             }
         } else {
             if (this.pivotY != undefined) {
-                return this._y + this.pivotY + this._height;
+                return this._y + this.pivotY + this.getBoundingHeight();
         	} else {
         		return this._y + this.getBoundingHalfHeight();
         	}

@@ -119,7 +119,7 @@
 	 * @return {Vector2d}
 	 */
 	Math2d.prototype.getRotatedVertexCoords = function(x, y, rotation) {
-		return new Vector2d( this.getRotatedVertexCoordsX(x, y, rotation), getRotatedVertexCoordsY(x, y, rotation) );
+		return new Vector2d( this.getRotatedVertexCoordsX(x, y, rotation), this.getRotatedVertexCoordsY(x, y, rotation) );
 	};
    /**
 	* Returns the magnitude of a vector

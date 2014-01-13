@@ -40,7 +40,7 @@
 			}
 		}
 		
-		attributes.push("collided", false);
+		attributes.set("collided", false);
 		
 	});
 

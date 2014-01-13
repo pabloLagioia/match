@@ -18,6 +18,8 @@
 			up: "up", left: "left", right: "right", down: "down",
 			rotateTurretLeft: "a", rotateTurretRight: "s"
 		});
+		tank.has("damageTaken", 0);
+		tank.has("health", 100);
 		tank.has("collisionGroup", 0);
 
 		tank.shows("base").as("rectangle").set({
@@ -40,6 +42,12 @@
 		});
 		
 		// tank.does("monitorAttributes");
+		tank.does("takeDamage", function (e, a) {
+			a.set("health", a.get("health") - a.get("damageTaken"));
+		});
+		tank.does("resetDamageTaken", function (e, a) {
+			a.set("damageTaken", 0);
+		});
 		tank.does("fixViews");
 		tank.does("rotateTurret", function(entity, attributes, views) {
 		
