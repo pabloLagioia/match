@@ -62,7 +62,7 @@ function main() {
 
 			// layer.push(obj);
 
-			M.renderer.camera.setViewport(300, 300);
+			// M.renderer.camera.setViewport(300, 300);
 			
 		},
 		

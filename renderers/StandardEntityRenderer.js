@@ -290,25 +290,12 @@
 
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
-		
-		var pivotX, pivotY;
-		
-		if ( renderizable.pivotX != null ) {
-			pivotX = renderizable.pivotX;
-		} else {
-			pivotX = -renderizable._halfWidth;
-		}
-		if ( renderizable.pivotY != null ) {
-			pivotY = renderizable.pivotY;
-		} else {
-			pivotY = -renderizable._halfHeight;
-		}
 
 		if ( renderizable._rotation || renderizable._scale ) {
 		
 			context.save();
 
-			context.translate(renderizable._x - cameraX, renderizable._y - cameraY);
+			this._applyTranslation(renderizable, context, cameraX, cameraY);
 			this._applyRotation(renderizable, context);
 			this._applyScale(renderizable, context);
 			
@@ -316,7 +303,7 @@
 				context.fillStyle = renderizable._fillStyle;
 			}
 			
-			context.fillRect( pivotX, pivotY, renderizable._width, renderizable._height );
+			context.fillRect( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
 
 			if ( renderizable._strokeStyle ) {
 
@@ -325,7 +312,7 @@
 				}
 
 				context.strokeStyle = renderizable._strokeStyle;
-				context.strokeRect( pivotX, pivotY, renderizable._width, renderizable._height );
+				context.strokeRect( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
 			}
 
 			context.restore();
@@ -336,7 +323,7 @@
 				context.fillStyle = renderizable._fillStyle;
 			}
 			
-			context.fillRect( renderizable._x + pivotX, renderizable._y + pivotY, renderizable._width, renderizable._height );
+			context.fillRect( renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight, renderizable._width, renderizable._height );
 			
 			if ( renderizable._strokeStyle ) {
 
@@ -374,11 +361,7 @@
 		context.textAlign = renderizable._textAlign;
 
 		context.textBaseline = renderizable._textBaseline;
-
-		context.fillStyle = renderizable._fillStyle;
 		
-		context.fillRect( renderizable._x, renderizable._y, 2, 2 );
-
 		this._applyShadow(renderizable, context);
 
 		if ( renderizable._halfWidth == 0 ) {
@@ -407,21 +390,22 @@
 		}
 
 	};
-	StandardEntityRenderer.prototype.fillText = function(renderer, context, x , y) {
+	StandardEntityRenderer.prototype.fillText = function(renderizable, context, x , y) {
 
+		context.fillStyle = renderizable._fillStyle;
 		
-		if ( renderer.multiLine ) {
-			for ( var i = 0; i < renderer.multiLine.length; i++ ) {
-				context.fillText( renderer.multiLine[i], x, y + i * renderer.getHeight() );
+		if ( renderizable.multiLine ) {
+			for ( var i = 0; i < renderizable.multiLine.length; i++ ) {
+				context.fillText( renderizable.multiLine[i], x, y + i * renderizable.getHeight() );
 			}
 		} else {
-			context.fillText( renderer._text, x, y );
+			context.fillText( renderizable._text, x, y );
 		}
 
-		if ( renderer._strokeStyle ) {
-			context.strokeStyle = renderer._strokeStyle;
-			context.lineWidth = renderer._lineWidth || 1;
-			context.strokeText(renderer._text, x, y );
+		if ( renderizable._strokeStyle ) {
+			context.strokeStyle = renderizable._strokeStyle;
+			context.lineWidth = renderizable._lineWidth || 1;
+			context.strokeText(renderizable._text, x, y );
 		}
 
 	};

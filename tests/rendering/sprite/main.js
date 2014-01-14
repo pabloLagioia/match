@@ -37,6 +37,7 @@ function main() {
 		object.does("bounce");
 		object.does("stickToCanvas");
 
+		layer.background = "#fff";
 		layer.push(object);
 		
 	});

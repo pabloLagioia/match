@@ -7,28 +7,39 @@
 			var i = 0,
 				values = views._values,
 				l = values.length,
-				currentView,
+				view,
 				location = attributes.get("location"),
 				rotation = attributes.get("rotation");
 
 			for ( ; i < l; i++ ) {
 			
-				currentView = values[i];
+				view = values[i];
 				
-				if ( currentView._initialLocation == undefined ) {
-					currentView._initialLocation = {
-						x: currentView.getX(),
-						y: currentView.getY()
+				if ( view._initialLocation == undefined ) {
+					view._initialLocation = {
+						x: view.getX(),
+						y: view.getY()
 					}
 				}
-				
-				if ( currentView._initialRotation == undefined ) {
-					currentView._initialRotation = currentView.getRotation();
+				if ( view._initialRotation == undefined ) {
+					view._initialRotation = view._rotation;
 				}
 				
-				currentView.setX(location.x + currentView._initialLocation.x);
-				currentView.setY(location.y + currentView._initialLocation.y);
-				currentView.setRotation(rotation + currentView._initialRotation);
+				if ( rotation != 0 ) {
+
+					// if ( view._x != 0 && view._y != 0 ) {
+					// 	var rotatedX = M.math2d.getRotatedVertexCoordsX(view._initialLocation.x, view._initialLocation.y, rotation),
+					// 		rotatedY = M.math2d.getRotatedVertexCoordsY(view._initialLocation.x, view._initialLocation.y, rotation);
+
+					// 	view.setLocation(rotatedX + location.x, rotatedY + location.y);
+					// }
+					
+					// view.setRotation(view._initialRotation + rotation);
+					
+				} else {
+					view.setX(location.x + view._initialLocation.x);
+					view.setY(location.y + view._initialLocation.y);
+				}
 				
 			}
 		
@@ -36,6 +47,6 @@
 		
 		// }
 	
-	});
+	}, "location, rotation", "fixes views to entity coordinates and rotation");
 
 })(M);

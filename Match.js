@@ -418,12 +418,38 @@ var M = window.M || {},
 		arguments[0] = "M.plugins." + arguments[0];
 		this.registerClass.apply(this, arguments);
 	};
-	Match.prototype.registerBehaviour = function(name, func) {
+	Match.prototype.registerBehaviour = function(name, value, requires, description) {
+
 		if ( this.game.behaviours[name] == undefined ) {
-			this.game.behaviours[name] = func;
+			this.game.behaviours[name] = value;
+			if ( requires ) {
+				if ( typeof requires == "string" ) {
+					requires = requires.split(",");
+				}
+				value.requires = requires;
+			}
+			if ( description ) {
+				value.description = description;
+			}
 		} else {
 			this.logger.warn("There already is a behaviour named " + name);
 		}
+
+		// var behaviour;
+
+		// if ( arguments.length == 2 ) {
+		// 	behaviour = {
+		// 		name: arguments[0],
+		// 		callback: arguments[1]
+		// 	}
+		// }
+
+		// if ( this.game.behaviours[behaviour.name] == undefined ) {
+		// 	this.game.behaviours[behaviour.name] = behaviour;
+		// } else {
+		// 	this.logger.warn("There already is a behaviour named " + name);
+		// }
+
 	};
 	Match.prototype.registerAttribute = function(name, value) {
 		if ( this.game.attributes[name] == undefined ) {

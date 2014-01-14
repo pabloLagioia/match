@@ -1,4 +1,4 @@
-(function (namespace, SimpleMap) {
+(function (namespace, SimpleMap, M) {
 
 	function StoreAs(name, attributes) {
 		this.name = name;
@@ -79,6 +79,7 @@
 			M.logger.error("Cannot add undefined behaviour " + name + " to entity");
 		} else {
 			this.behaviours.set(name, value);
+			// this.behaviours.set(name, value.callback);
 		}
 	};
 
@@ -92,4 +93,4 @@
 
 	namespace.Entity = Entity;
 
-})(M, SimpleMap);
+})(M, SimpleMap, M);

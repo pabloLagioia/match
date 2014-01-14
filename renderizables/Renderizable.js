@@ -28,8 +28,8 @@
 		 */
 		this._y = 0;
 		
-		this.pivotX = null;
-		this.pivotY = null;
+		this.pivotX = 0;
+		this.pivotY = 0;
 		
 		/**
 		 * object width
