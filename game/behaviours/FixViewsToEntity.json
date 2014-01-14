@@ -1,0 +1,5 @@
+{
+	"name": "FixViewsToEntity",
+	"requires": ["location", "rotation"],
+	"description": "Rotates and translates views using location and rotation attributes to make all views depend on the entity position and rotation"
+}

@@ -38,41 +38,30 @@
 			x: 0, y: -72, color: "gray", width: 10, height: 70
 		});
 		
-		// tank.does("monitorAttributes");
 		tank.does("takeDamage", function (e, a) {
 			a.set("health", a.get("health") - a.get("damageTaken"));
 		});
 		tank.does("resetDamageTaken", function (e, a) {
 			a.set("damageTaken", 0);
 		});
-		tank.does("fixViews");
 		tank.does("rotateTurret", function(entity, attributes, views) {
 
-			var rotation = attributes.get("rotation"),
-				turretRotation = attributes.get("turretRotation"),
+			var turretRotation = attributes.get("turretRotation"),
 				turretRotationSpeed = attributes.get("turretRotationSpeed") * attributes.get("turretDirection"),
 				turretBase = views.get("turretBase"),
-				cannon = views.get("cannon"),
-				location = attributes.get("location");
-		
+				cannon = views.get("cannon");
+
 			if ( turretRotation != this.previousTurretRotation ) {
 
 				turretBase.offsetRotation(turretRotationSpeed);
-				cannon.offsetRotation(turretRotationSpeed);
-
-				var x = turretBase._initialLocation.x - cannon._initialLocation.x,
-					y = turretBase._initialLocation.y - cannon._initialLocation.y,
-					rotatedX = M.math2d.getRotatedVertexCoordsX(x, y, rotation + turretRotationSpeed),
-					rotatedY = M.math2d.getRotatedVertexCoordsY(x, y, rotation + turretRotationSpeed);
-
-				cannon._initialLocation.x = rotatedX;
-				cannon._initialLocation.y = rotatedY;
+				cannon.offsetRotation(turretRotationSpeed, turretBase._x, turretBase._y);
 
 				this.previousTurretRotation = turretRotation;
 
-			}
-			
+			}		
+
 		});
+		tank.does("fixViewsToEntity");
 		tank.does("accelerate", function(e, a, v, input) {
 			if ( a.get("accelerating") ) {
 				a.set("speed", a.get("speed") + a.get("acceleration"));
@@ -110,15 +99,21 @@
 				a.set("direction", M.math2d.getRotatedVertex(a.get("direction"), rotationSpeed));
 			}
 			if ( keysDown[mappings.rotateTurretRight] ) {
-				var	rotationSpeed = a.get("turretRotationSpeed"),
-					rotation = a.get("turretRotation") - rotationSpeed;
-				a.set("turretRotation", rotation);
-				a.set("turretDirection", -1);
-			} else if ( keysDown[mappings.rotateTurretLeft] ) {
+
 				var	rotationSpeed = a.get("turretRotationSpeed"),
 					rotation = a.get("turretRotation") + rotationSpeed;
+
 				a.set("turretRotation", rotation);
 				a.set("turretDirection", 1);
+
+			} else if ( keysDown[mappings.rotateTurretLeft] ) {
+			
+				var	rotationSpeed = a.get("turretRotationSpeed"),
+					rotation = a.get("turretRotation") - rotationSpeed;
+
+				a.set("turretRotation", rotation);
+				a.set("turretDirection", -1);
+
 			}
 
 		});
@@ -126,8 +121,7 @@
 		tank.does("collide");
 		
 		tank.does("moveWithSpeedAndDirection");
-		
-		
+
 		return tank;
 
 	}

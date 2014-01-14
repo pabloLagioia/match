@@ -422,33 +422,9 @@ var M = window.M || {},
 
 		if ( this.game.behaviours[name] == undefined ) {
 			this.game.behaviours[name] = value;
-			if ( requires ) {
-				if ( typeof requires == "string" ) {
-					requires = requires.split(",");
-				}
-				value.requires = requires;
-			}
-			if ( description ) {
-				value.description = description;
-			}
 		} else {
 			this.logger.warn("There already is a behaviour named " + name);
 		}
-
-		// var behaviour;
-
-		// if ( arguments.length == 2 ) {
-		// 	behaviour = {
-		// 		name: arguments[0],
-		// 		callback: arguments[1]
-		// 	}
-		// }
-
-		// if ( this.game.behaviours[behaviour.name] == undefined ) {
-		// 	this.game.behaviours[behaviour.name] = behaviour;
-		// } else {
-		// 	this.logger.warn("There already is a behaviour named " + name);
-		// }
 
 	};
 	Match.prototype.registerAttribute = function(name, value) {

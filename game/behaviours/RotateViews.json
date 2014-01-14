@@ -1,0 +1,5 @@
+{
+	"name": "RotateViews",
+	"requires": ["rotation"],
+	"description": "Rotates all views based on the rotation attribute of the entity"
+}

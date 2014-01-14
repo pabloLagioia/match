@@ -46,24 +46,6 @@ function main() {
 				layer.push(tank);
 			}
 
-			// var obj = new M.Entity();
-			// obj.shows("base").as("rectangle").set({
-			// 	x: 350, y: 150, width: 50, height: 50, color: "red"
-			// });
-			// obj.shows("cannon").as("rectangle").set({
-			// 	x: 350, y: 150, width: 30, height: 25, color: "orange", pivotY: -50
-			// });
-			// obj.shows("center").as("rectangle").set({
-			// 	x: 350, y: 150, width: 1, height: 1, color: "black"
-			// });
-
-			// obj.has("spinAroundSpeed", 0.01);
-			// obj.does("spinAround");
-
-			// layer.push(obj);
-
-			// M.renderer.camera.setViewport(300, 300);
-			
 		},
 		
 		function (loaded) {

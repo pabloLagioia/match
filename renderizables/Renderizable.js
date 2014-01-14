@@ -960,8 +960,28 @@
 	 * @method offsetRotation
 	 * @param {float} offset
 	 */
-    Renderizable.prototype.offsetRotation = function(offset) {
-        return this.setRotation(this._rotation + offset);
+    Renderizable.prototype.offsetRotation = function(offset, pivotX, pivotY) {
+        
+        this.setRotation(this._rotation + offset);
+
+		if ( pivotX != undefined || pivotY != undefined ) {
+
+			var x = this._x - pivotX,
+				y = this._y - pivotY,				
+				rotatedX,
+				rotatedY;
+				
+			if ( x != 0 || y != 0 ) {
+				rotatedX = M.math2d.getRotatedVertexCoordsX(x, y, offset),
+				rotatedY = M.math2d.getRotatedVertexCoordsY(x, y, offset);
+				this.setLocation(rotatedX + pivotX, rotatedY + pivotY);
+			}
+
+
+		}
+
+		return this;
+
     };
 	/**
 	 * Sets the rotation angle of this object
@@ -970,9 +990,13 @@
 	 * @param {float} rotation the rotation angle
 	 */
 	Renderizable.prototype.setRotation = function (rotation) {
+
 		this._rotation = rotation;
+
 		this.notifyChange();
+
 		return this;
+
 	};
 	/**
 	 * Gets the rotation angle of this object
