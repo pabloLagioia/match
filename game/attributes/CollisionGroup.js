@@ -1,0 +1,1 @@
+M.registerAttribute("collisionGroup", 0);

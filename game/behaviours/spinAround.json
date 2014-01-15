@@ -1,0 +1,5 @@
+{
+	"name": "spinAround",
+	"requires": ["spinAroundSpeed"],
+	"description": "Rotates the views using spinAroundSpeed"
+}

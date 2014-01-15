@@ -54,16 +54,13 @@
         <script src="../../SimpleMap.js"></script>
         <script src="../../EventSimpleMap.js"></script>
         <script src="../../Entity.js"></script>
-        <script src="../../game/attributes/Location.js"></script>
-        <script src="../../game/behaviours/FixViewsToEntity.js"></script>
-        <script src="../../game/behaviours/Move.js"></script>
-        <script src="../../game/behaviours/MonitorLocationAndRotation.js"></script>
-        <script src="../../game/behaviours/Collision.js"></script>
-		<script src="../../game/behaviours/Basic.js"></script>
+        <script src="../../game/attributes/attributes?get=location,direction"></script>
+        <script src="../../game/behaviours/behaviours?get=fixViewsToEntity,moveWithSpeedAndDirection,collide,fixViewsToEntity"></script>
 		<script src="Tank.js"></script>
 		<script src="main.js"></script>
 	</head>
 	<body>
 		<canvas width="640" height="480"></canvas>
+		<p id="info"></p>
 	</body>
 </html>

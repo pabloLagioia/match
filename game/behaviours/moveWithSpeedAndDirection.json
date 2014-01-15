@@ -1,0 +1,5 @@
+{
+	"name": "moveWithSpeedAndDirection",
+	"requires": ["speed", "direction", "location"],
+	"description": "Moves an object using speed in the given direction"
+}

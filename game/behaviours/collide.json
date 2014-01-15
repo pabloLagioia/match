@@ -1,0 +1,5 @@
+{
+	"name": "collide",
+	"requires": ["location", "collisionGroup"],
+	"description": "Determines if two objects with the same collisionGroup collide. If they do it sets the attribute collided to true"
+}

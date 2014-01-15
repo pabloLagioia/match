@@ -1,0 +1,13 @@
+{
+	"name": "scaleData",
+	"description": "Provides information on how to scale the views of an entity",
+	"fields": {
+		"value": "Number representing the scale proportion",
+		"direction": "Number representing the direction of the scale. 1 to make it grow, -1 to shrink",
+		"speed": "Number representing the speed to scale the object",
+		"max": "Number representing the maximum value to scale the object",
+		"min": "Number representing the minimum value to scale the object"
+	},
+	"methods": {
+	}
+}

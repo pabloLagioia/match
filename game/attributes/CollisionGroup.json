@@ -1,0 +1,4 @@
+{
+	"name": "collisionGroup",
+	"description": "A number that represents the collision group of the entity. All objects in the same group should collide with each other"
+}

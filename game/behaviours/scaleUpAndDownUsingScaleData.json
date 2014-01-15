@@ -1,0 +1,5 @@
+{
+	"name": "scaleUpAndDownUsingScaleData",
+	"requires": ["scaleData"],
+	"description": "Scales the views up and down based on scale data"
+}

@@ -1,0 +1,5 @@
+{
+	"name": "stickToCanvas",
+	"requires": [],
+	"description": "Prevents the object from going outside of the canvas"
+}

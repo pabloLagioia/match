@@ -1,0 +1,5 @@
+{
+	"name": "bounce",
+	"requires": ["direction"],
+	"description": "Makes the views bounce in the canvas using a direction"
+}

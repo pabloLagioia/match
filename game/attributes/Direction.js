@@ -1,0 +1,1 @@
+M.registerAttribute("direction", M.math2d.Vector2d);

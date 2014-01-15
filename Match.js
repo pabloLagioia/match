@@ -281,6 +281,15 @@ var M = window.M || {},
 		 * @private
 		 */
 		this._inputHandlers = [];
+		
+		this.DEFAULT_UPDATES_PER_SECOND = 60;
+		this._updatesPerSecond = 0;
+		this.msPerUpdate = 0;
+		this._previousLoopTime = null;
+		this._lag = 0;
+		this._tries = 5;
+		
+		this.setUpdatesPerSecond(this.DEFAULT_UPDATES_PER_SECOND);
 
 		this.plugins = {
 			html: {
@@ -310,18 +319,30 @@ var M = window.M || {},
 		});
 
 	}
-
+	
 	Match.prototype.getPluginTemplate = function(id) {
 		var div = document.createElement("div");
 		div.setAttribute("id", id);
 		div.innerHTML = this.plugins.html[id];
 		return div;
 	};
-
+	
+	Match.prototype.setUpdatesPerSecond = function(updates) {
+		this._updatesPerSecond = updates;
+		this.msPerUpdate = Math.floor(1000 / updates);
+	};
+	
+	Match.prototype.getUpdatesPerSecond = function() {
+		return this._updatesPerSecond;
+	};
+	
 	Match.prototype.setUpGameLoop = function() {
 
 		this.gameLoopAlreadySetup = true;
-
+		
+		this._previousLoopTime = this.getTime();
+		this._lag = 0;
+	
 		gameLoop();
 		/*
 		 * If there is a main function defined in window, it is called
@@ -506,16 +527,32 @@ var M = window.M || {},
 	Match.prototype.gameLoop = function() {
 
 		if ( !this._isPlaying ) return;
-
+		
 		this.onBeforeLoop.raise();
 
 		var p = this.onLoopProperties;
 
 		p.time = this.FpsCounter.timeInMillis;
 
-		this.updateGameObjects(this._gameObjects, p);
+		var current = this.getTime(),
+			elapsed = current - this._previousLoopTime;
+		
+		this._previousLoopTime = current;
+		this._lag += elapsed;
+		
+		if ( this._tries > 0 ) {
+			this._lag = 0;
+			this._tries--;
+		}
 		
 		this._updateInput(p);
+
+		while ( this._lag >= this.msPerUpdate ) {
+		
+			this.updateGameObjects(this._gameObjects, p);
+			this._lag -= this.msPerUpdate;
+
+		}
 
 		for ( var i = 0, l = this._gameLayers.length; i < l; i++ ) {
 			this.renderer.render(this._gameLayers[i]);
@@ -527,8 +564,6 @@ var M = window.M || {},
 		this.FpsCounter.count();
 
 		this.onAfterLoop.raise();
-
-		if ( this.mouse ) this.mouse.clear();
 
 	};
 	/**

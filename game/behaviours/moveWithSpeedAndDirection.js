@@ -5,13 +5,7 @@ M.registerBehaviour("moveWithSpeedAndDirection", function(entity, attributes, vi
 		location = attributes.get("location");
 	
 	if ( speed != 0 ) {
-	
-		location.prevX = location.x;
-		location.prevY = location.y;
-	
-		location.x += speed * direction.x;
-		location.y += speed * direction.y;
-		
+		location.offset(speed * direction.x, speed * direction.y);
 	}
 			
 });

@@ -28,9 +28,6 @@
 		 */
 		this._y = 0;
 		
-		this.pivotX = 0;
-		this.pivotY = 0;
-		
 		/**
 		 * object width
 		 * @private
@@ -756,17 +753,9 @@
 	 */
     Renderizable.prototype.getLeft = function () {
         if (this._scale) {
-            if (this.pivotX != undefined) {
-                return this._x + this.pivotX - this.getBoundingWidth() * this._scale.x;
-            } else {
-                return this._x - this.getBoundingHalfWidth() * this._scale.x;
-            }
+			return this._x - this.getBoundingHalfWidth() * this._scale.x;
         } else {
-            if (this.pivotX != undefined) {
-                return this._x + this.pivotX - this.getBoundingWidth();
-        	} else {
-        		return this._x - this.getBoundingHalfWidth();
-        	}
+			return this._x - this.getBoundingHalfWidth();
         }
     };
 	/**
@@ -777,17 +766,9 @@
 	 */
     Renderizable.prototype.getRight = function () {
         if (this._scale) {
-            if (this.pivotX != undefined) {
-                return this._x + this.pivotX + this.getBoundingWidth() * this._scale.x;
-            } else {
-                return this._x + this.getBoundingHalfWidth() * this._scale.x;
-            }
+            return this._x + this.getBoundingHalfWidth() * this._scale.x;
         } else {
-            if (this.pivotX != undefined) {
-                return this._x + this.pivotX + this.getBoundingWidth();
-        	} else {
-        		return this._x + this.getBoundingHalfWidth();
-            }
+			return this._x + this.getBoundingHalfWidth();
         }
     };
 	/**
@@ -798,17 +779,9 @@
 	 */
     Renderizable.prototype.getTop = function () {
         if (this._scale) {
-            if (this.pivotY != undefined) {
-                return this._y + this.pivotY - this.getBoundingHeight() * this._scale.y;
-            } else {
-                return this._y - this.getBoundingHalfHeight() * this._scale.y;
-            }
+            return this._y - this.getBoundingHalfHeight() * this._scale.y;
         } else {
-            if (this.pivotY != undefined) {
-                return this._y + this.pivotY - this.getBoundingHeight();
-        	} else {
-        		return this._y - this.getBoundingHalfHeight();
-            }
+        	return this._y - this.getBoundingHalfHeight();
         }
     };
 	/**
@@ -819,17 +792,9 @@
 	 */
     Renderizable.prototype.getBottom = function () {
         if (this._scale) {
-            if (this.pivotY != undefined) {
-                return this._y + this.pivotY + this.getBoundingHeight() * this._scale.y;
-            } else {
-                return this._y + this.getBoundingHalfHeight() * this._scale.y;
-            }
+            return this._y + this.getBoundingHalfHeight() * this._scale.y;
         } else {
-            if (this.pivotY != undefined) {
-                return this._y + this.pivotY + this.getBoundingHeight();
-        	} else {
-        		return this._y + this.getBoundingHalfHeight();
-        	}
+        	return this._y + this.getBoundingHalfHeight();
         }
     };
 	/**

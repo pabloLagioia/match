@@ -1,0 +1,5 @@
+{
+	"name": "translateViews",
+	"requires": ["location"],
+	"description": "Translates all views based on the location attribute of the entity"
+}

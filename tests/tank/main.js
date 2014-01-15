@@ -33,7 +33,14 @@ function main() {
 			
 			for ( var i = 0; i < M.random.integer(2, 3); i++ ) {
 				var tree = new M.Entity();
-				tree.shows("tree").as("sprite").setImage("tree").setLocation(M.random.integer(0, 640), M.random.integer(0, 480));
+				// tree.shows("tree").as("sprite").setImage("tree").setLocation(M.random.integer(0, 640), M.random.integer(0, 480));
+				tree.shows("tree").as("rectangle").set({
+					fill: "red",
+					x: M.random.integer(0, 640),
+					y: M.random.integer(0, 480),
+					width: 62,
+					height: 64
+				});
 				tree.has("collisionGroup", 0);
 				terrainLayer.push(tree);
 			}

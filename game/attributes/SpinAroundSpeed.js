@@ -1,0 +1,1 @@
+M.registerAttribute("spinAroundSpeed", 0.01);

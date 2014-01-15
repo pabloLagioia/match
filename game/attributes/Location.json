@@ -1,0 +1,16 @@
+{
+	"name": "location",
+	"description": "Provides information about the location the entity",
+	"fields": {
+		"x": "Coordinate in the x axis",
+		"y": "Coordinate in the y axis"
+	},
+	"methods": {
+		"offset(x, y)": "Adds the given values to x and y",
+		"set": "Sets x and y to the given  values",
+		"reset": "Sets x and y to 0",
+		"setX": "Sets x to the given value",
+		"setY": "Sets y to the given value",
+		"rotate": "Rotates x and y by the given angle"
+	}
+}

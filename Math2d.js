@@ -296,11 +296,42 @@
 	* @private
 	*/
 	function Vector2d(x, y) {
-		this.x = x;
-		this.y = y;
+		this.x = x || 0;
+		this.y = y || 0;
 	}
+	Vector2d.prototype.offset = function(x, y) {
+		this.set(this.x + x, this.y + y);
+		return this;
+	};
+	Vector2d.prototype.set = function(x, y) {
+		this.setX(x);
+		this.setY(y);
+		return this;
+	};
+	Vector2d.prototype.reset = function() {
+		return this.set(0, 0);
+	};
+	Vector2d.prototype.setX = function(x) {
+		this.prevX = this.x;
+		this.x = x;
+		return this;
+	};
+	Vector2d.prototype.setY = function(y) {
+		this.prevY = this.y;
+		this.y = y;
+		return this;
+	};
+	Vector2d.prototype.rotate = function(rotation) {
+		this.setX(instance.getRotatedVertexCoordsX(this.x, this.y, rotation));
+		this.setY(instance.getRotatedVertexCoordsY(this.x, this.y, rotation));
+		return this;
+	};
 
-	namespace.math2d = namespace.Math2d = new Math2d();
+	M.Vector2d = Vector2d;
+	
+	var instance = new Math2d();
+
+	namespace.math2d = namespace.Math2d = instance;
 	namespace.math2d.Vector2d = Vector2d;
 	
 })(window.Match);

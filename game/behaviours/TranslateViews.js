@@ -29,4 +29,4 @@ M.registerBehaviour("translateViews", function(e, a, v) {
 
 		}
 
-}, "location", "Translates all views based on the location attribute of the entity");
+});
