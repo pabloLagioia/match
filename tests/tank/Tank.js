@@ -121,6 +121,8 @@
 		tank.does("collide");
 		
 		tank.does("moveWithSpeedAndDirection");
+		
+		tank.does("followCamera");
 
 		return tank;
 

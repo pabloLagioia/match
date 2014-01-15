@@ -1,0 +1,5 @@
+{
+	"name": "followCamera",
+	"requires": ["location"],
+	"description": "Moves the camera with the object. In other words, the location of the camera is set exactly as the location of the object."
+}

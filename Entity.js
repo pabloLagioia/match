@@ -70,6 +70,9 @@
 		this.attributes.set(name, value);
 		return value;
 	};
+	Entity.prototype.hasnt = function(name) {
+		return this.attributes.remove(name);
+	};
 	
 	Entity.prototype.does = function(name, value) {
 		if ( value == undefined ) {
@@ -82,6 +85,10 @@
 			// this.behaviours.set(name, value.callback);
 		}
 	};
+	
+	Entity.prototype.doesnt = function(name) {
+		return this.behaviours.remove(name);
+	};
 
 	Entity.prototype.shows = function(name, value) {
 		if ( value == undefined ) {
@@ -89,6 +96,10 @@
 		} else {
 			this.views.set(name, value);
 		}
+	};
+	
+	Entity.prototype.doesntShow = function(name) {
+		return this.views.remove(name);
 	};
 
 	namespace.Entity = Entity;

@@ -34,8 +34,8 @@ function main() {
 			for ( var i = 0; i < M.random.integer(2, 3); i++ ) {
 				var tree = new M.Entity();
 				// tree.shows("tree").as("sprite").setImage("tree").setLocation(M.random.integer(0, 640), M.random.integer(0, 480));
-				tree.shows("tree").as("rectangle").set({
-					fill: "red",
+				tree.shows("body").as("sprite").set({
+					fill: "tree",
 					x: M.random.integer(0, 640),
 					y: M.random.integer(0, 480),
 					width: 62,
