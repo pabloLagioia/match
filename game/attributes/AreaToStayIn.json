@@ -1,0 +1,10 @@
+{
+	"name": "areaToStayIn",
+	"description": "Object that represents an area which the entity should not leave",
+	"fields": {
+		"top": "Min y coordinate",
+		"right": "Max x coordinate",
+		"bottom": "Max y coordinate",
+		"left": "Min x coordinate"
+	}
+}

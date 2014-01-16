@@ -1,0 +1,5 @@
+{
+	"name": "stayInArea",
+	"requires": ["areaToStayIn"],
+	"description": "Prevents the views of an entity from going outside of the given area"
+}
