@@ -1,0 +1,5 @@
+{
+	"name": "accelerate",
+	"requires": ["isAccelerating", "speed", "acceleration", "maxSpeed"],
+	"description": "If isAccelerating is true then speed will be increased by the acceleration value until it reaches maxSpeed"
+}

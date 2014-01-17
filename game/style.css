@@ -29,3 +29,6 @@ ul.registered .item {
 .item.selected {
 	border: #000 1px solid;
 }
+.item .description {
+	margin: 20px;
+}

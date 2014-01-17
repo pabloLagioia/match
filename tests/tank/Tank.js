@@ -4,24 +4,35 @@
 
 		var tank = new M.Entity();
 
+		//ATTRIBUTES
+		
 		tank.has("location").set(350, 200);
+		tank.has("direction").set(0, -1);
 		tank.has("acceleration", 0.01);
-		tank.has("decceleration", 0.01);
+		tank.has("deceleration", 0.03);
 		tank.has("speed", 0);
+		tank.has("maxSpeed", 2);
+		tank.has("minSpeed", -1);
+		tank.has("canGoReverse", false);
+		
 		tank.has("rotation", 0);
 		tank.has("rotationSpeed", 0.025);
 		tank.has("turretRotation", 0);
 		tank.has("turretRotationSpeed", 0.05);
-		tank.has("direction").set(0, -1);
 		tank.has("turretDirection", 0);
+
 		tank.has("keyboardMapping", {
 			up: "up", left: "left", right: "right", down: "down",
 			rotateTurretLeft: "a", rotateTurretRight: "s"
 		});
+
 		tank.has("damageTaken", 0);
 		tank.has("health", 100);
+
 		tank.has("collisionGroup", 0);
 
+		//VIEWS
+		
 		tank.shows("base").as("rectangle").set({
 			x: 0, y: 0, color: "brown", width: 65, height: 100
 		});
@@ -38,12 +49,16 @@
 			x: 0, y: -72, color: "gray", width: 10, height: 70
 		});
 		
+		//BEHAVIOURS
+		
 		tank.does("takeDamage", function (e, a) {
 			a.set("health", a.get("health") - a.get("damageTaken"));
 		});
+		
 		tank.does("resetDamageTaken", function (e, a) {
 			a.set("damageTaken", 0);
 		});
+		
 		tank.does("rotateTurret", function(entity, attributes, views) {
 
 			var turretRotation = attributes.get("turretRotation"),
@@ -61,31 +76,27 @@
 			}		
 
 		});
+		
 		tank.does("fixViewsToEntity");
-		tank.does("accelerate", function(e, a, v, input) {
-			if ( a.get("accelerating") ) {
-				a.set("speed", a.get("speed") + a.get("acceleration"));
-			}
-		});
-		tank.does("deccelerate", function(e, a, v, input) {
-			if ( a.get("deccelerating") ) {
-				a.set("speed", a.get("speed") - a.get("decceleration"));
-			}
-		});
+		
+		tank.does("accelerate");
+		
+		tank.does("deccelerate");
+		
 		tank.does("listenToKeyboard", function(e, a, v, input) {
 		
 			var keysDown = input.keyboard.keysDown,
 				mappings = a.get("keyboardMapping");
 				
 			if ( keysDown[mappings.up] ) {
-				a.set("accelerating", true);
-				a.set("deccelerating", false);
+				a.set("isAccelerating", true);
+				a.set("isDecelerating", false);
 			} else if ( keysDown[mappings.down] ) {
-				a.set("deccelerating", true);
-				a.set("accelerating", false);
+				a.set("isDecelerating", true);
+				a.set("isAccelerating", false);
 			} else {
-				a.set("accelerating", false);
-				a.set("deccelerating", false);
+				a.set("isAccelerating", false);
+				a.set("isDecelerating", false);
 			}
 			if ( keysDown[mappings.left] ) {
 				var	rotationSpeed = a.get("rotationSpeed"),
@@ -122,7 +133,7 @@
 		
 		tank.does("moveWithSpeedAndDirection");
 		
-		tank.does("followCamera");
+		// tank.does("followCamera");
 
 		return tank;
 

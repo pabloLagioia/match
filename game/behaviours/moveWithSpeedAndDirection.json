@@ -1,5 +1,5 @@
 {
 	"name": "moveWithSpeedAndDirection",
 	"requires": ["speed", "direction", "location"],
-	"description": "Moves an object using speed in the given direction"
+	"description": "Updates the location of the entity using speed and direction attributes"
 }

@@ -1,0 +1,5 @@
+{
+	"name": "decelerate",
+	"requires": ["isDecelerating", "speed", "deceleration", "canGoReverse"],
+	"description": "If isDecelerating is true then speed will be reduced by the acceleration value. If the entity has canGoReverse set to false or undefined then the entity will stop"
+}
