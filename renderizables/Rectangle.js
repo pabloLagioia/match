@@ -129,6 +129,17 @@
 		this.notifyChange();
 	};
 	/**
+	 * Sets the style used to stroke the rectangle
+	 *
+	 * @method setStrokeStyle
+	 * @param {Object} value the strokeStyle
+	 * @example
+			this.setStrokeStyle("rgb('255,0,0')");
+	 * @example
+			this.setStrokeStyle("Red");
+	 */
+	Rectangle.prototype.setBorder = Rectangle.prototype.setStrokeStyle;
+	/**
 	 * Sets the line width used to stroke the rectangle
 	 *
 	 * @method setStrokeWidth
@@ -140,6 +151,7 @@
 		this._lineWidth = value;
 		this.notifyChange();
 	};
+	Rectangle.prototype.setBorderWidth = Rectangle.prototype.setStrokeWidth;
 	/**
 	 * Sets the shadow style for this rectangle
 	 *
@@ -175,6 +187,7 @@
 	Rectangle.prototype.getStrokeStyle = function() {
 		return this._strokeStyle
 	};
+	Rectangle.prototype.getBorder = Rectangle.prototype.getStrokeStyle;
 	/**
 	 * Gets the stroke width
 	 * @method getStrokeWidth
@@ -183,6 +196,7 @@
 	Rectangle.prototype.getStrokeWidth = function() {
 		return this._lineWidth;
 	};
+	Rectangle.prototype.getBorderWidth = Rectangle.prototype.getStrokeWidth;
 	/**
 	 * Gets the shadow
 	 * @method getShadow

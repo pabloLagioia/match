@@ -323,7 +323,7 @@
 				context.fillStyle = renderizable._fillStyle;
 			}
 			
-			context.fillRect( renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight, renderizable._width, renderizable._height );
+			context.fillRect( renderizable._x - renderizable._halfWidth - cameraX, renderizable._y - renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
 			
 			if ( renderizable._strokeStyle ) {
 
@@ -332,7 +332,7 @@
 				}
 
 				context.strokeStyle = renderizable._strokeStyle;
-				context.strokeRect( renderizable._x - renderizable._halfWidth, renderizable._y - renderizable._halfHeight, renderizable._width, renderizable._height );
+				context.strokeRect( renderizable._x - renderizable._halfWidth - cameraX, renderizable._y - renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
 
 			}
 

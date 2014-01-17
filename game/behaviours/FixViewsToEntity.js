@@ -10,15 +10,15 @@ M.registerBehaviour("fixViewsToEntity", function(e, a, v) {
 		this.rotation = 0;
 	}
 
-	if ( rotation != this.rotation ) {
-		offsetRotation = rotation - this.rotation;
-		this.rotation = rotation;
-	}
-
 	if ( this.location == undefined ) {
 		this.location = new Object();
 		this.location.x = 0;
 		this.location.y = 0;
+	}
+
+	if ( rotation != this.rotation ) {
+		offsetRotation = rotation - this.rotation;
+		this.rotation = rotation;
 	}
 
 	if ( location.x != this.location.x ) {
@@ -32,15 +32,15 @@ M.registerBehaviour("fixViewsToEntity", function(e, a, v) {
 	
 	v.eachValue(function(view) {
 
-		if ( offsetRotation != 0 ) {
-
-			view.offsetRotation(offsetRotation, location.x, location.y);
-
-		} 
-
 		if ( offsetX != 0 || offsetY != 0 ) {
 
 			view.offset(offsetX, offsetY);
+
+		}
+
+		if ( offsetRotation != 0 ) {
+
+			view.offsetRotation(offsetRotation, location.x, location.y);
 
 		}
 

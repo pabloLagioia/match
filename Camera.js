@@ -53,7 +53,17 @@
 		 */
 		this._halfViewportWidth = 0;
 		
+		this._boundingArea = null;
+		
 	}
+	Camera.prototype.setBoundingArea = function(left, top, right, bottom) {
+		this._boundingArea = {
+			minX: left,
+			minY: top,
+			maxX: right,
+			maxY: bottom
+		}
+	};
 	/**
 	 * Sets viewport width, hight and halfs sizes
 	 * @method setViewport
@@ -86,6 +96,20 @@
 	Camera.prototype.centerAt = function(x, y) {
 		this._x = x - this._halfViewportWidth;
 		this._y = y - this._halfViewportHeight;
+		if ( this._boundingArea ) {
+			if ( this._x < this._boundingArea.minX ) {
+				this._x = this._boundingArea.minX;
+			}
+			if ( this._y < this._boundingArea.minY ) {
+				this._y = this._boundingArea.minY;
+			}
+			if ( this._x > this._boundingArea.maxX ) {
+				this._x = this._boundingArea.maxX;
+			}
+			if ( this._y > this._boundingArea.maxY ) {
+				this._y = this._boundingArea.maxY;
+			}
+		}
 		M.redrawAllLayers();
 	};
 
