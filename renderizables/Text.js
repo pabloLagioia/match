@@ -429,6 +429,7 @@
 		this._strokeStyle = value;
 		this.notifyChange();
 	};
+	Text.prototype.setBorder = Text.prototype.setStrokeStyle;
 	/**
 	 * Sets the line width used to stroke the text
 	 *
@@ -441,6 +442,7 @@
 		this._lineWidth = value;
 		this._changed = true;
 	};
+	Text.prototype.setBorderWidth = Text.prototype.setStrokeWidth;
 	/**
 	 * Gets the line width used to stroke the text
 	 *
@@ -450,6 +452,8 @@
 	Text.prototype.getStrokeWidth = function() {
 		return this._lineWidth;
 	};
+	Text.prototype.getBorderWidth = Text.prototype.getStrokeWidth;
+	Text.prototype.getBorder = Text.prototype.getStrokeStyle;
 	/**
 	 * Sets the text
 	 * @method setText

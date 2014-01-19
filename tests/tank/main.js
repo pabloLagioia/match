@@ -11,8 +11,6 @@ function main() {
 		
 		function() {
 		
-			var terrainLayer = M.createLayer();
-			
 			var tileW = M.sprites.assets.grass.width,
 				tileH = M.sprites.assets.grass.height,
 				tileHW = tileH / 2,
@@ -29,7 +27,7 @@ function main() {
 				}
 			}
 			
-			terrainLayer.push(terrain);
+			M.push(terrain);
 			
 			for ( var i = 0; i < M.random.integer(2, 3); i++ ) {
 				var tree = new M.Entity();
@@ -42,15 +40,13 @@ function main() {
 					height: 64
 				});
 				tree.has("collisionGroup", 0);
-				terrainLayer.push(tree);
+				M.push(tree);
 			}
 		
-			var layer = M.createLayer();
-
 			for ( var i = 0; i < 1; i++ ) {
 				tank = M.game.entities.createTank();
 
-				layer.push(tank);
+				M.push(tank, "gameArea");
 			}
 
 		},

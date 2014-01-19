@@ -54,7 +54,7 @@
 		tank.does("takeDamage", function (e, a) {
 			a.set("health", a.get("health") - a.get("damageTaken"));
 		});
-		
+
 		tank.does("resetDamageTaken", function (e, a) {
 			a.set("damageTaken", 0);
 		});
@@ -130,11 +130,10 @@
 		});
 		
 		tank.does("collide");
+		tank.does("followCamera");
 		
 		tank.does("moveWithSpeedAndDirection");
 		
-		// tank.does("followCamera");
-
 		return tank;
 
 	}

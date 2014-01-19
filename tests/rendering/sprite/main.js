@@ -21,8 +21,7 @@ function main() {
 
 	}, function() {
 
-		var layer = M.createLayer(),
-			object = new M.Entity();
+		var object = new M.Entity();
 
 		object.shows("itself").as("sprite").set({
 			fill: "logo", x: M.renderer.getCenter().x, y: M.renderer.getCenter().y
@@ -37,8 +36,7 @@ function main() {
 		object.does("bounce");
 		object.does("stickToCanvas");
 
-		layer.background = "#fff";
-		layer.push(object);
+		M.push(object);
 		
 	});
 

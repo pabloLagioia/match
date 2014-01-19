@@ -80,11 +80,15 @@
 	 * @param {StandardEntityRenderer} context
 	 */
 	StandardEntityRenderer.prototype._applyAlpha = function(object, context) {
-		if ( object._alpha != null && this.alpha != object._alpha && object._alpha >= 0 && object._alpha <= 1 ) {
-			context.globalAlpha = this.alpha = object._alpha;
-		} else if (this.alpha != this.DEFAULT_ALPHA) {
+		
+		if ( object._alpha != undefined && object._alpha >= 0 && object._alpha <= 1 ) {
+			if (  this.alpha != object._alpha ) {
+				context.globalAlpha = this.alpha = object._alpha;
+			}
+		} else if ( this.alpha != this.DEFAULT_ALPHA ) {
 			this.resetAlpha(context);
 		}
+
 	};
 	/**
 	 * @method resetAlpha
@@ -546,16 +550,21 @@
 
 			}
 
-			// layer.needsRedraw = false;
+			//TODO: Review post processing
+			if ( layer.postProcessing ) {
+				layer.postProcessing(this.backBuffer, this.frontBuffer, cameraX, cameraY);
+			}
 
 			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
 
+			// layer.needsRedraw = false;
+
 		// }
 
-		if ( this.needsSorting ) {
-			this.sort();
-			this.needsSorting = false;
-		}
+		// if ( this.needsSorting ) {
+		// 	this.sort();
+		// 	this.needsSorting = false;
+		// }
 
 	};
 	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY) {

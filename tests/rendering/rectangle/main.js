@@ -1,7 +1,6 @@
 function main() {
 
-	var layer = M.createLayer(),
-		object = new M.Entity();;
+	var object = new M.Entity();
 
 	object.shows("itself").as("rectangle").set({
 		fill: "red", x: M.renderer.getCenter().x, y: M.renderer.getCenter().y, width: 100, height: 50
@@ -16,8 +15,6 @@ function main() {
 	object.does("bounce");
 	object.does("stickToCanvas");
 
-	layer.push(object);
-	
-	layer.background = "#000";
-	
+	M.push(object);
+
 }

@@ -38,6 +38,15 @@
 
 	};
 	/**
+	 * Removes all items
+	 * @method clear
+	 */
+	SimpleMap.prototype.clear = function() {
+		this._keys = {};
+		this._values = [];
+		this.length = 0;
+	};
+	/**
 	 * Gets the item that matches the given key
 	 * @method get
 	 * @param {Object} key object representing unique id

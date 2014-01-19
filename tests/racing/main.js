@@ -3,30 +3,26 @@ var car;
 function main() {
 
 	var CANVAS_W = 640,
-		CANVAS_H = 480;
-
-	var terrainLayer = M.createLayer();
-	
-	var tileW = 128,
+		CANVAS_H = 480,
+		tileW = 128,
 		tileH = 128,
 		tileHW = tileH / 2,
 		tileHH = tileW / 2,
 		tilesX = track[0].length,
 		tilesY = track.length;
 	
-	
 	for ( var column = 0; column < tilesX; column++ ) {
 		for ( var row = 0; row < tilesY; row++ ) {
 			
 			var viewId = "tile" + column + ":" + row;
 			
-			var terrain = new M.Entity();
+			var tile = new M.Entity();
 			
 			switch ( track[row][column] ) {
 			
 				case 0:
 				
-					terrain.shows(viewId).as("rectangle").set({
+					tile.shows(viewId).as("rectangle").set({
 						fill: "#500",
 						x: column * tileW + tileHW,
 						y: row * tileH + tileHH,
@@ -35,12 +31,12 @@ function main() {
 						width: tileW,
 						height: tileH
 					});
-					terrain.has("collisionGroup", 0);
+					tile.has("collisionGroup", 0);
 				
 					break;
 				case 1:
 					
-					terrain.shows(viewId).as("rectangle").set({
+					tile.shows(viewId).as("rectangle").set({
 						fill: "#050",
 						x: column * tileW + tileHW,
 						y: row * tileH + tileHH,
@@ -50,13 +46,13 @@ function main() {
 						height: tileH
 					});
 					
-					terrain.has("collisionGroup", 1);
+					tile.has("collisionGroup", 0);
 					
 					break;
 				
 				case 2:
 					
-					terrain.shows(viewId).as("rectangle").set({
+					tile.shows(viewId).as("rectangle").set({
 						fill: "#999",
 						x: column * tileW + tileHW,
 						y: row * tileH + tileHH,
@@ -66,27 +62,26 @@ function main() {
 						height: tileH
 					});
 					
-					terrain.has("collisionGroup", 2);
+					tile.has("collisionGroup", 2);
 					
 					break;
 					
 			}
 			
-			terrainLayer.push(terrain);
+			M.push(tile, "terrain");
 			
 		}
+
 	}
 	
-	var layer = M.createLayer();
-
-	M.renderer.camera.setBoundingArea(0, 0, tileW * tilesX - CANVAS_W, tileH * tilesY - CANVAS_H);
+	M.getCamera().setBoundingArea(0, 0, tileW * tilesX - CANVAS_W, tileH * tilesY - CANVAS_H);
 	
 	//PLAYER 1
 		car = M.game.entities.createCar();
 		car.attribute("location").set((CANVAS_W / 2 + 160) * 2, (CANVAS_H / 2 + 400) * 2);
 		car.does("followCamera");
-		M.renderer.camera.centerAt(car.attribute("location").x, car.attribute("location").y);
-		layer.push(car);
+		M.getCamera().centerAt(car.attribute("location").x, car.attribute("location").y);
+		M.push(car, "track");
 	
 	//PLAYER 2
 	var car2 = M.game.entities.createCar();
@@ -95,6 +90,6 @@ function main() {
 			up: "w", left: "a", right: "d", down: "s"
 		});
 		car2.view("base").setColor("blue");
-		layer.push(car2);
+		M.push(car2, "track");
 
 }

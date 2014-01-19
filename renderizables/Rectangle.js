@@ -129,14 +129,14 @@
 		this.notifyChange();
 	};
 	/**
-	 * Sets the style used to stroke the rectangle
+	 * Sets the border color of the rectangle
 	 *
-	 * @method setStrokeStyle
-	 * @param {Object} value the strokeStyle
+	 * @method setBorder
+	 * @param {Object} value the color of the border
 	 * @example
-			this.setStrokeStyle("rgb('255,0,0')");
+			this.setBorder("rgb('255,0,0')");
 	 * @example
-			this.setStrokeStyle("Red");
+			this.setBorder("Red");
 	 */
 	Rectangle.prototype.setBorder = Rectangle.prototype.setStrokeStyle;
 	/**

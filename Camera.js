@@ -110,17 +110,21 @@
 				this._y = this._boundingArea.maxY;
 			}
 		}
-		M.redrawAllLayers();
+		this.notifyChange();
+	};
+
+	Camera.prototype.notifyChange = function() {
+		//TODO: Inform renderer that it must redraw all layers
 	};
 
 	Camera.prototype.setX = function(value) {
 		this._x = value;
-		M.redrawAllLayers();
+		this.notifyChange();
 	};
 
 	Camera.prototype.setY = function(value) {
 		this._y = value;
-		M.redrawAllLayers();
+		this.notifyChange();
 	};
 
 	Camera.prototype.getX = function() {
