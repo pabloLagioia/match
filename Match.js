@@ -291,7 +291,7 @@ var M = window.M || {},
 		this.DEFAULT_LAYER_NAME = "world";
 		this.DEFAULT_LAYER_BACKGROUND = "#000";
 
-		this.DEFAULT_UPDATES_PER_SECOND = 60;
+		this.DEFAULT_UPDATES_PER_SECOND = 55;
 		this._updatesPerSecond = 0;
 		this.msPerUpdate = 0;
 		this._previousLoopTime = null;
@@ -350,12 +350,18 @@ var M = window.M || {},
 	};
 	/**
 	 * Returns the layer by the given name
+	 * @method getLayer
+	 * @param {String} name the name of the layer
+	 */
+	Match.prototype.getLayer = function(name) {
+		return this._gameLayers.get(name);
+	};
+	/**
+	 * Returns the layer by the given name. Works exactly as getLayer
 	 * @method layer
 	 * @param {String} name the name of the layer
 	 */
-	Match.prototype.layer = function(name) {
-		return this._gameLayers.get(name);
-	};
+	Match.prototype.layer = Match.prototype.getLayer;
 	Match.prototype.setUpGameLoop = function() {
 
 		this.gameLoopAlreadySetup = true;
@@ -397,7 +403,7 @@ var M = window.M || {},
 			});
 		});
 
-		this.push(logo);
+		this.push(logo).to(this.DEFAULT_LAYER_NAME);
 
 		setTimeout(function() {
 			var mainLayer = M.layer(M.DEFAULT_LAYER_NAME);
@@ -586,13 +592,12 @@ var M = window.M || {},
 		
 		this.onBeforeLoop.raise();
 
-		var p = this.onLoopProperties;
-
-		p.time = this.FpsCounter.timeInMillis;
-
-		var current = this.getTime(),
+		var p = this.onLoopProperties,
+			current = this.getTime(),
 			elapsed = current - this._previousLoopTime,
 			renderer = this.renderer;
+
+		// p.time = this.FpsCounter.timeInMillis;
 		
 		this._previousLoopTime = current;
 		this._lag += elapsed;
@@ -603,6 +608,10 @@ var M = window.M || {},
 			this._tries--;
 		}
 		
+		this._gameLayers.eachValue(function(layer) {
+			renderer.render(layer);
+		});
+		
 		this._updateInput(p);
 
 		while ( this._lag >= this.msPerUpdate ) {
@@ -611,10 +620,6 @@ var M = window.M || {},
 			this._lag -= this.msPerUpdate;
 
 		}
-
-		this._gameLayers.eachValue(function(layer) {
-			renderer.render(layer);
-		});
 
 		/*
 		 * Update FPS count
@@ -709,21 +714,39 @@ var M = window.M || {},
 	Match.prototype.isInOnLoopList = function(object) {
 		return this._gameObjects.indexOf(object) != -1;
 	};
-	Match.prototype.push = function(obj, layerName) {
+	Match.prototype.add = function() {
 
-		if ( !layerName ) {
-			layerName = this.DEFAULT_LAYER_NAME;
+		for ( var i = 0; i < arguments.length; i++ ) {
+			this.pushGameObject(arguments[i]);
 		}
-		
-		var layer = this.layer(layerName);
 	
-		if ( !layer ) {
-			layer = this.createGameLayer(layerName);
+		return {
+		
+			objects: arguments,
+			
+			to: function(layerName) {
+			
+				if ( !layerName ) {
+					return;
+				}
+			
+				var layer = M.layer(layerName);
+				
+				if ( !layer ) {
+					layer = M.createGameLayer(layerName);
+				}
+				
+				if ( layer ) {
+					for ( var i = 0; i < this.objects.length; i++ ) {
+						M.getLayer(layerName).add(this.objects[i]);
+					}
+				}
+				
+			}
 		}
-
-		layer.push(obj);
 		
 	};
+	Match.prototype.push = Match.prototype.add;	
 	/**
 	 * Pushes a game object, that is an object that implements an onLoop method, to the game object list.
 	 * NOTE: If the object does not implement onLoop then this method will throw an Error
@@ -1459,8 +1482,8 @@ var M = window.M || {},
 	 * browser so we just check Match state to know whether to loop or not.
 	 */
 	function gameLoop() {
-		requestAnimationFrame( gameLoop );
 		M.gameLoop();
+		requestAnimationFrame( gameLoop );
 	}
 
 })(window);

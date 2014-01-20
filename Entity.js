@@ -9,7 +9,7 @@
 		if ( typeof value == "function" ) {
 			value = new value;
 		}
-		this.attributes.set(this.name, actualName);
+		this.attributes.set(this.name, value);
 		return value;
 	}
 	

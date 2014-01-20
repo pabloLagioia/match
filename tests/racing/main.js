@@ -68,7 +68,7 @@ function main() {
 					
 			}
 			
-			M.push(tile, "terrain");
+			M.add(tile).to("terrain");
 			
 		}
 
@@ -81,7 +81,7 @@ function main() {
 		car.attribute("location").set((CANVAS_W / 2 + 160) * 2, (CANVAS_H / 2 + 400) * 2);
 		car.does("followCamera");
 		M.getCamera().centerAt(car.attribute("location").x, car.attribute("location").y);
-		M.push(car, "track");
+		M.add(car).to("track");
 	
 	//PLAYER 2
 	var car2 = M.game.entities.createCar();
@@ -90,6 +90,6 @@ function main() {
 			up: "w", left: "a", right: "d", down: "s"
 		});
 		car2.view("base").setColor("blue");
-		M.push(car2, "track");
+		M.add(car2).to("track");
 
 }

@@ -211,7 +211,7 @@
 	 * @example
 			this.push(new Sprite("ninja"), "ninja", 10);
 	 */
-	GameLayer.prototype.push = function(object, key, zIndex) {
+	GameLayer.prototype.add = function(object, key, zIndex) {
 
 		if ( ! object ) {
 			throw new Error("Cannot push null Object to game layer");
@@ -265,14 +265,15 @@
 
 		this.onRenderList.push(object);
 
-		if ( object.onLoop ) {
-			M.pushGameObject(object);
-		}
+		// if ( object.onLoop ) {
+			// M.pushGameObject(object);
+		// }
 
 		//TODO: We need to know which objects were added so if they were outside the viewport we must not re render
 		this.needsRedraw = true;
 
 	};
+	GameLayer.prototype.push = GameLayer.prototype.add;
 	/**
 	 * Sorts the onRenderList by the elements zIndex
 	 * @method sort

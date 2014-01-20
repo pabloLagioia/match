@@ -11,11 +11,14 @@
 		this.onUnload = new EventListener();
 		this.layers = [];
 		this.objects = [];
-		this.sprites = {};
-		this.sounds = {};
+		this.resources = {
+			sprites: null,
+			sounds: null
+		}
 	}
 
 	Scene.prototype.addLayer = function(layer) {
+		
 	}
 	Scene.prototype.removeLayer = function(layer) {
 	}
