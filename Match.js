@@ -517,6 +517,16 @@ var M = window.M || {},
 			this.logger.warn("There already is an attribute named " + name);
 		}
 	};
+	Match.prototype.registerEntity = function(name, value) {
+		if ( this.game.entities[name] == undefined ) {
+			this.game.entities[name] = value;
+		} else {
+			this.logger.warn("There already is an entitie named " + name);
+		}
+	};
+	Match.prototype.createEntity = function(name) {
+		return this.game.entities[name]();
+	};
 	/**
 	 * Calls the onLoop method on all elements in nodes
 	 * @method updateGameObjects

@@ -57,7 +57,22 @@ function main() {
 		
 			for ( var i = 0; i < 1; i++ ) {
 				
-				tank = M.game.entities.createTank();
+				tank = M.createEntity("tank");
+
+				tank.addEventListener("fire", function(entity, attributes, views) {
+
+					var tankDirection = attributes.get("direction"),
+						turretDirection = attributes.get("turretDirectionVector"),
+						location = attributes.get("location");
+					
+					//CREATE BULLET AND ADD IT TO THE LAYER
+					var bullet = M.createEntity("bullet");
+					bullet.attribute("direction").set(tankDirection.x, tankDirection.y);
+					bullet.attribute("location").set(location.x, location.y);
+					bullet.has("rotation", attributes.get("turretRotation") + attributes.get("rotation"));
+					M.add(bullet).to("gameArea");
+
+				});
 
 				M.add(tank).to("gameArea");
 				
