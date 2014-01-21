@@ -600,14 +600,13 @@ var M = window.M || {},
 
 		if ( !this._isPlaying ) return;
 		
-		// this.onBeforeLoop.raise();
+		this.onBeforeLoop.raise();
 
 		var p = this.onLoopProperties,
 			current = this.getTime(),
-			renderer = this.renderer,
-			alphaTime;
+			renderer = this.renderer;
 
-		// p.time = this.FpsCounter.timeInMillis;
+		p.time = this.FpsCounter.timeInMillis;
 		
 		this._lag += current - this._previousLoopTime;
 		this._previousLoopTime = current;
@@ -624,17 +623,16 @@ var M = window.M || {},
 
 		}
 
-		// requestAnimationFrame(function() {
-			// this._gameLayers.eachValue(function(layer) {
-				// renderer.render(layer);
-			// });
+		this._gameLayers.eachValue(function(layer) {
+			renderer.render(layer);
+		});
 
 		/*
 		 * Update FPS count
 		 */
 		this.FpsCounter.count();
 
-		// this.onAfterLoop.raise();
+		this.onAfterLoop.raise();
 
 	};
 	/**
@@ -1092,8 +1090,6 @@ var M = window.M || {},
 			this.setUpGameLoop();
 		}
 
-		render();
-
 	};
 	/**
 	 * Removes the provided index from the given array
@@ -1488,37 +1484,13 @@ var M = window.M || {},
 	 * @method gameLoop
 	 *
 	 */
-
-
-	function render() {
-
-		var prevRenderTime = new Date().getTime();
-
-		M._gameLayers.eachValue(function(layer) {
-			M.renderer.render(layer);
-		});
-
-		
-		document.getElementById("info").innerHTML = new Date().getTime() - prevRenderTime;
-	
-		requestAnimationFrame(render);
-
-	}
-
 	/*
 	 * NOTE: cancelRequestAnimationFrame has not been implemented in every
 	 * browser so we just check Match state to know whether to loop or not.
 	 */
 	function gameLoop() {
-		setInterval(function() {
-
-			var prevUpdateTime = new Date().getTime();
-
-			M.gameLoop();
-
-			document.getElementById("info2").innerHTML = new Date().getTime() - prevUpdateTime;
-
-		}, M._msPerUpdate);
+		M.gameLoop();
+		requestAnimationFrame(gameLoop);
 	}
 
 })(window);

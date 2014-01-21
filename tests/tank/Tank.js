@@ -179,13 +179,12 @@
 
 		});
 
-		tank.does("collide");
+		// tank.does("collide");
 		tank.does("actOnCollision", function(e, a) {
 
 			var manifold = a.get("manifold");
 
 			if ( manifold ) {
-
 
 				var speed = a.get("speed"),
 					direction = a.get("direction"),
