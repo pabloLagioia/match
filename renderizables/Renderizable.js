@@ -27,7 +27,9 @@
 		 * @type float
 		 */
 		this._y = 0;
-		
+
+		this._prevX = 0;		
+		this._prevY = 0;		
 		/**
 		 * object width
 		 * @private
@@ -883,8 +885,8 @@
 	 * @param {float} y the y coordinate
 	 */
     Renderizable.prototype.setLocation = function (x, y) {
-		this.prevX = this._x;
-		this.prevY = this._y;
+		this._prevX = this._x;
+		this._prevY = this._y;
 		this._x = x;
 		this._y = y;
 		this.notifyChange();
@@ -897,7 +899,7 @@
 	 * @param {CanvasRenderingContext2D} context
 	 */
 	Renderizable.prototype.movedInX = function () {
-		return this.prevX != this._x;
+		return this._prevX != this._x;
 	};
 	/**
 	 * Returns true if this object moved in the y axis
@@ -906,7 +908,7 @@
 	 * @return {Boolean}
 	 */
 	Renderizable.prototype.movedInY = function () {
-		return this.prevY != this._y;
+		return this._prevY != this._y;
 	};
     /**
 	 * Offsets the alpha value
@@ -979,7 +981,7 @@
 	 * @param {float} x the rotation angle
 	 */
 	Renderizable.prototype.setX = function (x) {
-		this.prevX = this._x;
+		this._prevX = this._x;
 		this._x = x;
 		this.notifyChange();
 		return this;
@@ -991,7 +993,7 @@
 	 * @param {float} y the rotation angle
 	 */
 	Renderizable.prototype.setY = function (y) {
-		this.prevY = this._y;
+		this._prevY = this._y;
 		this._y = y;
 		this.notifyChange();
 		return this;
@@ -1012,12 +1014,12 @@
     	var notify = false;
 
     	if ( x != 0 ) {
-			this.prevX = this._x;
+			this._prevX = this._x;
 			this._x += x;
 			notify = true;
 		}
 		if ( y != 0 ) {
-			this.prevY = this._y;
+			this._prevY = this._y;
 			this._y += y;
 			notify = true;
 		}
@@ -1036,7 +1038,7 @@
 	 * @param {float} x the x coordinate to add
 	 */
     Renderizable.prototype.offsetX = function (x) {
-		this.prevX = this._x;
+		this._prevX = this._x;
 		this._x += x;
         this.notifyChange();
 		return this;
@@ -1048,7 +1050,7 @@
 	 * @param {float} y the y coordinate to add
 	 */
     Renderizable.prototype.offsetY = function (y) {
-		this.prevY = this._y;
+		this._prevY = this._y;
 		this._y += y;
         this.notifyChange();
 		return this;

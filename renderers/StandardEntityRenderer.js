@@ -134,16 +134,20 @@
 			this.shadowChanged = false;
 		}
 	};
-	/**
-	 * Applies the translation of this object to the provided context using the camera coordinates or 0
-	 *
-	 * @method _applyTranslation
-	 * @protected
-	 * @param {Renderizable} object
-	 * @param {int} [cameraX] defaults to 0
-	 * @param {int} [cameraY] defaults to 0
-	 */
-	StandardEntityRenderer.prototype._applyTranslation = function(object, context, cameraX, cameraY) {
+	StandardEntityRenderer.prototype.setRenderingAlphaTime = function(alphaTime) {
+		this._alphaTime = alphaTime;
+		this._alphaTimeDif = 1 - alphaTime;
+	};			
+	StandardEntityRenderer.prototype.interpolate = function(current, previous) {
+		return previous * this._alphaTime + current * this._alphaTimeDif;
+	};
+	StandardEntityRenderer.prototype._interpolateX = function(object) {
+		return this.interpolate(object._x, object._prevX);
+	};
+	StandardEntityRenderer.prototype._interpolateY = function(object) {
+		return this.interpolate(object._y, object._prevY);
+	};
+	StandardEntityRenderer.prototype._applyTranslation = function(object, context, cameraX, cameraY, cameraPrevX, cameraPrevY) {
 		context.translate(object._x - cameraX, object._y - cameraY);
 	};
 	/**
@@ -290,7 +294,7 @@
 	StandardEntityRenderer.prototype.getViewportSize = function() {
 		return { width: this.camera.viewportWidth, height: this.camera.viewportHeight };
 	};
-	StandardEntityRenderer.prototype.renderRectangle = function(renderizable, context, cameraX, cameraY) {
+	StandardEntityRenderer.prototype.renderRectangle = function(renderizable, context, cameraX, cameraY, cameraPrevX, cameraPrevY) {
 
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
@@ -299,7 +303,7 @@
 		
 			context.save();
 
-			this._applyTranslation(renderizable, context, cameraX, cameraY);
+			this._applyTranslation(renderizable, context, cameraX, cameraY, cameraPrevX, cameraPrevY);
 			this._applyRotation(renderizable, context);
 			this._applyScale(renderizable, context);
 			
@@ -326,7 +330,8 @@
 			if ( renderizable._fillStyle ) {
 				context.fillStyle = renderizable._fillStyle;
 			}
-			
+
+			//Include alpha time here			
 			context.fillRect( renderizable._x - renderizable._halfWidth - cameraX, renderizable._y - renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
 			
 			if ( renderizable._strokeStyle ) {
@@ -422,7 +427,7 @@
 	 * @param {int} cameraX
 	 * @param {int} cameraY
 	 */
-	StandardEntityRenderer.prototype.renderCircle = function( renderizable, context, cameraX, cameraY ) {
+	StandardEntityRenderer.prototype.renderCircle = function( renderizable, context, cameraX, cameraY, cameraPrevX, cameraPrevY ) {
 
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
@@ -431,7 +436,7 @@
 
 			context.save();
 
-			this._applyTranslation(renderizable, context, cameraX, cameraY);
+			this._applyTranslation(renderizable, context, cameraX, cameraY, cameraPrevX, cameraPrevY);
 			this._applyScale(renderizable, context);
 
 			context.beginPath();
@@ -481,7 +486,7 @@
 	 * @param {int} cameraX
 	 * @param {int} cameraY
 	 */
-	StandardEntityRenderer.prototype.renderSprite = function( renderizable, context, cameraX, cameraY ) {
+	StandardEntityRenderer.prototype.renderSprite = function( renderizable, context, cameraX, cameraY, cameraPrevX, cameraPrevY ) {
 
 		if ( ! renderizable._image ) return;
 		
@@ -497,7 +502,7 @@
 		
 			context.save();
 			
-			this._applyTranslation(renderizable, context, cameraX, cameraY);
+			this._applyTranslation(renderizable, context, cameraX, cameraY, cameraPrevX, cameraPrevY);
 			this._applyRotation(renderizable, context);
 			this._applyScale(renderizable, context);
 
@@ -512,7 +517,7 @@
 		}
 
 	};
-	StandardEntityRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight) {
+	StandardEntityRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight, cameraPrevX, cameraPrevY) {
 	
 		// if ( layer.needsRedraw ) {
 
@@ -542,7 +547,7 @@
 			
 					if ( this.camera.canSee(currentView) ) {
 					
-						this.render(currentView, this.backBuffer, cameraX, cameraY);
+						this.render(currentView, this.backBuffer, cameraX, cameraY, cameraPrevX, cameraPrevY);
 					
 					}
 				
@@ -567,25 +572,25 @@
 		// }
 
 	};
-	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY) {
+	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY, cameraPrevX, cameraPrevY) {
 
 		var types = M.renderizables.TYPES;
 		
 		switch ( object.TYPE ) {
 			case types.SPRITE:
-				this.renderSprite(object, context, cameraX, cameraY);
+				this.renderSprite(object, context, cameraX, cameraY, cameraPrevX, cameraPrevY);
 				break;
 			case types.LAYER:
-				this.renderLayer(object, object._context, this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
+				this.renderLayer(object, object._context, this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight, this.camera._prevX, this.camera._prevY);
 				break;
 			case types.TEXT:
-				this.renderText(object, context, cameraX, cameraY);
+				this.renderText(object, context, cameraX, cameraY, cameraPrevX, cameraPrevY);
 				break;
 			case types.RECTANGLE:
-				this.renderRectangle(object, context, cameraX, cameraY);
+				this.renderRectangle(object, context, cameraX, cameraY, cameraPrevX, cameraPrevY);
 				break;
 			case types.CIRCLE:
-				this.renderCircle(object, context, cameraX, cameraY);
+				this.renderCircle(object, context, cameraX, cameraY, cameraPrevX, cameraPrevY);
 				break;
 			default:
 				throw new Error("Unable to render object of type " + object.TYPE);

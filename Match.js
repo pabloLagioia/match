@@ -291,12 +291,12 @@ var M = window.M || {},
 		this.DEFAULT_LAYER_NAME = "world";
 		this.DEFAULT_LAYER_BACKGROUND = "#000";
 
-		this.DEFAULT_UPDATES_PER_SECOND = 55;
+		this.DEFAULT_UPDATES_PER_SECOND = 60;
 		this._updatesPerSecond = 0;
-		this.msPerUpdate = 0;
+		this._msPerUpdate = 0;
 		this._previousLoopTime = null;
 		this._lag = 0;
-		this._tries = 5;
+		this._maxLag = 50;
 		
 		this.setUpdatesPerSecond(this.DEFAULT_UPDATES_PER_SECOND);
 
@@ -342,7 +342,7 @@ var M = window.M || {},
 	
 	Match.prototype.setUpdatesPerSecond = function(updates) {
 		this._updatesPerSecond = updates;
-		this.msPerUpdate = Math.floor(1000 / updates);
+		this._msPerUpdate = Math.floor(1000 / updates);
 	};
 	
 	Match.prototype.getUpdatesPerSecond = function() {
@@ -590,43 +590,41 @@ var M = window.M || {},
 
 		if ( !this._isPlaying ) return;
 		
-		this.onBeforeLoop.raise();
+		// this.onBeforeLoop.raise();
 
 		var p = this.onLoopProperties,
 			current = this.getTime(),
-			elapsed = current - this._previousLoopTime,
-			renderer = this.renderer;
+			renderer = this.renderer,
+			alphaTime;
 
 		// p.time = this.FpsCounter.timeInMillis;
 		
+		this._lag += current - this._previousLoopTime;
 		this._previousLoopTime = current;
-		this._lag += elapsed;
 
-		//TODO: Check this		
-		if ( this._tries > 0 ) {
-			this._lag = 0;
-			this._tries--;
+		if ( this._lag > this._maxLag ) {
+			this._lag = this._maxLag;
 		}
-		
-		this._gameLayers.eachValue(function(layer) {
-			renderer.render(layer);
-		});
-		
-		this._updateInput(p);
 
-		while ( this._lag >= this.msPerUpdate ) {
+		while ( this._lag > this._msPerUpdate ) {
 		
+			this._updateInput(p);
 			this.updateGameObjects(this._gameObjects, p);
-			this._lag -= this.msPerUpdate;
+			this._lag -= this._msPerUpdate;
 
 		}
+
+		// requestAnimationFrame(function() {
+			// this._gameLayers.eachValue(function(layer) {
+				// renderer.render(layer);
+			// });
 
 		/*
 		 * Update FPS count
 		 */
 		this.FpsCounter.count();
 
-		this.onAfterLoop.raise();
+		// this.onAfterLoop.raise();
 
 	};
 	/**
@@ -1084,7 +1082,7 @@ var M = window.M || {},
 			this.setUpGameLoop();
 		}
 
-		// M._intro.play();
+		render();
 
 	};
 	/**
@@ -1300,6 +1298,9 @@ var M = window.M || {},
 		decimals = parseInt( a );
 		return Math.round( number * decimals ) / decimals;
 	};
+	Match.prototype.fastRoundTo = function( number, decimals ) {
+		return this.fastRound( number * decimals ) / decimals;
+	};
 	/**
 	 * Rounds a number down using the fastest round method in javascript.
 	 * @see http://jsperf.com/math-floor-vs-math-round-vs-parseint/33
@@ -1477,13 +1478,37 @@ var M = window.M || {},
 	 * @method gameLoop
 	 *
 	 */
+
+
+	function render() {
+
+		var prevRenderTime = new Date().getTime();
+
+		M._gameLayers.eachValue(function(layer) {
+			M.renderer.render(layer);
+		});
+
+		
+		document.getElementById("info").innerHTML = new Date().getTime() - prevRenderTime;
+	
+		requestAnimationFrame(render);
+
+	}
+
 	/*
 	 * NOTE: cancelRequestAnimationFrame has not been implemented in every
 	 * browser so we just check Match state to know whether to loop or not.
 	 */
 	function gameLoop() {
-		M.gameLoop();
-		requestAnimationFrame( gameLoop );
+		setInterval(function() {
+
+			var prevUpdateTime = new Date().getTime();
+
+			M.gameLoop();
+
+			document.getElementById("info2").innerHTML = new Date().getTime() - prevUpdateTime;
+
+		}, M._msPerUpdate);
 	}
 
 })(window);

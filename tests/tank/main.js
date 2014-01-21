@@ -20,8 +20,6 @@ function main() {
 			
 			var terrain = new M.Entity();
 			
-			var worldLayer = M.getLayer("world");
-			
 			for ( var column = 0; column < tilesX; column++ ) {
 				for ( var row = 0; row < tilesY; row++ ) {
 					var viewId = "tile" + column + ":" + row;
@@ -49,15 +47,14 @@ function main() {
 				
 				tree.has("collisionGroup", 0);
 				
-				// M.add(tree).to("world");
-				
-				worldLayer.add(tree);
+				M.add(tree).to("world");
 				
 			}
 		
-			for ( var i = 0; i < 1; i++ ) {
+			for ( var i = 0; i < 100; i++ ) {
 				
 				tank = M.game.entities.createTank();
+				tank.getAttribute("location").set(M.random.integer(0, 640), M.random.integer(0, 480));
 
 				M.add(tank).to("gameArea");
 				

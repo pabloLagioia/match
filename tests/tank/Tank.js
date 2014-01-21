@@ -178,9 +178,27 @@
 			}
 
 		});
-		
+
 		tank.does("collide");
-		tank.does("followCamera");
+		tank.does("actOnCollision", function(e, a) {
+
+			var manifold = a.get("manifold");
+
+			if ( manifold ) {
+
+
+				var speed = a.get("speed"),
+					direction = a.get("direction"),
+					location = a.get("location");
+
+				location.offset(direction.x * -speed, direction.y * -speed);
+
+				//determine if the object collided because it was rotated
+
+			}
+
+		});
+		// tank.does("followCamera");
 		
 		tank.does("moveWithSpeedAndDirection");
 		

@@ -26,6 +26,8 @@
 		 * @type float
 		 */
 		this._y = 0;
+		this._prevX = 0;
+		this._prevY = 0;
 		/**
 		 * Represents the width of the viewable area
 		 * @property viewportWidth
@@ -94,23 +96,28 @@
 	 * @param {y} integer
 	 */
 	Camera.prototype.centerAt = function(x, y) {
-		this._x = x - this._halfViewportWidth;
-		this._y = y - this._halfViewportHeight;
+
+		x = x - this._halfViewportWidth;
+		y = y - this._halfViewportHeight;
+
 		if ( this._boundingArea ) {
-			if ( this._x < this._boundingArea.minX ) {
-				this._x = this._boundingArea.minX;
+			if ( x < this._boundingArea.minX ) {
+				x = this._boundingArea.minX;
 			}
-			if ( this._y < this._boundingArea.minY ) {
-				this._y = this._boundingArea.minY;
+			if ( y < this._boundingArea.minY ) {
+				y = this._boundingArea.minY;
 			}
-			if ( this._x > this._boundingArea.maxX ) {
-				this._x = this._boundingArea.maxX;
+			if ( x > this._boundingArea.maxX ) {
+				x = this._boundingArea.maxX;
 			}
-			if ( this._y > this._boundingArea.maxY ) {
-				this._y = this._boundingArea.maxY;
+			if ( y > this._boundingArea.maxY ) {
+				y = this._boundingArea.maxY;
 			}
 		}
-		this.notifyChange();
+
+		this.setX(x);
+		this.setY(y);
+
 	};
 
 	Camera.prototype.notifyChange = function() {
@@ -118,11 +125,13 @@
 	};
 
 	Camera.prototype.setX = function(value) {
+		this._prevX = this._x;
 		this._x = value;
 		this.notifyChange();
 	};
 
 	Camera.prototype.setY = function(value) {
+		this._prevY = this._y;
 		this._y = value;
 		this.notifyChange();
 	};
@@ -144,11 +153,11 @@
 	};
 
 	Camera.prototype.getLeftFromLayer = function(layer) {
-		return this.x * layer.parrallaxFactor.x;
+		return this._x * layer.parrallaxFactor.x;
 	};
 
 	Camera.prototype.getTopFromLayer = function(layer) {
-		return this.y * layer.parrallaxFactor.y;
+		return this._y * layer.parrallaxFactor.y;
 	};
 
 	Camera.prototype.getBottomFromLayer = function(layer) {

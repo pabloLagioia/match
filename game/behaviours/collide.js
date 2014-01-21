@@ -1,5 +1,26 @@
 M.registerBehaviour("collide", function(entity, attributes) {
 
+	var Vector2d = M.math2d.Vector2d;
+
+	function getVelocityManifold(entityA, entityB) {
+	
+		var velocityA = getSpeedVector(entityA),
+			velocityB = getSpeedVector(entityB);
+
+		return new Vector2d(velocityA.x - velocityB.x, velocityA.y - velocityB.y); 
+
+	}
+
+	function getSpeedVector(entity) {
+		
+		var speed = entity.getAttribute("speed"),
+			direction = entity.getAttribute("direction");
+		
+		return new Vector2d(speed * direction.x, speed * direction.y);
+
+	}
+
+
 	var location = attributes.get("location"),
 		otherObjects = M._gameObjects,
 		i = 0,
@@ -19,13 +40,12 @@ M.registerBehaviour("collide", function(entity, attributes) {
 					
 					if ( collisionHandler.haveCollided(entity.views._values[entityView], current.views._values[view]) ) {
 
-						location.set(location.prevX, location.prevY);
-
-						entity.attributes.set("collider", current);
+						// attributes.set("manifold", {
+						// 	collidedWith: current,
+						// 	velocityDelta: getVelocityManifold(entity, current)
+						// });
 						
-						document.getElementById("info").innerHTML = "collided";
-
-						return;
+						// return;
 					
 					}
 					
@@ -37,8 +57,6 @@ M.registerBehaviour("collide", function(entity, attributes) {
 		}
 	}
 	
-	attributes.set("collider", false);
-	
-	document.getElementById("info").innerHTML = "";
+	attributes.set("manifold", false);
 	
 });
