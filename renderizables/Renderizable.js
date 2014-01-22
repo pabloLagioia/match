@@ -104,47 +104,12 @@
 		 */
 		this.operation = null;
 		/**
-		 * Array that contains animations for this object
-		 * @private
-		 * @property animations
-		 * @type ArrayList
-		 */
-        this.animations = [];
-		/**
-		 * Array that contains chained animations for this object
-		 * @private
-		 * @property chainedAnimations
-		 * @type ArrayList
-		 */
-        this.chainedAnimations = [];
-		/**
-		 * Index of the behaviour that's being executed at the moment
-		 * @private
-		 * @property _currentChainedBehaviour
-		 * @type int
-		 */
-		this._currentChainedBehaviour = 0;
-		/**
-		 * Array that contains timers for this object
-		 * @private
-		 * @property _onLoopTimers
-		 * @type Array
-		 */
-        this._onLoopTimers = [];
-		/**
 		 * object transparency
 		 * @private
 		 * @property _alpha
 		 * @type float
 		 */
 		this._alpha = null;
-		/**
-		 * Reference to the layer that contains this object
-		 * @private
-		 * @property onwerLayer
-		 * @type float
-		 */
-		this.onwerLayer = null;
 
 		this._math = Math;
 		this._math2d = M.math2d;
@@ -163,19 +128,6 @@
 	 * @type int
 	 */
 	Renderizable.prototype._zIndex = 0;
-	/**
-	 * Loops through animations, timers and calls onUpdate
-	 * @method onLoop
-	 * @protected
-	 */
-    Renderizable.prototype.onLoop = function (p) {
-        this._loopThroughAnimations();
-        this._loopThroughTimers();
-        for ( var i = 0; i < this.behaviours.length; i++ ) {
-        	this.behaviours[i](this, this.attributes);
-        }
-        if (this.onUpdate) this.onUpdate(p);
-    };
 	/**
 	 * Sets the properties of this object based on the given object
 	 * @method set
@@ -200,9 +152,10 @@
 	 * @param {float} value alpha value to set. Must be between 0 and 1
 	 */
 	Renderizable.prototype.setAlpha = function(value) {
-		if ( value >= 0 && value <= 1 ) {
+		if ( value >= 0 && value <= 1 && this._alpha != value ) {
 			this._alpha = value;
 			this.raiseEvent("alphaChanged", value);
+			this.raiseEvent("attributeChanged", "alpha");
 		} else {
 			this._alpha = null;
 		}
@@ -498,8 +451,11 @@
 	 * @param {int} value the zIndex
 	 */
     Renderizable.prototype.setZIndex = function (value) {
-        this._zIndex = value;
-        this.raiseEvent("zIndexChanged", value);
+		if ( this._zIndex != value ) {
+			this._zIndex = value;
+			this.raiseEvent("zIndexChanged", value);
+			this.raiseEvent("attributeChanged", "zIndex");
+		}
 		return this;
     };
 	/**
@@ -519,6 +475,7 @@
     	if ( this._visible != value ) {
 	        this._visible = value;
 	        this.raiseEvent("visibilityChanged", value);
+			this.raiseEvent("attributeChanged", "visibility");
     	}
 		return this;
     };
@@ -528,9 +485,12 @@
 	 * @param {float} value
 	 */
     Renderizable.prototype.setWidth = function (value) {
-        this._width = value;
-        this._halfWidth = value / 2;
-        this.raiseEvent("widthChanged", value);
+		if ( this._width != value ) {
+			this._width = value;
+			this._halfWidth = value / 2;
+			this.raiseEvent("widthChanged", value);
+			this.raiseEvent("attributeChanged", "width");
+		}
 		return this;
     };
 	/**
@@ -539,9 +499,12 @@
 	 * @param {float} value
 	 */
     Renderizable.prototype.setHeight = function (value) {
-        this._height = value;
-        this._halfHeight = value / 2;
-        this.raiseEvent("heightChanged", value);
+		if ( this._height != value ) {
+			this._height = value;
+			this._halfHeight = value / 2;
+			this.raiseEvent("heightChanged", value);
+			this.raiseEvent("attributeChanged", "height");
+		}
 		return this;
     };
 	/**
@@ -658,13 +621,16 @@
 	 * @method setScaleX
 	 * @param {float} the width factor
 	 */
-    Renderizable.prototype.setScaleX = function (x) {
+    Renderizable.prototype.setScaleX = function (value) {
 		if ( !this._scale ) {
 			this._scale = new Object();
 			this._scale.y = 1;
 		}
-        this._scale.x = x;
-        this.raiseEvent("scaleXChanged", value);
+		if ( this._scale.x != value ) {
+			this._scale.x = value;
+			this.raiseEvent("scaleXChanged", value);
+			this.raiseEvent("attributeChanged", "scaleX");
+		}
 		return this;
     };
 	/**
@@ -672,13 +638,16 @@
 	 * @method setScaleY
 	 * @param {float} the height factor
 	 */
-    Renderizable.prototype.setScaleY = function (y) {
+    Renderizable.prototype.setScaleY = function (value) {
 		if ( !this._scale ) {
 			this._scale = new Object();
 			this._scale.x = 1;
 		}
-		this._scale.y = y;
-		this.raiseEvent("scaleYChanged", value);
+		if ( this._scale.y != value ) {
+			this._scale.y = value;
+			this.raiseEvent("scaleYChanged", value);
+			this.raiseEvent("attributeChanged", "scaleY");
+		}
 		return this;
 	};
     Renderizable.prototype.offsetScale = function (x, y) {
@@ -919,10 +888,15 @@
 	 * @param {float} rotation the rotation angle
 	 */
 	Renderizable.prototype.setRotation = function (rotation) {
+		
+		if ( rotation != this._rotation ) {
+		
+			this._rotation = rotation;
 
-		this._rotation = rotation;
-
-		this.raiseEvent("rotationChanged", rotation);
+			this.raiseEvent("rotationChanged", rotation);
+			this.raiseEvent("attributeChanged", "rotation");
+		
+		}
 
 		return this;
 
@@ -942,10 +916,13 @@
 	 * @method setX
 	 * @param {float} x the rotation angle
 	 */
-	Renderizable.prototype.setX = function (x) {
-		this._prevX = this._x;
-		this._x = x;
-		this.raiseEvent("xChanged", x);
+	Renderizable.prototype.setX = function (value) {
+		if ( value != this._x ) {
+			this._prevX = this._x;
+			this._x = value;
+			this.raiseEvent("xChanged", value);
+			this.raiseEvent("attributeChanged", "x");
+		}
 		return this;
 	};
 	/**
@@ -954,10 +931,13 @@
 	 * @method setY
 	 * @param {float} y the rotation angle
 	 */
-	Renderizable.prototype.setY = function (y) {
-		this._prevY = this._y;
-		this._y = y;
-		this.raiseEvent("yChanged", y);
+	Renderizable.prototype.setY = function (value) {
+		if ( value != this._y ) {
+			this._prevY = this._y;
+			this._y = value;
+			this.raiseEvent("yChanged", value);
+			this.raiseEvent("attributeChanged", "y");
+		}
 		return this;
     };
 	Renderizable.prototype.remove = function () {

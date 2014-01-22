@@ -234,47 +234,13 @@
 		}
 
 		var self = this,
-			notifyRedraw = function() {
+			onChange = function() {
 				self.needsRedraw = true;
 			};
-
-		entity.addEventListener("xChanged", notifyRedraw);
-		entity.addEventListener("yChanged", notifyRedraw);
-		entity.addEventListener("rotationChanged", notifyRedraw);
-		entity.addEventListener("scaleXChanged", notifyRedraw);
-		entity.addEventListener("scaleYChanged", notifyRedraw);
-		entity.addEventListener("alphaChanged", notifyRedraw);
-		entity.addEventListener("widthChanged", notifyRedraw);
-		entity.addEventListener("heightChanged", notifyRedraw);
-		entity.addEventListener("visibilityChanged", notifyRedraw);
 		
-		// entity.addEventListener("xChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
-		// entity.addEventListener("yChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
-		// entity.addEventListener("rotationChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
-		// entity.addEventListener("scaleXChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
-		// entity.addEventListener("scaleYChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
-		// entity.addEventListener("alphaChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
-		// entity.addEventListener("widthChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
-		// entity.addEventListener("heightChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
-		// entity.addEventListener("visibilityChanged", function() {
-		// 	self.needsRedraw = true;
-		// });
+		entity.views.eachValue(function(view) {
+			view.addEventListener("attributeChanged", onChange);
+		});
 
 		this.needsSorting = true;
 

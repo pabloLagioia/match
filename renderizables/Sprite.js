@@ -243,16 +243,6 @@
 		return false;
 
 	};
-	/**
-	 * Loops through animations, timers, calls onUpdate and animates the sprite
-	 * @method onLoop
-	 * @protected
-	 */
-	Sprite.prototype.onLoop = function(p) {
-        this._loopThroughAnimations();
-        this._loopThroughTimers();
-		this._animate();
-	};
     /**
 	 * Sets the index of the frame to render
 	 *

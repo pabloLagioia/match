@@ -614,7 +614,8 @@ var M = window.M || {},
 		if ( this._lag > this._maxLag ) {
 			this._lag = this._maxLag;
 		}
-
+		
+		
 		while ( this._lag > this._msPerUpdate ) {
 		
 			this._updateInput(p);
@@ -623,9 +624,15 @@ var M = window.M || {},
 
 		}
 
+		// document.getElementById("info").innerHTML = new Date().getTime() - current;
+		
+		current = new Date().getTime();
+
 		this._gameLayers.eachValue(function(layer) {
 			renderer.render(layer);
 		});
+		
+		// document.getElementById("info2").innerHTML = new Date().getTime() - current;
 
 		/*
 		 * Update FPS count

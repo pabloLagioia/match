@@ -15,6 +15,6 @@ function main() {
 	object.does("bounce");
 	object.does("stickToCanvas");
 
-	M.push(object);
+	M.push(object).to("world");
 
 }

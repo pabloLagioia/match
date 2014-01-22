@@ -2,7 +2,7 @@
  * @module Match
  * @namespace renderers
  */
-(function(namespace, M, Renderizable) {
+(function(namespace, M, Shape) {
 
 	var textMeasuringDiv = document.createElement("div");
 		textMeasuringDiv.setAttribute("id", "match-text-measuring");
@@ -18,12 +18,12 @@
 	/**
 	 * @class Text
 	 * @constructor
-	 * @extends renderers.Renderizable
+	 * @extends renderers.Shape
 	 * @param {Object} [properties] properties to construct this object
 	 */
 	function Text( properties ) {
 
-		this.extendsRenderizable(properties);
+		this.extendsShape();
 		/**
 		 * Font style
 		 * @private
@@ -140,13 +140,13 @@
 		//Calculate and cache internal halfWidth and halfHeight which are needed for bounding method
 		this.getWidth();
 		this.getHeight();
-		return this.renderizableGetBoundingHalfWidth();
+		return this.shapeGetBoundingHalfWidth();
 	};
 	Text.prototype.getBoundingHalfHeigth = function () {
 		//Calculate and cache internal halfWidth and halfHeight which are needed for bounding method
 		this.getWidth();
 		this.getHeight();
-		return this.renderizableGetBoundingHalfHeight();
+		return this.shapeGetBoundingHalfHeight();
 	};
 	/**
 	 * Gets the height of this object
@@ -330,65 +330,6 @@
 		this.raiseEvent("styleChanged", value);
 	};
 	/**
-	 * Sets the font fillStyle
-	 *
-	 * @method setFillStyle
-	 * @param {Object} value the fillStyle
-	 * @example
-			this.setFillStyle("rgb('255,0,0')");
-	 * @example
-			// is equal to
-			this.setFillStyle(M.Color.rgb(255,0,0));
-			// Note: you must add the Color class to the compilation
-	 */
-	Text.prototype.setFillStyle = function(value) {
-		this._fillStyle = value;
-		this.raiseEvent("fillStyleChanged", value);
-	};
-	/**
-	 * Applies the css style by the given selector to the text object.
-	 * Valid css values: color, font-family, font-size, font-style, font-variant, font-weight, text-shadow
-	 *
-	 * @method css
-	 * @param {String} selector the css selector
-	 * @example
-			this.css(".myTextStyle");
-	 */
-	Text.prototype.css = function(selector) {
-		var style = M.getStyleBySelector(selector);
-		if ( style.color != "" ) this.setFillStyle(style.color);
-		if ( style.fontFamily != "" ) this.setFamily(style.fontFamily);
-		if ( style.fontSize != "" ) this.setSize(style.fontSize);
-		if ( style.fontStyle != "" ) this.setStyle(style.fontStyle);
-		if ( style.fontVariant != "" ) this.setVariant(style.fontVariant);
-		if ( style.fontWeight != "" ) this.setWeight(style.fontWeight);
-		if ( style.left != "" ) this.setLeft(style.left);
-		if ( style.right != "" ) this.setRight(style.right);
-		if ( style.top != "" ) this.setTop(style.top);
-		if ( style.bottom != "" ) this.setBottom(style.bottom);
-		if ( style.textShadow != "" ) {
-		
-			var color, shadow, x, y, blur;
-			
-			if ( style.textShadow.indexOf("rgb") > -1 ) {
-				color = style.textShadow.match(/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/)[0];
-			} else {
-				if ( style.textShadow.indexOf("px") > style.textShadow.indexOf(" ") ) {
-					color = style.textShadow.substr(0, style.textShadow.indexOf(" "));
-				}
-			}
-		
-			shadow = style.textShadow.match(/([0-9]+px) ([0-9]+px) ([0-9]+px)/);
-			if ( shadow ) {
-				x = parseInt(shadow[1]);
-				y = parseInt(shadow[2]);
-				blur = parseInt(shadow[3]);
-			}
-			this.setShadow( x, y, color, blur );
-		}
-		this._changed = true;
-	};
-	/**
 	 * Gets the font size
 	 * @method getSize
 	 * @return {int} the size
@@ -421,40 +362,6 @@
 		return this._style;
 	};
 	/**
-	 * Sets the stroke style
-	 * @method setStrokeStyle
-	 * @param {Object} value the strokeStyle
-	 */
-	Text.prototype.setStrokeStyle = function(value) {
-		this._strokeStyle = value;
-		this.raiseEvent("strokeStyleChanged", value);
-	};
-	Text.prototype.setBorder = Text.prototype.setStrokeStyle;
-	/**
-	 * Sets the line width used to stroke the text
-	 *
-	 * @method setStrokeWidth
-	 * @param {int} value the strokeStyle
-	 * @example
-			this.setStrokeWidth(5);
-	 */
-	Text.prototype.setStrokeWidth = function(value) {
-		this._lineWidth = value;
-		this._changed = true;
-	};
-	Text.prototype.setBorderWidth = Text.prototype.setStrokeWidth;
-	/**
-	 * Gets the line width used to stroke the text
-	 *
-	 * @method getStrokeWidth
-	 * @return {int}
-	 */
-	Text.prototype.getStrokeWidth = function() {
-		return this._lineWidth;
-	};
-	Text.prototype.getBorderWidth = Text.prototype.getStrokeWidth;
-	Text.prototype.getBorder = Text.prototype.getStrokeStyle;
-	/**
 	 * Sets the text
 	 * @method setText
 	 * @param {String} value the text
@@ -476,22 +383,6 @@
 		return this._family;
 	};
 	/**
-	 * Gets the fill style
-	 * @method getFillStyle
-	 * @return {String} the fillStyle
-	 */
-	Text.prototype.getFillStyle = function(value) {
-		return this._fillStyle;
-	};
-	/**
-	 * Gets the stroke style
-	 * @method getStrokeStyle
-	 * @return {String} the strokeStyle
-	 */
-	Text.prototype.getStrokeStyle = function(value) {
-		return this._strokeStyle;
-	};
-	/**
 	 * Gets the text
 	 * @method getText
 	 * @return {String} the text
@@ -499,32 +390,6 @@
 	Text.prototype.getText = function() {
 		return this._text;
 	};
-	/**
-	 * Sets the text shadow
-	 * @method setShadow
-	 * @param {float} x displacent in x
-	 * @param {float} y displacent in y
-	 * @param {String} color
-	 * @param {int} blur
-	 */
-	Text.prototype.setShadow = function(x, y, color, blur) {
-		this._shadow = {
-			x: x, y: y, color: color || "black", blur: blur || 1
-		}
-		this.raiseEvent("shadowChanged", this._shadow);
-	};
-	/**
-	 * Gets the text shadow
-	 * @method getShadow
-	 * @return {Object} the shadow
-	 */
-	Text.prototype.getShadow = function() {
-		return this._shadow;
-	};
-	Text.prototype.setFill = Text.prototype.setFillStyle;
-	Text.prototype.getFill = Text.prototype.getFillStyle;
-	Text.prototype.setColor = Text.prototype.setFillStyle;
-	Text.prototype.getColor = Text.prototype.getFillStyle;
 	/**
 	 * Returns the constructor's name
 	 *
@@ -536,8 +401,8 @@
 
     Text.name = "Text";
     
-	M.extend( Text, Renderizable );
+	M.extend( Text, Shape );
 
 	namespace.Text = Text;
 
-})(Match.renderizables, Match, Match.renderizables.Renderizable);
+})(Match.renderizables, Match, Match.renderizables.Shape);

@@ -2,51 +2,18 @@
  * @module Match
  * @namespace renderers
  */
-(function(namespace, M, Renderizable) {
+(function(namespace, M, Shape) {
 
 	/**
 	 * @class Circle
 	 * @constructor
-	 * @extends renderers.Renderizable
+	 * @extends renderers.Shape
 	 * @param {Object} [properties] properties to construct this object
 	 */
 	function Circle( properties ) {
 
-		this.extendsRenderizable(properties);
-		/**
-		 * Fill Style used to fill the circle. Can be a color, a pattern or a gradient
-		 * @private
-		 * @property _fillStyle
-		 * @default "black"
-		 * @type Object
-		 * @example
-				this._fillStyle = "black";
-		 * @example
-				this._fillStyle = "rgba(255,0,0,100)";
-		 */
-		this._fillStyle = "rgb(0,0,0)";
-		/**
-		 * Stroke Style
-		 * @private
-		 * @property _strokeStyle
-		 * @type String
-		 * @example
-				this._strokeStyle = "black";
-		 * @example
-				this._strokeStyle = "rgba(255,0,0,100)";
-		 */
-		this._strokeStyle = null;
-		/**
-		 * Line width used to render the borders of the circle
-		 * @private
-		 * @property _lineWidth
-		 * @type String
-		 * @example
-				this._strokeStyle = "black";
-		 * @example
-				this._strokeStyle = "rgba(255,0,0,100)";
-		 */
-		this._lineWidth = null;
+		this.extendsShape();
+
 		/**
 		 * Radius of the circle
 		 * @private
@@ -80,152 +47,32 @@
 
 	}
 	/**
-	 * Applies the css style by the given selector to the circle object.
-	 * Valid css values: color, background-color, border-color, border-width, width, height, box-shadow
+	 * Sets the diameter of the circle
 	 *
-	 * @method css
-	 * @param {String} selector the css selector
-	 * @example
-			this.css(".myCssStyle");
+	 * @method setSize
+	 * @param {float} size
 	 */
-	Circle.prototype.css = function(selector) {
-		var style = M.getStyleBySelector(selector);
-		if ( style.color != "" ) this.setFillStyle(style.color);
-		if ( style.backgroundColor != "" ) this.setFillStyle(style.backgroundColor);
-		if ( style.borderColor != "" ) this.setStrokeStyle(style.borderColor);
-		if ( style.borderWidth != "" ) this.setLineWidth(style.borderWidth);
-		if ( style.width != "" ) this.setRadius(style.width);
-		if ( style.height != "" ) this.setRadius(style.height);
-		if ( style.left != "" ) this.setLeft(style.left);
-		if ( style.right != "" ) this.setRight(style.right);
-		if ( style.top != "" ) this.setTop(style.top);
-		if ( style.bottom != "" ) this.setBottom(style.bottom);
-		if ( style.boxShadow != "" ) {
-
-			var color, shadow, x, y, blur;
-
-			if ( style.boxShadow.indexOf("rgb") > -1 ) {
-				color = style.boxShadow.match(/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/)[0];
-			} else {
-				if ( style.boxShadow.indexOf("px") > style.boxShadow.indexOf(" ") ) {
-					color = style.boxShadow.substr(0, style.boxShadow.indexOf(" "));
-				}
-			}
-
-			shadow = style.boxShadow.match(/([0-9]+px) ([0-9]+px) ([0-9]+px)/);
-			if ( shadow ) {
-				x = parseInt(shadow[1]);
-				y = parseInt(shadow[2]);
-				blur = parseInt(shadow[3]);
-			}
-			this.setShadow( x, y, color, blur );
-		}
-	};
-	/**
-	 * Sets the style used to stroke the circle
-	 *
-	 * @method setStrokeStyle
-	 * @param {Object} value the strokeStyle
-	 * @example
-			this.setStrokeStyle("rgb('255,0,0')");
-	 * @example
-			this.setStrokeStyle("Red");
-	 */
-	Circle.prototype.setStrokeStyle = function(value) {
-		this._strokeStyle = value;
-		this.notifyChange();
-	};
-	Circle.prototype.getStrokeStyle = function() {
-		return this._strokeStyle;
-	};
-	/**
-	 * Sets the style used to fill the circle
-	 *
-	 * @method setFillStyle
-	 * @param {Object} value the fillStyle
-	 * @example
-			this.setFillStyle("rgb('255,0,0')");
-	 * @example
-			this.setFillStyle("Red");
-	 * @example
-			this.setFillStyle(aPattern);
-	 * @example
-			this.setFillStyle(aGradient);
-	 */
-	Circle.prototype.setFillStyle = function(value) {
-		this._fillStyle = value;
-		this.notifyChange();
-	};
-	/**
-	 * Gets the fill style
-	 * @method getFillStyle
-	 * @return {String} the fillStyle
-	 */
-	Circle.prototype.getFillStyle = function() {
-		return this._fillStyle;
-	};
 	Circle.prototype.setSize = function(size) {
 		return this.setRadius(size / 2);
 	};
+	/**
+	 * Gets the diameter of the circle
+	 *
+	 * @method getSize
+	 * @return {float} diameter
+	 */
 	Circle.prototype.getSize = function() {
 		return this._radius * 2;
 	};
-	Circle.prototype.setFill = Circle.prototype.setFillStyle;
-	Circle.prototype.getFill = Circle.prototype.setFillStyle;
-	Circle.prototype.setColor = Circle.prototype.setFillStyle;
-	Circle.prototype.getColor = Circle.prototype.getFillStyle;
 	/**
-	 * Sets the line width used to stroke the circle
-	 *
-	 * @method setStrokeWidth
-	 * @param {int} value the strokeStyle
-	 * @example
-			this.setStrokeWidth(5);
-	 */
-	Circle.prototype.setStrokeWidth = function(value) {
-		this._lineWidth = value;
-		this.notifyChange();
-	};
-	/**
-	 * Gets the stroke style
-	 * @method getStrokeStyle
-	 * @return {String} the strokeStyle
-	 */
-	Circle.prototype.getStrokeWidth = function() {
-		return this._lineWidth;
-	};
-	/**
-	 * Sets the radius of circle
+	 * Sets the radius of the circle
 	 *
 	 * @method setRadius
 	 * @param {float} radius
 	 */
 	Circle.prototype.setRadius = function(radius) {
 		this._radius = radius;
-		this.notifyChange();
-	};
-	/**
-	 * Sets the shadow style for this circle
-	 *
-	 * @method setShadow
-	 * @param {float} x displacent in x
-	 * @param {float} y displacent in y
-	 * @param {String} color
-	 * @param {int} blur
-	 */
-	Circle.prototype.setShadow = function(x, y, color, blur) {
-		this._shadow = {
-			x: x, y: y, color: color || "black", blur: blur || 1
-		}
-		this.notifyChange();
-	};
-	/**
-	 * Gets the shadow
-	 * @method getShadow
-	 * @return {Object} the shadow
-	 */
-	Circle.prototype.getShadow = function() {
-		return this._shadow;
+		this.raiseEvent("attributeChanged");
 	};
 	/**
 	 * Gets the radius of the circle
@@ -330,11 +177,10 @@
 	 */
 	Circle.prototype.setLeft = function(value) {
 		if ( this._scale ) {
-			this._x = value + this._radius * this._scale.x;
+			this.setX(value + this._radius * this._scale.x);
 		} else {
-			this._x = value + this._radius;
+			this.setX(value + this._radius);
 		}
-		this.notifyChange();
 	};
 	/**
 	 * Sets the rightmost coordinates of the Object
@@ -344,11 +190,10 @@
 	 */
 	Circle.prototype.setRight = function(value) {
 		if ( this._scale ) {
-			this._x = value - this._radius * this._scale.x;
+			this.setX(value - this._radius * this._scale.x);
 		} else {
-			this._x = value - this._radius;
+			this.setX(value - this._radius);
 		}
-		this.notifyChange();
 	};
 	/**
 	 * Sets the topmost coordinates of the Object
@@ -358,11 +203,10 @@
 	 */
 	Circle.prototype.setTop = function(value) {
 		if ( this._scale ) {
-			this._y = value + this._radius * this._scale.y;
+			this.setY(this._y = value + this._radius * this._scale.y);
 		} else {
-			this._y = value + this._radius;
+			this.setY(value + this._radius);
 		}
-		this.notifyChange();
 	};
 	/**
 	 * Sets the bottommost coordinates of the Object
@@ -372,11 +216,10 @@
 	 */
 	Circle.prototype.setBottom = function(value) {
 		if ( this._scale ) {
-			this._y = value - this._radius * this._scale.y;
+			this.setY(value - this._radius * this._scale.y);
 		} else {
-			this._y = value - this._radius;
+			this.setY(value - this._radius);
 		}
-		this.notifyChange();
 	};
 	/**
 	 * Returns the constructor's name
@@ -389,8 +232,8 @@
 
     Circle.name = "Circle";
 
-	M.extend(Circle, Renderizable);
+	M.extend(Circle, Shape);
 
 	namespace.Circle = Circle;
 
-})(Match.renderizables, Match, Match.renderizables.Renderizable);
+})(Match.renderizables, Match, Match.renderizables.Shape);

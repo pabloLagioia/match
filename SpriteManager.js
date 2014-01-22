@@ -100,26 +100,16 @@
 
         this.toLoad--;
 
-        if ( ! image.frames ) {
+        if ( image.frames == undefined ) {
 
             image.frames = [{x:0, y: 0, width: image.width, height: image.height, halfWidth: image.width / 2, halfHeight: image.height / 2}];
 
-        } else if ( image.frames instanceof Array ) {
-
-			for ( var i in image.frames ) {
-
-				image.frames[i].halfWidth = image.frames[i].width / 2;
-
-				image.frames[i].halfHeight = image.frames[i].height / 2;
-
-			}
-
-		} else {
+        } else if ( image.tiles ) {
 
 			var frames = new Array(),
-				width = image.frames.width,
-				height = image.frames.height,
-				padding = image.frames.padding || 0,
+				width = image.tiles.width,
+				height = image.tiles.height,
+				padding = image.tiles.padding || 0,
 				columns = Math.floor(image.width / (width + padding)),
 				lines = Math.floor(image.height / (height + padding)),
 				column,
@@ -142,6 +132,15 @@
 
 			image.frames = frames;
 
+		} else {
+		
+ 			for ( var i in image.frames ) {
+
+				image.frames[i].halfWidth = image.frames[i].width / 2;
+				image.frames[i].halfHeight = image.frames[i].height / 2;
+
+			}
+		
 		}
 
         this.onImageLoaded.raise({image: image, name: image.getAttribute("data-name"), remaining: this.toLoad, total: this.total});
@@ -280,7 +279,7 @@
 					}
 
 					this.assets[ i ] = img;
-				
+
 				} else {
 					alreadyLoaded++;
 				}
