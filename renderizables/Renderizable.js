@@ -13,6 +13,7 @@
 	 */
     function Renderizable(properties) {
     	this.extendsGameObject();
+    	this.extendsEventHandler();
 		/**
 		 * X coordinate of the object
 		 * @private
@@ -27,8 +28,19 @@
 		 * @type float
 		 */
 		this._y = 0;
-
-		this._prevX = 0;		
+		/**
+		 * previous x coordinate of the object
+		 * @private
+		 * @property _prevX
+		 * @type float
+		 */
+		this._prevX = 0;
+		/**
+		 * previous y coordinate of the object
+		 * @private
+		 * @property _prevY
+		 * @type float
+		 */
 		this._prevY = 0;		
 		/**
 		 * object width
@@ -142,27 +154,9 @@
 		this._cachedBoundingHalfWidth = null;
 		this._cachedBoundingHalfHeight = null;
 		
-		this._raisedNotVisible = false;
-
         this.set(properties);
 
 	}
-	/**
-	 * Notifies owner layer about a change in this object
-	 * @method notifyChange
-	 */
-	Renderizable.prototype.notifyChange = function() {
-		this.ownerLayer&&this.ownerLayer.renderizableChanged();
-		return this;
-	};
-	/**
-	 * Notifies owner layer about a change in the zIndex this object
-	 * @method notifyZIndexChange
-	 */
-	Renderizable.prototype.notifyZIndexChange = function() {
-		this.ownerLayer&&this.ownerLayer.zIndexChanged();
-		return this;
-	};
 	/**
 	 * @private
 	 * @property _zIndex
@@ -208,7 +202,7 @@
 	Renderizable.prototype.setAlpha = function(value) {
 		if ( value >= 0 && value <= 1 ) {
 			this._alpha = value;
-			this.notifyChange();
+			this.raiseEvent("alphaChanged", value);
 		} else {
 			this._alpha = null;
 		}
@@ -505,8 +499,7 @@
 	 */
     Renderizable.prototype.setZIndex = function (value) {
         this._zIndex = value;
-        this.notifyChange();
-        this.notifyZIndexChange();
+        this.raiseEvent("zIndexChanged", value);
 		return this;
     };
 	/**
@@ -523,8 +516,10 @@
 	 * @param {Boolean} value true if it is visible or false if it is not
 	 */
     Renderizable.prototype.setVisible = function (value) {
-        this._visible = value;
-        this.notifyChange();
+    	if ( this._visible != value ) {
+	        this._visible = value;
+	        this.raiseEvent("visibilityChanged", value);
+    	}
 		return this;
     };
 	/**
@@ -535,7 +530,7 @@
     Renderizable.prototype.setWidth = function (value) {
         this._width = value;
         this._halfWidth = value / 2;
-        this.notifyChange();
+        this.raiseEvent("widthChanged", value);
 		return this;
     };
 	/**
@@ -546,7 +541,7 @@
     Renderizable.prototype.setHeight = function (value) {
         this._height = value;
         this._halfHeight = value / 2;
-        this.notifyChange();
+        this.raiseEvent("heightChanged", value);
 		return this;
     };
 	/**
@@ -654,11 +649,8 @@
         if (!x && !y) return;
         if (!x) x = 1;
         if (!y) y = 1;
-        this._scale = {
-            x: x,
-            y: y
-        };
-        this.notifyChange();
+        this.setScaleX(x);
+        this.setScaleY(y);
 		return this;
     };
 	/**
@@ -672,7 +664,7 @@
 			this._scale.y = 1;
 		}
         this._scale.x = x;
-        this.notifyChange();
+        this.raiseEvent("scaleXChanged", value);
 		return this;
     };
 	/**
@@ -686,7 +678,7 @@
 			this._scale.x = 1;
 		}
 		this._scale.y = y;
-		this.notifyChange();
+		this.raiseEvent("scaleYChanged", value);
 		return this;
 	};
     Renderizable.prototype.offsetScale = function (x, y) {
@@ -728,10 +720,10 @@
     Renderizable.prototype.invertX = function () {
 		if ( !this._scale ) {
 			this._scale = new Object();
-			this._scale.y = 1;
+			this._scale.x = -1;
+		} else {
+			this.setScaleX(this._scale.x * -1);
 		}
-        this._scale.x *= -1;
-        this.notifyChange();
 		return this;
     };
 	/**
@@ -741,10 +733,10 @@
     Renderizable.prototype.invertY = function () {
 		if ( !this._scale ) {
 			this._scale = new Object();
-			this._scale.x = 1;
+			this._scale.y = -1;
+		} else {
+			this.setScaleY(this._scale.y * -1);
 		}
-        this._scale.y = -1;
-        this.notifyChange();
 		return this;
     };
 	/**
@@ -806,13 +798,11 @@
 	 * @param {float} value the coordinates to left of the object
 	 */
     Renderizable.prototype.setLeft = function (value) {
-		this._prevX = this._x;
         if (this._scale) {
-            this._x = value + this.getBoundingHalfWidth() * this._scale.x;
+        	this.setX(value + this.getBoundingHalfWidth() * this._scale.x);
         } else {
-            this._x = value + this.getBoundingHalfWidth();
+        	this.setX(value + this.getBoundingHalfWidth());
         }
-        this.notifyChange();
 		return this;
     };
 	/**
@@ -822,13 +812,11 @@
 	 * @param {float} value the coordinates to right of the object
 	 */
     Renderizable.prototype.setRight = function (value) {
-		this._prevX = this._x;
         if (this._scale) {
-            this._x = value - this.getBoundingHalfWidth() * this._scale.x;
+            this.setX(value - this.getBoundingHalfWidth() * this._scale.x);
         } else {
-            this._x = value - this.getBoundingHalfWidth();
+            this.setX(value - this.getBoundingHalfWidth());
         }
-        this.notifyChange();
 		return this;
     };
 	/**
@@ -838,13 +826,11 @@
 	 * @param {float} value the coordinates to top of the object
 	 */
     Renderizable.prototype.setTop = function (value) {
-		this._prevY = this._y;
         if (this._scale) {
-            this._y = value + this.getBoundingHalfHeight() * this._scale.y;
+            this.setY(this._y = value + this.getBoundingHalfHeight() * this._scale.y);
         } else {
-            this._y = value + this.getBoundingHalfHeight();
+            this.setY(this._y = value + this.getBoundingHalfHeight());
         }
-        this.notifyChange();
 		return this;
     };
 	/**
@@ -854,13 +840,11 @@
 	 * @param {float} value the coordinates to bottom of the object
 	 */
     Renderizable.prototype.setBottom = function (value) {
-		this._prevY = this._y;
         if (this._scale) {
-            this._y = value - this.getBoundingHalfHeight() * this._scale.y;
+            this.setY(value - this.getBoundingHalfHeight() * this._scale.y);
         } else {
-            this._y = value - this.getBoundingHalfHeight();
+            this.setY(value - this.getBoundingHalfHeight());
         }
-        this.notifyChange();
 		return this;
     };
 	/**
@@ -885,31 +869,10 @@
 	 * @param {float} y the y coordinate
 	 */
     Renderizable.prototype.setLocation = function (x, y) {
-		this._prevX = this._x;
-		this._prevY = this._y;
-		this._x = x;
-		this._y = y;
-		this.notifyChange();
+    	this.setX(x);
+    	this.setY(y);
 		return this;
     };
-	/**
-	 * Returns true if this object moved in the x axis
-	 *
-	 * @method movedInX
-	 * @param {CanvasRenderingContext2D} context
-	 */
-	Renderizable.prototype.movedInX = function () {
-		return this._prevX != this._x;
-	};
-	/**
-	 * Returns true if this object moved in the y axis
-	 *
-	 * @method movedInY
-	 * @return {Boolean}
-	 */
-	Renderizable.prototype.movedInY = function () {
-		return this._prevY != this._y;
-	};
     /**
 	 * Offsets the alpha value
 	 *
@@ -917,8 +880,7 @@
 	 * @param {float} offset
 	 */
     Renderizable.prototype.offsetAlpha = function(offset) {
-        this._alpha += offset;
-        this.notifyChange();
+        this.setAlpha(this._alpha + offset);
 		return this;
     };
     /**
@@ -960,7 +922,7 @@
 
 		this._rotation = rotation;
 
-		this.notifyChange();
+		this.raiseEvent("rotationChanged", rotation);
 
 		return this;
 
@@ -983,7 +945,7 @@
 	Renderizable.prototype.setX = function (x) {
 		this._prevX = this._x;
 		this._x = x;
-		this.notifyChange();
+		this.raiseEvent("xChanged", x);
 		return this;
 	};
 	/**
@@ -995,7 +957,7 @@
 	Renderizable.prototype.setY = function (y) {
 		this._prevY = this._y;
 		this._y = y;
-		this.notifyChange();
+		this.raiseEvent("yChanged", y);
 		return this;
     };
 	Renderizable.prototype.remove = function () {
@@ -1011,23 +973,9 @@
 	 */
     Renderizable.prototype.offset = function (x, y) {
 
-    	var notify = false;
+   		this.offsetX(x);
+    	this.offsetY(y);
 
-    	if ( x != 0 ) {
-			this._prevX = this._x;
-			this._x += x;
-			notify = true;
-		}
-		if ( y != 0 ) {
-			this._prevY = this._y;
-			this._y += y;
-			notify = true;
-		}
-
-		if ( notify ) {
-    	    this.notifyChange();
-    	}
-		
 		return this;
 
     };
@@ -1038,9 +986,9 @@
 	 * @param {float} x the x coordinate to add
 	 */
     Renderizable.prototype.offsetX = function (x) {
-		this._prevX = this._x;
-		this._x += x;
-        this.notifyChange();
+    	if ( x != 0 ) {
+    		this.setX(this._x + x);
+    	}
 		return this;
     };
 	/**
@@ -1050,9 +998,9 @@
 	 * @param {float} y the y coordinate to add
 	 */
     Renderizable.prototype.offsetY = function (y) {
-		this._prevY = this._y;
-		this._y += y;
-        this.notifyChange();
+    	if ( y != 0 ) {
+    		this.setY(this._y + y);
+    	}
 		return this;
     };
 	/**
@@ -1103,6 +1051,7 @@
     Renderizable.name = "Renderizable";
 
     M.extend(Renderizable, M.GameObject);
+    M.extend(Renderizable, EventHandler);
 
 	M.renderizables.Renderizable = Renderizable;
 

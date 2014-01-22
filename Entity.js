@@ -27,11 +27,10 @@
 	};
 
 	function Entity() {
-		// this.attributes = new EventSimpleMap();
+		this.extendsEventHandler();
 		this.attributes = new SimpleMap();
 		this.behaviours = new SimpleMap();
 		this.views = new SimpleMap();
-		this._eventListeners = {};
 	}
 
 	Entity.prototype.onLoop = function(p) {
@@ -49,26 +48,6 @@
 	
 	Entity.prototype.getBehaviour = function(name) {
 		return this.behaviours.get(name);
-	};
-	Entity.prototype.addEventListener = function(name, callback) {
-		if ( !this._eventListeners[name] ) {
-			this._eventListeners[name] = [];
-		}
-		this._eventListeners[name].push(callback);
-	};
-	Entity.prototype.raiseEvent = function(name, callback) {
-		var eventListeners = this._eventListeners[name];
-		if ( eventListeners ) {
-			for ( var i = 0, l = eventListeners.length; i < l; i++ ) {
-				eventListeners[i](this, this.attributes, this.views);
-			}
-		}
-	};
-	Entity.prototype.removeEventListener = function(name, callback) {
-		if ( this._eventListeners[name] ) {
-			var eventListeners = this._eventListeners[name];
-			eventListeners.splice(eventListeners.indexOf(callback), 1);
-		}
 	};
 
 	Entity.prototype.behaviour = Entity.prototype.getBehaviour;
@@ -104,7 +83,6 @@
 			M.logger.error("Cannot add undefined behaviour " + name + " to entity");
 		} else {
 			this.behaviours.set(name, value);
-			// this.behaviours.set(name, value.callback);
 		}
 	};
 	
@@ -123,6 +101,8 @@
 	Entity.prototype.doesntShow = function(name) {
 		return this.views.remove(name);
 	};
+
+	M.extend(Entity, EventHandler);
 
 	namespace.Entity = Entity;
 

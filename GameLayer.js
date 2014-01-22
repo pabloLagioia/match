@@ -211,63 +211,74 @@
 	 * @example
 			this.push(new Sprite("ninja"), "ninja", 10);
 	 */
-	GameLayer.prototype.add = function(object, key, zIndex) {
+	GameLayer.prototype.add = function(entity, key, zIndex) {
 
-		if ( ! object ) {
-			throw new Error("Cannot push null Object to game layer");
+		if ( ! entity ) {
+			throw new Error("Cannot push null entity to game layer");
 		}
 
-		// if ( !object.onRender ) {
-			// throw new Error(M.getObjectName(object) + " must implement onRender method");
-		// }
-
-		if ( !object.setZIndex ) {
-			// throw new Error(M.getObjectName(object) + " does not implement setZIndex method");
-			console.warn(M.getObjectName(object) + " does not implement setZIndex method");
+		if ( !entity.setZIndex ) {
+			M.logger.warn(M.getObjectName(entity) + " does not implement setZIndex method");
 		}
 
-		if ( !object.getZIndex ) {
-			//throw new Error(M.getObjectName(object) + " does not implement getZIndex method");
-			console.warn(M.getObjectName(object) + " does not implement getZIndex method");
+		if ( !entity.getZIndex ) {
+			M.logger.warn(M.getObjectName(entity) + " does not implement getZIndex method");
 		}
 
-		if ( !object._zIndex ) {
-			object._zIndex = this.onRenderList.length;
-		}
-/* 
-		if ( !object.notifyChange ) {
-			// throw new Error(M.getObjectName(object) + " does not implement notifyChange method. This method must inform the onwerLayer of any change in a value that would require a redraw action. ie: function() { this.ownerLayer.renderizableChanged(); } ownerLayer is added when the object is pushed into a layer by default");
-			console.warn(M.getObjectName(object) + " does not implement notifyChange method. This method must inform the onwerLayer of any change in a value that would require a redraw action. ie: function() { this.ownerLayer.renderizableChanged(); } ownerLayer is added when the object is pushed into a layer by default");
-			object.notifyChange = function () {
-				if ( this.ownerLayer ) {
-					this.ownerLayer.renderizableChanged();
-				}
-			}
-		} */
-
-		if ( !object.notifyZIndexChange ) {
-			// throw new Error(M.getObjectName(object) + " does not implement notifyZIndexChange method. This method must inform the onwerLayer of any change in the zIndex so that the layer reorders its children. ie: function() { this.ownerLayer.zIndexChanged(); } ownerLayer is added when the object is pushed into a layer by default");
-			console.warn(M.getObjectName(object) + " does not implement notifyZIndexChange method. This method must inform the onwerLayer of any change in the zIndex so that the layer reorders its children. ie: function() { this.ownerLayer.zIndexChanged(); } ownerLayer is added when the object is pushed into a layer by default");
-			object.notifyZIndexChange = function () {
-				if ( this.ownerLayer ) {
-					this.ownerLayer.zIndexChange();
-				}
-			}
+		if ( !entity._zIndex ) {
+			entity._zIndex = this.onRenderList.length;
 		}
 
-		object.ownerLayer = this;
-
-		if ( object.onLoad ) {
-			object.onLoad();
+		if ( entity.onLoad ) {
+			entity.onLoad();
 		}
+
+		var self = this,
+			notifyRedraw = function() {
+				self.needsRedraw = true;
+			};
+
+		entity.addEventListener("xChanged", notifyRedraw);
+		entity.addEventListener("yChanged", notifyRedraw);
+		entity.addEventListener("rotationChanged", notifyRedraw);
+		entity.addEventListener("scaleXChanged", notifyRedraw);
+		entity.addEventListener("scaleYChanged", notifyRedraw);
+		entity.addEventListener("alphaChanged", notifyRedraw);
+		entity.addEventListener("widthChanged", notifyRedraw);
+		entity.addEventListener("heightChanged", notifyRedraw);
+		entity.addEventListener("visibilityChanged", notifyRedraw);
+		
+		// entity.addEventListener("xChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
+		// entity.addEventListener("yChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
+		// entity.addEventListener("rotationChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
+		// entity.addEventListener("scaleXChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
+		// entity.addEventListener("scaleYChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
+		// entity.addEventListener("alphaChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
+		// entity.addEventListener("widthChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
+		// entity.addEventListener("heightChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
+		// entity.addEventListener("visibilityChanged", function() {
+		// 	self.needsRedraw = true;
+		// });
 
 		this.needsSorting = true;
 
-		this.onRenderList.push(object);
-
-		// if ( object.onLoop ) {
-			// M.pushGameObject(object);
-		// }
+		this.onRenderList.push(entity);
 
 		//TODO: We need to know which objects were added so if they were outside the viewport we must not re render
 		this.needsRedraw = true;

@@ -147,7 +147,7 @@
 
 		this.loop = loop || this._animation.loop;
 
-		this.notifyChange();
+		this.raiseEvent("animationPlaying");
 
 	};
 	/**
@@ -208,8 +208,6 @@
 
 				this.currentFrameStartInMillis = timeInMillis;
 
-				this.notifyChange();
-
 			}
 
 		}
@@ -269,6 +267,7 @@
         this._height = this.currentFrame.height;
         this._halfWidth = this.currentFrame.halfWidth;
         this._halfHeight = this.currentFrame.halfHeight;
+        this.raiseEvent("frameChanged", index);
     };
 	/**
 	 * Returns the constructor's name

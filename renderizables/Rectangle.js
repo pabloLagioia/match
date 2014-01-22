@@ -112,7 +112,7 @@
 	 */
 	Rectangle.prototype.setFillStyle = function(value) {
 		this._fillStyle = value;
-		this.notifyChange();
+		this.raiseEvent("fillStyleChanged", value);
 	};
 	/**
 	 * Sets the style used to stroke the rectangle
@@ -126,7 +126,7 @@
 	 */
 	Rectangle.prototype.setStrokeStyle = function(value) {
 		this._strokeStyle = value;
-		this.notifyChange();
+		this.raiseEvent("strokeStyleChanged", value);
 	};
 	/**
 	 * Sets the border color of the rectangle
@@ -149,7 +149,7 @@
 	 */
 	Rectangle.prototype.setStrokeWidth = function(value) {
 		this._lineWidth = value;
-		this.notifyChange();
+		this.raiseEvent("strokeWidthChanged", value);
 	};
 	Rectangle.prototype.setBorderWidth = Rectangle.prototype.setStrokeWidth;
 	/**
@@ -165,7 +165,7 @@
 		this._shadow = {
 			x: x, y: y, color: color || "black", blur: blur || 1
 		}
-		this.notifyChange();
+		this.raiseEvent("shadowChanged", this._shadow);
 	};
 	/**
 	 * Gets the fill style
@@ -185,7 +185,7 @@
 	 * @return {String} the strokeStyle
 	 */
 	Rectangle.prototype.getStrokeStyle = function() {
-		return this._strokeStyle
+		return this._strokeStyle;
 	};
 	Rectangle.prototype.getBorder = Rectangle.prototype.getStrokeStyle;
 	/**
