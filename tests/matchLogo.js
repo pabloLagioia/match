@@ -1,7 +1,6 @@
-function main() {
+M.registerScene("matchLogo", {
 
-	M.sprites.load({
-
+	sprites: {
 		fonts: {
 			source: "font.png",
 			frames: {
@@ -47,26 +46,25 @@ function main() {
 				"-": {x: 400, y: 505, width: 47, height: 73}
 			}
 		}
+	},
+	onLoad: function() {
 
-	}, function() {
+		var object = new M.Entity(),
+			center = M.getCenter();
 
-		var object = new M.Entity();
-
+		object.shows("poweredBy").as("bitmapText").set({
+			fill: "fonts", x: center.x, y: center.y - 40, text: "POWERED BY",
+			scaleX: 0.15,
+			scaleY: 0.15
+		});
 		object.shows("match").as("bitmapText").set({
-			fill: "fonts", x: 0, y: 0, text: "HELLO MATCH",
+			fill: "fonts", x: center.x, y: center.y, text: "MATCH",
 			scaleX: 0.5,
 			scaleY: 0.5
 		});
 
-		object.has("direction").set(1,1);
-		object.has("spinAroundSpeed");
-
-		object.does("spinAround");
-		object.does("bounce");
-		object.does("stickToCanvas");
-
 		M.push(object).to("world");
 		
-	});
+	};
 
-}
+});

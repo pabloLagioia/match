@@ -575,7 +575,7 @@
 	};
 	StandardEntityRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight) {
 	
-		// if ( layer.needsRedraw ) {
+		if ( layer.needsRedraw ) {
 
 			var current,
 				currentView,
@@ -618,20 +618,22 @@
 
 			//TODO: Review buffer. Layer should not know anything about rendering
 			if ( layer._buffer == undefined ) {
-				layer._buffer = new Image();
+				layer._buffer = document.createElement("canvas").getContext("2d");
+				layer._buffer.canvas.width = this.backBuffer.canvas.width;
+				layer._buffer.canvas.height = this.backBuffer.canvas.height;
 			}
 			
-			// layer._buffer.src = this.backBuffer.canvas.toDataURL();
+			layer._buffer.drawImage(this.backBuffer.canvas, 0, 0);
 			
 			layer.needsRedraw = false;
 
 			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
 			
-		// } else {
+		} else {
 		
-			// this.frontBuffer.drawImage(layer._buffer, 0, 0);
+			this.frontBuffer.drawImage(layer._buffer.canvas, 0, 0);
 			
-		// }
+		}
 
 		// if ( this.needsSorting ) {
 		// 	this.sort();
