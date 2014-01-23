@@ -83,7 +83,6 @@
 	 * @return {Array} Array containing the event listeners that are removed
 	 */
 	EventListener.prototype.removeAllEventListeners = function() {
-		var listeners = this.listeners;
 		this.listeners = new Array();
 		return listeners;
 	};

@@ -85,10 +85,8 @@
 	 * @param {Function} callback
 	 */
 	SimpleMap.prototype.eachKey = function(callback) {
-		var i = 0,
-			l = this._values.length;
-		for ( ; i < l; i++ ) {
-			callback(this._keys[i]);
+		for ( var key in this._keys ) {
+			callback(key);
 		}
 	};
 	/**
@@ -97,10 +95,8 @@
 	 * @param {Function} callback
 	 */
 	SimpleMap.prototype.each = function(callback) {
-		var i = 0,
-			l = this._values.length;
-		for ( ; i < l; i++ ) {
-			callback(this._keys[i], this._values[i]);
+		for ( var key in this._keys ) {
+			callback(key, this.get(key));
 		}
 	};
 

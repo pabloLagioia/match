@@ -1,7 +1,7 @@
 /**
  * @module Match
  */
-(function(M) {
+(function(M, EventHandler) {
 
 	/**
 	 * Provides a Camera for easy scene displacement
@@ -12,6 +12,8 @@
 	 */
 	function Camera() {
 	
+		this.extendsEventHandler();
+
 		/**
 		 * The x coordinate
 		 * @property x
@@ -120,20 +122,16 @@
 
 	};
 
-	Camera.prototype.notifyChange = function() {
-		//TODO: Inform renderer that it must redraw all layers
-	};
-
 	Camera.prototype.setX = function(value) {
 		this._prevX = this._x;
 		this._x = value;
-		this.notifyChange();
+		this.raiseEvent("locationChanged");
 	};
 
 	Camera.prototype.setY = function(value) {
 		this._prevY = this._y;
 		this._y = value;
-		this.notifyChange();
+		this.raiseEvent("locationChanged");
 	};
 
 	Camera.prototype.getX = function() {
@@ -182,14 +180,7 @@
 		} else {
 			sizeObj = renderizable._halfHeight;
 		}
-		
-		// if ( this._y + this.viewportHeight < renderizable._y - sizeObj ) return false;
-		// if ( this._y - this.viewportHeight > renderizable._y + sizeObj ) return false;
-		// if ( this._x + this.viewportWidth < renderizable._x - sizeObj ) return false;
-		// if ( this._x - this.viewportWidth > renderizable._x + sizeObj ) return false;
-		
-		//This is more precize but takes more processing time if the object is rotating constantly
-		//We should make sure this is less expensive than rendering an object
+
 		if ( this._y + this.viewportHeight < renderizable.getTop() ) return false;
 		if ( this._y - this.viewportHeight > renderizable.getBottom() ) return false;
 		if ( this._x + this.viewportWidth < renderizable.getLeft() ) return false;
@@ -199,6 +190,8 @@
 		
 	};
 	
+	M.extend(Camera, EventHandler);
+
 	M.Camera = Camera;
 
-})(window.Match);
+})(Match, EventHandler);

@@ -316,6 +316,8 @@ var M = window.M || {},
 			attributes: {
 			},
 			entities: {
+			},
+			scenes: {
 			}
 		};
 
@@ -409,31 +411,13 @@ var M = window.M || {},
 	};
 	Match.prototype._showLogo = function() {
 
-		var logo = new M.Entity();
-
-		logo.shows("itself").as("sprite").set({
-			fill: this.LOGO,
-			x: this.getCenter().x,
-			y: this.getCenter().y,
-			alpha: 0
-		});
-		logo.has("alphaDirection", 1);
-		logo.has("alphaOffset", 0.025);
-		logo.does("fadeInAndOut", function(e, a, v) {
-			v.eachValue(function(view) {
-				view.offsetAlpha(a.get("alphaOffset") * a.get("alphaDirection"));
-			});
-		});
-
-		this.push(logo).to(this.DEFAULT_LAYER_NAME);
+		this.setScene("matchLogo");
 
 		setTimeout(function() {
-			var mainLayer = M.layer(M.DEFAULT_LAYER_NAME);
-			mainLayer.background = "#fff";
-			mainLayer.removeAll();
-			M.LOGO = null;
-			M.removeAllGameObjects();
-			window.main();
+			M.removeScene();
+			if ( window.main ) {
+				window.main();
+			}
 		}, this.LOGO_DURATION);
 
 	};
@@ -548,6 +532,13 @@ var M = window.M || {},
 	};
 	Match.prototype.createEntity = function(name) {
 		return this.game.entities[name]();
+	};	
+	Match.prototype.registerScene = function(name, value) {
+		if ( this.game.scenes[name] == undefined ) {
+			this.game.scenes[name] = value;
+		} else {
+			this.logger.warn("There already is a scenes named " + name);
+		}
 	};
 	/**
 	 * Calls the onLoop method on all elements in nodes
@@ -651,9 +642,7 @@ var M = window.M || {},
 		
 		current = new Date().getTime();
 
-		this._gameLayers.eachValue(function(layer) {
-			renderer.render(layer);
-		});
+		this.renderer.renderLayers(this._gameLayers);
 		
 		renderInfo.innerHTML = new Date().getTime() - current;
 
@@ -891,63 +880,100 @@ var M = window.M || {},
 	 * @param {Layer} a layer that will be shown when loading
 	 * @param {Function} transition the transition applied to the scene that is leaving and the one that is entering
 	 */
-	Match.prototype.setScene = function (scene, loadingLayer, transition) {
+	Match.prototype.setScene = function () {
 
-		var m = this;
+		var scene;
 
-		this.removeAllGameLayers();
-		
-		if (loadingLayer ) {
-			this.pushLayer(loadingLayer);
+		if ( typeof arguments[0] == "string" && this.game.scenes[arguments[0]] ) {
+			scene = this.game.scenes[arguments[0]];
+		} else if ( typeof arguments[0] == "object" ) {
+			scene = arguments[0];
+		} else {
+			this.logger.error("Unable to load logo scene");
+			return;
 		}
-		
-		this.sprites.onAllImagesLoaded.removeAllEventListeners();
-	
-		this.sprites.load(scene.resources.sprites, function () {
-			
-			for ( var i in scene.layers ) {
-			
-				var layer = new m.Layer,
-					layerData = scene.layers[i];
+
+		this.removeScene();
+
+		// var m = this;
+
+		var soundsReady = false,
+			spritesReady = false;
+
+		if ( scene.sounds ) {
+			this.sounds.load(scene.sounds, function () {
+
+				soundsReady = true;
+
+				if ( spritesReady && scene.onLoad ) {
+					scene.onLoad();
+				}
+
+			});
+		} else {
+			soundsReady = true;
+		}
+
+		if ( scene.sprites ) {
+			this.sprites.load(scene.sprites, function () {
 				
-				for ( var j in layerData ) {
+				//TODO: This is used for scenes that come with the objects and layers already defined
+				// for ( var i in scene.layers ) {
 				
-					var object = layerData[j],
-						instance = m._getClassInstance(object.className, object.setAttributes);
+				// 	var layer = new m.Layer,
+				// 		layerData = scene.layers[i];
+					
+				// 	for ( var j in layerData ) {
+					
+				// 		var object = layerData[j],
+				// 			instance = m._getClassInstance(object.className, object.setAttributes);
+							
+				// 		if ( object.beforePush ) {
+				// 			object.beforePush(instance);
+				// 		}
 						
-					if ( object.beforePush ) {
-						object.beforePush(instance);
-					}
+				// 		layer.push(instance);
+						
+				// 	}
 					
-					layer.push(instance);
+				// 	m.pushLayer(layer);
 					
-				}
+				// }
 				
-				m.pushLayer(layer);
+				// for ( var i in scene.objects ) {
+				// 	var object = scene.objects[i],
+				// 		instance = m._getClassInstance(object.className, object.setAttributes);
+				// 	if ( object.beforePush ) {
+				// 		object.beforePush(instance);
+				// 	}
+				// 	m.pushGameObject(instance);
+				// }
+
+				spritesReady = true;
 				
-			}
-			
-			for ( var i in scene.objects ) {
-				var object = scene.objects[i],
-					instance = m._getClassInstance(object.className, object.setAttributes);
-				if ( object.beforePush ) {
-					object.beforePush(instance);
+				if ( soundsReady && scene.onLoad ) {
+					scene.onLoad();
 				}
-				m.pushGameObject(instance);
-			}
-			
-			if (loadingLayer ) {
-				m.removeLayer(loadingLayer);
-			}
-			
-		});
+
+			});
+		} else {
+			spritesReady = true;
+		}
+
+		if ( scene.onLoad && scene.sounds == undefined && scene.sprites == undefined ) {
+			scene.onLoad();
+		}
 		
 	};
 	/**
 	 * TODO: Complete JS Doc
 	 */
 	Match.prototype.removeScene = function() {
+		this.removeAllGameObjects();
 		this.removeAllGameLayers();
+		this.sprites.removeAllEventListeners();
+		this.sounds.removeAllEventListeners();
+		this.createGameLayer(this.DEFAULT_LAYER_NAME).background = this.DEFAULT_LAYER_BACKGROUND;
 	};
 	/**
 	 * Pushes all provided layers into Match list of game layers
@@ -978,10 +1004,6 @@ var M = window.M || {},
 
 		if ( layer ) {
 
-			for ( var i = 0, l = layer.onRenderList.length; i < l; i++ ) {
-				this.removeGameObject(layer.onRenderList[i]);
-			}
-
 			return this._gameLayers.remove(name);
 
 		}
@@ -1000,7 +1022,7 @@ var M = window.M || {},
 	 */
 	Match.prototype.removeAllGameLayers = function() {
 		var self = this;
-		this._gameLayers.eachValue(function(layer) {
+		this._gameLayers.eachKey(function(layer) {
 			self.removeGameLayer(layer);
 		});
 	};

@@ -619,6 +619,12 @@
 		this.total = 0;
 	};
 
+	SoundManager.prototype.removeAllEventListeners = function() {
+		this.onSoundLoaded = new EventListener();
+		this.onAllSoundsLoaded = new EventListener();
+		this.onSoundError = new EventListener();
+	};
+
 	M.SoundManager = M.sounds = new SoundManager();
 
 })( Match, EventListener );

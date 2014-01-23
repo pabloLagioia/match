@@ -43,5 +43,6 @@
 	"renderizables/BitmapText",
 	"Timer",
 	"TimeCounter",
-	"Entity"
+	"Entity",
+	"matchLogo"
 ]

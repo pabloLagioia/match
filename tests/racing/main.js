@@ -83,7 +83,7 @@ function main() {
 		M.getCamera().centerAt(car.attribute("location").x, car.attribute("location").y);
 		M.add(car).to("track");
 	
-	//PLAYER 2
+	//PLAYER 2	
 	var car2 = M.game.entities.createCar();
 		car2.attribute("location").set((CANVAS_W / 2 + 220) * 2, (CANVAS_H / 2 + 400) * 2);
 		car2.has("keyboardMapping", {

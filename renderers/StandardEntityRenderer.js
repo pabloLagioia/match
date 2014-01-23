@@ -43,7 +43,14 @@
 
 		this.compositeOperation = this.DEFAULT_COMPOSITE_OPERATION;
 
+		this._reRenderAllLayers = false;
+
+		var self = this;
+
 		this.camera = new M.Camera();
+		this.camera.addEventListener("locationChanged", function () {
+			self._reRenderAllLayers = true;
+		});
 
 		this.updateBufferSize();
 		this.updateViewport();
@@ -573,23 +580,24 @@
 		}
 		
 	};
-	StandardEntityRenderer.prototype.renderLayer = function (layer, context, cameraX, cameraY, viewportWidth, viewportHeight) {
+	StandardEntityRenderer.prototype.renderLayer = function (layer, cameraX, cameraY, viewportWidth, viewportHeight) {
 	
-		if ( layer.needsRedraw ) {
+		if ( this._reRenderAllLayers || layer.needsRedraw ) {
 
 			var current,
 				currentView,
-				currentViews;
+				currentViews,
+				canvas = this.backBuffer.canvas;
 
 			if ( layer.background ) {
 				if ( layer.background.src ) {
 					this.backBuffer.drawImage(layer.background, 0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
 				} else {
 					this.backBuffer.fillStyle = layer.background;
-					this.backBuffer.fillRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
+					this.backBuffer.fillRect(0, 0, canvas.width, canvas.height);
 				}
 			} else {
-				this.backBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
+				this.backBuffer.clearRect(0, 0, canvas.width, canvas.height);
 			}
 
 			for ( var i = 0, l = layer.onRenderList.length; i < l; i++ ) {
@@ -619,11 +627,12 @@
 			//TODO: Review buffer. Layer should not know anything about rendering
 			if ( layer._buffer == undefined ) {
 				layer._buffer = document.createElement("canvas").getContext("2d");
-				layer._buffer.canvas.width = this.backBuffer.canvas.width;
-				layer._buffer.canvas.height = this.backBuffer.canvas.height;
+				layer._buffer.canvas.width = canvas.width;
+				layer._buffer.canvas.height = canvas.height;
 			}
 			
-			layer._buffer.drawImage(this.backBuffer.canvas, 0, 0);
+			layer._buffer.clearRect(0, 0, canvas.width, canvas.height);
+			layer._buffer.drawImage(canvas, 0, 0);
 			
 			layer.needsRedraw = false;
 
@@ -641,6 +650,12 @@
 		// }
 
 	};
+	StandardEntityRenderer.prototype.renderLayers = function(layers) {
+		for ( var i = 0, l = layers._values.length; i < l; i++ ) {
+			this.renderLayer(layers._values[i], this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
+		}		
+		this._reRenderAllLayers = false;
+	};
 	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY) {
 
 		var types = M.renderizables.TYPES;
@@ -649,9 +664,9 @@
 			case types.SPRITE:
 				this.renderSprite(object, context, cameraX, cameraY);
 				break;
-			case types.LAYER:
-				this.renderLayer(object, object._context, this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
-				break;
+			// case types.LAYER:
+			// 	this.renderLayer(object, this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
+			// 	break;
 			case types.BITMAP_TEXT:
 				this.renderBitmapText(object, context, cameraX, cameraY);
 				break;

@@ -112,6 +112,8 @@
 	Sprite.prototype.getFillStyle = Sprite.prototype.getImage;
 	Sprite.prototype.setFill = Sprite.prototype.setImage;
 	Sprite.prototype.getFill = Sprite.prototype.getImage;
+	Sprite.prototype.setSprite = Sprite.prototype.setImage;
+	Sprite.prototype.getSprite = Sprite.prototype.getImage;
 	/**
 	 * Starts playing the animation
 	 * 
