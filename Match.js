@@ -324,11 +324,33 @@ var M = window.M || {},
 		 * Start game loop when document is loaded
 		 */
 		document.addEventListener( "DOMContentLoaded", function() {
+			document.body.appendChild(debugElement);
 			self.setUpGameLoop();
 		});
 
 	}
 	
+	var debugElement = document.createElement("div"),
+		updateInfoContainer = document.createElement("div"),
+		renderInfoContainer = document.createElement("div"),
+		updateInfo = document.createElement("span"),
+		renderInfo = document.createElement("span");
+
+		debugElement.setAttribute("id", "debugInfo");
+		updateInfo.setAttribute("id", "updateInfo");
+		renderInfo.setAttribute("id", "renderInfo");
+
+		updateInfoContainer.innerHTML = "Updates: ";
+		updateInfoContainer.appendChild(updateInfo);
+
+		renderInfoContainer.innerHTML = "Renders: ";
+		renderInfoContainer.appendChild(renderInfo);
+
+		debugElement.appendChild(updateInfoContainer);
+		debugElement.appendChild(renderInfoContainer);
+
+		debugElement.style = "font-family: verdana";
+
 	Match.prototype.getCamera = function() {
 		return this.renderer.camera;
 	};
@@ -615,6 +637,7 @@ var M = window.M || {},
 			this._lag = this._maxLag;
 		}
 		
+		current = new Date().getTime();
 		
 		while ( this._lag > this._msPerUpdate ) {
 		
@@ -624,7 +647,7 @@ var M = window.M || {},
 
 		}
 
-		// document.getElementById("info").innerHTML = new Date().getTime() - current;
+		updateInfo.innerHTML = new Date().getTime() - current;
 		
 		current = new Date().getTime();
 
@@ -632,7 +655,7 @@ var M = window.M || {},
 			renderer.render(layer);
 		});
 		
-		// document.getElementById("info2").innerHTML = new Date().getTime() - current;
+		renderInfo.innerHTML = new Date().getTime() - current;
 
 		/*
 		 * Update FPS count
@@ -1394,76 +1417,6 @@ var M = window.M || {},
 		}
 		return name;
 	};
-
-	/** CES PARADIGM *****************************************************************************************/
-	// Match.prototype._define = function(type, name, constructor) {
-	// 	var namespace = this._createNamespaceFromString("M.game." + type + "." + name);
-	// 	namespace.namespace[namespace.name] = constructor;
-	// };
-	// Match.prototype.defineAttribute = function(name, constructor) {
-	// 	this._define("attributes", name, constructor);
-	// };
-	// Match.prototype.defineBehaviour = function(name, constructor) {
-	// 	this._define("behaviours", name, constructor);
-	// };
-	// Match.prototype.defineEntity = function(name, constructor) {
-	// 	this._define("entities", name, constructor);
-	// };
-	// Match.prototype.defineEntities = function(entities) {
-	// 	for ( var i in map ) {
-	// 		this.defineEntity(i, map[i]);
-	// 	}
-	// };
-	// Match.prototype.defineAttributes = function(map) {
-	// 	for ( var i in map ) {
-	// 		this.defineAttribute(i, map[i]);
-	// 	}
-	// };
-	// Match.prototype.defineBehaviours = function(map) {
-	// 	for ( var i in map ) {
-	// 		this.defineBehaviour(i, map[i]);
-	// 	}
-	// };
-	// /**
-	//  * Create acts as a factory
-	//  */
-	// Match.prototype.create = function(name) {
-	// 	return this.game.entities[name]();
-	// };
-	// Match.prototype.defineAttribute = function(name, value) {
-		// this.game.attributes.add(name, value);
-	// };
-	// Match.prototype.defineBehaviour = function(name, value) {
-		// this.game.behaviours.add(name, value);
-	// };
-	// Match.prototype.defineEntity = function(name, value) {
-		// this.game.entities.add(name, value);
-	// };
-	// Match.prototype.defineAttributes = function(map) {
-		// for ( var i in map ) {
-			// this.defineAttribute(i, map[i]);
-		// }
-	// };
-	// Match.prototype.defineBehaviours = function(map) {
-		// for ( var i in map ) {
-			// this.defineBehaviour(i, map[i]);
-		// }
-	// };
-	// Match.prototype.defineEntities = function(entities) {
-		// for ( var i in map ) {
-			// this.defineEntity(i, map[i]);
-		// }
-	// };
-	// Match.prototype.createEntity = function(name) {
-	// 	return this.game.entities[name]();
-	// };
-	// Match.prototype.getAttribute = function(name) {
-	// 	return this.game.attributes[name];
-	// };
-	// Match.prototype.getBehaviour = function(name) {
-	// 	return this.game.behaviours[name];
-	// };
-	/********************************************************************************************************/
 	
 	if ( !window.requestAnimationFrame ) {
 

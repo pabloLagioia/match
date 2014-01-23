@@ -517,19 +517,19 @@
 		}
 
 	};
-	StandardEntityRenderer.prototype.renderBitmapFont = function( renderizable, context, cameraX, cameraY ) {
+	StandardEntityRenderer.prototype.renderBitmapText = function( renderizable, context, cameraX, cameraY ) {
 	
 		if ( ! renderizable._sprite ) return;
 		
 		this._applyOperation(renderizable, context);
 		this._applyAlpha(renderizable, context);
 		
-		var length = renderizable._text.length,
-			start = 0;
-		
-		for ( var i = 0; i < length; i++ ) {
-			start += renderizable._sprite.frames[renderizable._text[i]].halfWidth;
-		}
+		var text = renderizable._text,
+			length = text.length,
+			start = 0,
+			frames = renderizable._sprite.frames,
+			x,
+			y;
 		
 		if ( renderizable._rotation || renderizable._scale ) {
 		
@@ -539,12 +539,14 @@
 			this._applyRotation(renderizable, context);
 			this._applyScale(renderizable, context);
 
+			x = -renderizable._halfWidth;
+			y = -renderizable._halfHeight;
 			
 			for ( var i = 0; i < length; i++ ) {
 			
-				var currentFrame = renderizable._sprite.frames[renderizable._text[i]];
+				var currentFrame = frames[text[i]];
 				
-				context.drawImage( renderizable._sprite, currentFrame.x, currentFrame.y, currentFrame.width, currentFrame.height, start, -currentFrame.halfHeight, currentFrame.width, currentFrame.height );
+				context.drawImage( renderizable._sprite, currentFrame.x, currentFrame.y, currentFrame.width, currentFrame.height, x + start, y, currentFrame.width, currentFrame.height );
 				
 				start = start + currentFrame.width;
 				
@@ -554,12 +556,15 @@
 
 		} else {
 
+			x = renderizable._x - cameraX - renderizable._halfWidth;
+			y = renderizable._y - cameraY - renderizable._halfHeight;
+
 			for ( var i = 0; i < length; i++ ) {
 			
-				var currentFrame = renderizable._sprite.frames[renderizable._text[i]];
+				var currentFrame = frames[text[i]];
 				
-				context.drawImage( renderizable._sprite, currentFrame.x, currentFrame.y, currentFrame.width, currentFrame.height, renderizable._x - start - cameraX, renderizable._y - currentFrame.halfHeight - cameraY, currentFrame.width, currentFrame.height );
-			
+				context.drawImage( renderizable._sprite, currentFrame.x, currentFrame.y, currentFrame.width, currentFrame.height, x + start, y, currentFrame.width, currentFrame.height );
+
 				start = start + currentFrame.width;
 				
 			}
@@ -616,7 +621,7 @@
 				layer._buffer = new Image();
 			}
 			
-			layer._buffer.src = this.backBuffer.canvas.toDataURL();
+			// layer._buffer.src = this.backBuffer.canvas.toDataURL();
 			
 			layer.needsRedraw = false;
 
@@ -645,8 +650,8 @@
 			case types.LAYER:
 				this.renderLayer(object, object._context, this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
 				break;
-			case types.BITMAP_FONT:
-				this.renderBitmapFont(object, context, cameraX, cameraY);
+			case types.BITMAP_TEXT:
+				this.renderBitmapText(object, context, cameraX, cameraY);
 				break;
 			case types.TEXT:
 				this.renderText(object, context, cameraX, cameraY);

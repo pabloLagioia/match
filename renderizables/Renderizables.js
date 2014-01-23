@@ -8,7 +8,7 @@
 		TYPES: {
 			SPRITE: 0,
 			LAYER: 1,
-			BITMAP_FONT: 2,
+			BITMAP_TEXT: 2,
 			TEXT: 3,
 			RECTANGLE: 4,
 			CIRCLE: 5

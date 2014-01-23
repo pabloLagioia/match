@@ -40,7 +40,7 @@
 	"renderizables/Rectangle",
 	"renderizables/Circle",
 	"renderizables/Text",
-	"renderizables/BitmapFont",
+	"renderizables/BitmapText",
 	"Timer",
 	"TimeCounter",
 	"Entity"
