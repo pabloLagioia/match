@@ -1,9 +1,12 @@
-M.registerScene("test", {
+M.registerScene("tanks", {
 
 	sprites: {
 		"grass": "grass.png",
 		"tree": "tree.gif"
 	},
+	
+	loadingScene: "loading",
+	
 	onLoad: function() {
 
 		var tileW = M.sprites.assets.grass.width,
@@ -62,5 +65,5 @@ M.registerScene("test", {
 var tank;
 
 function main() {
-	M.setScene("test");
+	M.setScene("tanks");
 }

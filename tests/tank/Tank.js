@@ -201,6 +201,11 @@
 		
 		tank.does("moveWithSpeedAndDirection");
 		
+		tank.does("listenToMouseOver", function(e, a, v, p) {
+			var mouse = p.mouse;
+			
+		});
+		
 		return tank;
 
 	}

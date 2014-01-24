@@ -61,10 +61,21 @@
 	 * @param {Object} key object representing unique id
 	 */
 	SimpleMap.prototype.remove = function(key) {
+		
 		var index = this._keys[key];
+		
 		this._values.splice(index, 1);
+		
 		delete this._keys[key];
+		
 		this.length--;
+		
+		for ( var i in this._keys ) {
+			if ( this._keys[i] > index ) {
+				this._keys[i]--;
+			}
+		}
+		
 	};
 	/**
 	 * Iterates through all values and invokes a callback

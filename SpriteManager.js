@@ -12,7 +12,7 @@
 	 * @constructor
 	 */
 	function SpriteManager() {
-
+	
 		/**
 		 * The path where all sprites are located
 		 * @property path

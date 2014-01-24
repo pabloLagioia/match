@@ -44,5 +44,6 @@
 	"Timer",
 	"TimeCounter",
 	"Entity",
-	"matchLogo"
+	"game/scenes/matchLogo",
+	"game/scenes/loading"
 ]

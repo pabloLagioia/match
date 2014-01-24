@@ -409,14 +409,16 @@ var M = window.M || {},
 	};
 	Match.prototype._showLogo = function() {
 
-		this.setScene("matchLogo");
+		this.setScene("matchLogo", function() {
 
-		setTimeout(function() {
-			M.removeScene();
-			if ( window.main ) {
-				window.main();
-			}
-		}, this.LOGO_DURATION);
+			setTimeout(function() {
+				M.removeScene();
+				if ( window.main ) {
+					window.main();
+				}
+			}, M.LOGO_DURATION);
+			
+		})
 
 	};
 	/**
@@ -510,7 +512,7 @@ var M = window.M || {},
 		if ( this.game.behaviours[name] == undefined ) {
 			this.game.behaviours[name] = value;
 		} else {
-			this.logger.warn("There already is a behaviour named " + name);
+			this.logger.warn("There is already a behaviour named ", name);
 		}
 
 	};
@@ -518,14 +520,14 @@ var M = window.M || {},
 		if ( this.game.attributes[name] == undefined ) {
 			this.game.attributes[name] = value;
 		} else {
-			this.logger.warn("There already is an attribute named " + name);
+			this.logger.warn("There is already an attribute named ", name);
 		}
 	};
 	Match.prototype.registerEntity = function(name, value) {
 		if ( this.game.entities[name] == undefined ) {
 			this.game.entities[name] = value;
 		} else {
-			this.logger.warn("There already is an entitie named " + name);
+			this.logger.warn("There is already an entity named ", name);
 		}
 	};
 	Match.prototype.createEntity = function(name) {
@@ -535,8 +537,14 @@ var M = window.M || {},
 		if ( this.game.scenes[name] == undefined ) {
 			this.game.scenes[name] = value;
 		} else {
-			this.logger.warn("There already is a scenes named " + name);
+			this.logger.warn("There is already a scenes named ", name);
 		}
+	};
+	Match.prototype.unregisterScene = function(name) {
+		this.game.scenes[name] = null;
+	};
+	Match.prototype.getScene = function(name) {
+		return this.game.scenes[name];
 	};
 	/**
 	 * Calls the onLoop method on all elements in nodes
@@ -870,7 +878,6 @@ var M = window.M || {},
 	 * @method createGameLayer
 	 */
 	Match.prototype.pushLayer = Match.prototype.pushGameLayer;
-
 	/**
 	 * Sets the current scene
 	 * @method setScene
@@ -878,88 +885,143 @@ var M = window.M || {},
 	 * @param {Layer} a layer that will be shown when loading
 	 * @param {Function} transition the transition applied to the scene that is leaving and the one that is entering
 	 */
-	Match.prototype.setScene = function () {
+	Match.prototype.setScene = function (name, callback) {
 
-		var scene;
+		var scene = this.getScene(name);
 
-		if ( typeof arguments[0] == "string" && this.game.scenes[arguments[0]] ) {
-			scene = this.game.scenes[arguments[0]];
-		} else if ( typeof arguments[0] == "object" ) {
-			scene = arguments[0];
+		if ( scene ) {
+			this.logger.log("Loading scene by name '", name, "'");
 		} else {
-			this.logger.error("Unable to load logo scene");
+			this.logger.error("Unable to load scene by name '", name, "'");
 			return;
 		}
-
+		
 		this.removeScene();
+		
+		if ( scene.loadingScene ) {
+		
+			var self = this;
+	
+			this.setScene(scene.loadingScene, function() {
+			
+				var soundsReady = false,
+					spritesReady = false,
+					loadingScene = self.getScene(scene.loadingScene),
+					loadingFinished = false,
+					checkLoading = function() {
+						if ( !loadingFinished && soundsReady && spritesReady ) {
+							self.sprites.removeAllEventListeners();
+							self.sounds.removeAllEventListeners();
+							self.removeAllGameLayers();
+							for ( var i in loadingScene.sprites ) {
+								if ( scene.sprites[i] == undefined ) {
+									self.sprites.remove(i);
+								}
+							}
+							for ( var i in loadingScene.sounds ) {
+								if ( scene.sounds[i] == undefined ) {
+									self.sounds.remove(i);
+								}
+							}
+							scene.onLoad();
+							loadingFinished = true;
+						}
+					};
+					
+				if ( scene.sounds ) {
+					self.sounds.load(scene.sounds, function() {
+						soundsReady = true;
+						checkLoading();
+					});
+				} else {
+					soundsReady = true;
+				}
 
-		// var m = this;
+				if ( scene.sprites ) {
+					self.sprites.load(scene.sprites, function() {
+						spritesReady = true;
+						checkLoading();
+					});
+				} else {
+					spritesReady = true;
+				}
+				
+				checkLoading();
+				
+			});
+			
+		} else {
 
-		var soundsReady = false,
-			spritesReady = false;
+			// var m = this;
 
-		if ( scene.sounds ) {
-			this.sounds.load(scene.sounds, function () {
+			var soundsReady = false,
+				spritesReady = false,
+				loadingFinished = false,
+				checkLoading = function() {
+					if ( !loadingFinished && soundsReady && spritesReady ) {
+						loadingFinished = true;
+						scene.onLoad();
+						if ( callback ) {
+							callback();
+						}
+					}
+				};
 
+			if ( scene.sounds ) {
+				this.sounds.load(scene.sounds, function () {
+					soundsReady = true;
+					checkLoading();
+				});
+			} else {
 				soundsReady = true;
+			}
 
-				if ( spritesReady && scene.onLoad ) {
-					scene.onLoad();
-				}
+			if ( scene.sprites ) {
 
-			});
-		} else {
-			soundsReady = true;
-		}
-
-		if ( scene.sprites ) {
-			this.sprites.load(scene.sprites, function () {
-				
-				//TODO: This is used for scenes that come with the objects and layers already defined
-				// for ( var i in scene.layers ) {
-				
-				// 	var layer = new m.Layer,
-				// 		layerData = scene.layers[i];
+				this.sprites.load(scene.sprites, function () {
 					
-				// 	for ( var j in layerData ) {
+					//TODO: This is used for scenes that come with the objects and layers already defined
+					// for ( var i in scene.layers ) {
 					
-				// 		var object = layerData[j],
-				// 			instance = m._getClassInstance(object.className, object.setAttributes);
+					// 	var layer = new m.Layer,
+					// 		layerData = scene.layers[i];
+						
+					// 	for ( var j in layerData ) {
+						
+					// 		var object = layerData[j],
+					// 			instance = m._getClassInstance(object.className, object.setAttributes);
+								
+					// 		if ( object.beforePush ) {
+					// 			object.beforePush(instance);
+					// 		}
 							
-				// 		if ( object.beforePush ) {
-				// 			object.beforePush(instance);
-				// 		}
+					// 		layer.push(instance);
+							
+					// 	}
 						
-				// 		layer.push(instance);
+					// 	m.pushLayer(layer);
 						
-				// 	}
+					// }
 					
-				// 	m.pushLayer(layer);
-					
-				// }
-				
-				// for ( var i in scene.objects ) {
-				// 	var object = scene.objects[i],
-				// 		instance = m._getClassInstance(object.className, object.setAttributes);
-				// 	if ( object.beforePush ) {
-				// 		object.beforePush(instance);
-				// 	}
-				// 	m.pushGameObject(instance);
-				// }
+					// for ( var i in scene.objects ) {
+					// 	var object = scene.objects[i],
+					// 		instance = m._getClassInstance(object.className, object.setAttributes);
+					// 	if ( object.beforePush ) {
+					// 		object.beforePush(instance);
+					// 	}
+					// 	m.pushGameObject(instance);
+					// }
 
+					spritesReady = true;
+					checkLoading();
+
+				});
+			} else {
 				spritesReady = true;
-				
-				if ( soundsReady && scene.onLoad ) {
-					scene.onLoad();
-				}
+			}
 
-			});
-		} else {
-			spritesReady = true;
-		}
+			checkLoading();
 
-		if ( scene.onLoad && scene.sounds == undefined && scene.sprites == undefined ) {
-			scene.onLoad();
 		}
 		
 	};
@@ -1004,6 +1066,10 @@ var M = window.M || {},
 
 			return this._gameLayers.remove(name);
 
+		} else {
+		
+			this.logger.error("could not remove layer by name", name);
+		
 		}
 
 	};
@@ -1422,10 +1488,6 @@ var M = window.M || {},
 	};
 	Match.prototype.getCenter = function() {
 		return this.renderer.getCenter();
-	};
-	Match.prototype.setLoadingScene = function(scene) {
-		this.prevLayers = M.removeScene();
-		this.pushScene(scene.getLayers());
 	};
 	Match.prototype.getObjectName = function(object) {
 		if (!object || !object.constructor) {

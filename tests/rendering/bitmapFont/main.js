@@ -53,7 +53,7 @@ function main() {
 		var object = new M.Entity();
 
 		object.shows("match").as("bitmapText").set({
-			fill: "fonts", x: 0, y: 0, text: "HELLO MATCH",
+			fill: "fonts", x: 0, y: 0, text: "HELLO WORLD",
 			scaleX: 0.5,
 			scaleY: 0.5
 		});
