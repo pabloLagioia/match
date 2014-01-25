@@ -64,6 +64,10 @@
 		
 		var index = this._keys[key];
 		
+		if ( index == undefined ) {
+			return;
+		}
+
 		this._values.splice(index, 1);
 		
 		delete this._keys[key];

@@ -298,6 +298,8 @@
 	function Vector2d(x, y) {
 		this.x = x || 0;
 		this.y = y || 0;
+		this.prevX = 0;
+		this.prevY = 0;
 	}
 	Vector2d.prototype.offset = function(x, y) {
 		this.set(this.x + x, this.y + y);

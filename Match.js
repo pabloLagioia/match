@@ -1389,8 +1389,9 @@ var M = window.M || {},
 	 */
 	Match.prototype.extend = function( child, parent ) {
 
-		if ( !child ) throw new Error("child is undefined and cannot be extended");
-		if ( !parent ) throw new Error("parent is undefined thus you cannot extend child");
+		if ( !child ) throw new Error("Child is undefined and cannot be extended");
+		if ( !parent ) throw new Error("Parent is undefined, you cannot extend child with an undefined parent");
+		if ( !parent.name ) throw new Error("Parent name is undefined. Please add a field name to the parent constructor where name is the name of the function. This usually creates issues in Internet Explorer.");
 	
 		child.prototype["extends" + parent.name] = parent;
 

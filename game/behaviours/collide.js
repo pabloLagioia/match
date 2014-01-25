@@ -40,12 +40,14 @@ M.registerBehaviour("collide", function(entity, attributes) {
 					
 					if ( collisionHandler.haveCollided(entity.views._values[entityView], current.views._values[view]) ) {
 
-						// attributes.set("manifold", {
-						// 	collidedWith: current,
-						// 	velocityDelta: getVelocityManifold(entity, current)
-						// });
+						attributes.set("manifold", {
+							collidedWith: current,
+							viewFromOther: current.views._values[view],
+							viewFromSelf: entity.views._values[entityView]/*,
+							velocityDelta: getVelocityManifold(entity, current)*/
+						});
 						
-						// return;
+						return;
 					
 					}
 					
