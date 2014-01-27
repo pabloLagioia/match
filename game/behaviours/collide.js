@@ -1,51 +1,63 @@
 M.registerBehaviour("collide", function(entity, attributes) {
 
-	var Vector2d = M.math2d.Vector2d;
-
-	function getVelocityManifold(entityA, entityB) {
-	
-		var velocityA = getSpeedVector(entityA),
-			velocityB = getSpeedVector(entityB);
-
-		return new Vector2d(velocityA.x - velocityB.x, velocityA.y - velocityB.y); 
-
-	}
-
-	function getSpeedVector(entity) {
-		
-		var speed = entity.getAttribute("speed"),
-			direction = entity.getAttribute("direction");
-		
-		return new Vector2d(speed * direction.x, speed * direction.y);
-
-	}
-
-
 	var location = attributes.get("location"),
 		otherObjects = M._gameObjects,
 		i = 0,
 		l = otherObjects.length,
-		current,
+		otherEntity,
 		collisionGroup = attributes.get("collisionGroup"),
-		collisionHandler = M.collisions.Polygon;
+		// simpleCollisionHandler = M.collisions.Simple,
+		polygonCollisionHandler = M.collisions.Polygon,
+		collisionInX = false,
+		collisionInY = false,
+		viewFromSelf,
+		viewFromOther,
+		j,
+		k,
+		currentY,
+		prevY;
 	
 	for ( ; i < l; i++ ) {
 	
-		current = otherObjects[i];
+		otherEntity = otherObjects[i];
 		
-		if ( current != entity && current.attribute("collisionGroup") == collisionGroup ) {
+		if ( otherEntity != entity && otherEntity.attribute("collisionGroup") == collisionGroup ) {
 
-			for ( var view = 0; view < current.views._values.length; view++ ) {
-				for ( var entityView = 0; entityView < entity.views._values.length; entityView++ ) {
+			for ( k = 0; k < otherEntity.views._values.length; k++ ) {
+
+				viewFromOther = otherEntity.views._values[k];
+
+				for ( j = 0; j < entity.views._values.length; j++ ) {
 					
-					if ( collisionHandler.haveCollided(entity.views._values[entityView], current.views._values[view]) ) {
+					viewFromSelf = entity.views._values[j];
+
+					if ( polygonCollisionHandler.haveCollided(viewFromSelf, viewFromOther) ) {
+
+						currentY = viewFromSelf._y;
+						prevY = viewFromSelf._prevY;
+
+						viewFromSelf._y = prevY;
+
+
+						if ( polygonCollisionHandler.haveCollided(viewFromSelf, viewFromOther) ) {
+							collisionInX = true;
+						} else {
+							collisionInY = true;
+						}
+
+						viewFromSelf._y = currentY;
 
 						attributes.set("manifold", {
-							collidedWith: current,
-							viewFromOther: current.views._values[view],
-							viewFromSelf: entity.views._values[entityView]/*,
-							velocityDelta: getVelocityManifold(entity, current)*/
+							collidedWith: otherEntity,
+							viewFromOther: viewFromOther,
+							viewFromSelf: viewFromSelf,
+							collisionInX: collisionInX,
+							collisionInY: collisionInY
 						});
+
+						if ( attributes.get("preventMoveOnCollision") ) {
+							location.set(location.prevX, location.prevY);
+						}
 						
 						return;
 					
