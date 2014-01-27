@@ -21,7 +21,7 @@ M.registerBehaviour("collide", function(entity, attributes) {
 	
 		otherEntity = otherObjects[i];
 		
-		if ( otherEntity != entity && otherEntity.attribute("collisionGroup") == collisionGroup ) {
+		if ( otherEntity != entity && otherEntity.attribute && otherEntity.attribute("collisionGroup") == collisionGroup ) {
 
 			for ( k = 0; k < otherEntity.views._values.length; k++ ) {
 
