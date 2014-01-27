@@ -1,3 +1,3 @@
-#RewriteEngine On    # Turn on the rewriting engine
-#RewriteRule    ^match.js?$		match.php    [NC,L]
-#RewriteRule    ^match?$			match.php    [NC,L]
+RewriteEngine On    # Turn on the rewriting engine
+RewriteRule    ^match.js?$		match.php    [NC,L]
+RewriteRule    ^match?$			match.php    [NC,L]

@@ -115,6 +115,8 @@
 		}
 	};
 
+	SimpleMap.name = "SimpleMap";
+
 	namespace.SimpleMap = SimpleMap;
 
 })(window);

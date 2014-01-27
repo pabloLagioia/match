@@ -86,6 +86,13 @@
 		}
 	};
 	
+	Entity.prototype.do = function(name) {
+		var behaviour = this.behaviour.get(name);
+		if ( behaviour ) {
+			behaviour(this, this.attributes, this.views, M.onLoopProperties)
+		}
+	};
+	
 	Entity.prototype.doesnt = function(name) {
 		return this.behaviours.remove(name);
 	};

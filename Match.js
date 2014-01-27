@@ -777,6 +777,38 @@ var M = window.M || {},
 		}
 		
 	};
+	Match.prototype.remove = function() {
+
+		for ( var i = 0; i < arguments.length; i++ ) {
+			this.removeGameObject(arguments[i]);
+		}
+	
+		return {
+		
+			objects: arguments,
+			
+			from: function(layerName) {
+			
+				if ( !layerName ) {
+					return;
+				}
+			
+				var layer = M.layer(layerName);
+				
+				if ( !layer ) {
+					layer = M.createGameLayer(layerName);
+				}
+				
+				if ( layer ) {
+					for ( var i = 0; i < this.objects.length; i++ ) {
+						M.getLayer(layerName).remove(this.objects[i]);
+					}
+				}
+				
+			}
+		}
+
+	};
 	Match.prototype.push = Match.prototype.add;	
 	/**
 	 * Pushes a game object, that is an object that implements an onLoop method, to the game object list.
@@ -1391,7 +1423,7 @@ var M = window.M || {},
 
 		if ( !child ) throw new Error("Child is undefined and cannot be extended");
 		if ( !parent ) throw new Error("Parent is undefined, you cannot extend child with an undefined parent");
-		if ( !parent.name ) throw new Error("Parent name is undefined. Please add a field name to the parent constructor where name is the name of the function. This usually creates issues in Internet Explorer.");
+		if ( !parent.name ) throw new Error("Parent name is undefined. Please add a field name to the parent constructor where name is the name of the function. This usually creates issues in Internet Explorer." + parent);
 	
 		child.prototype["extends" + parent.name] = parent;
 

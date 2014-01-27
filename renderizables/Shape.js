@@ -212,6 +212,8 @@
 	Shape.prototype.getShadow = function() {
 		return this._shadow;
 	};
+
+	Shape.name = "Shape";
 	
 	M.extend(Shape, Renderizable);
 	

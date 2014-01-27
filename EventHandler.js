@@ -28,6 +28,8 @@
 		this._eventListeners = {};
 	};
 
+	EventHandler.name = "EventHandler";
+
 	namespace.EventHandler = EventHandler;
 
 })(window);
