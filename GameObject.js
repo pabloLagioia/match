@@ -135,5 +135,7 @@
 	 * @protected
 	 * @param {input.Mouse} mouse the mouse object to provide further mouse information
 	 */
+
+	 GameObject.name = "GameObject";
 	
 })(window.M);

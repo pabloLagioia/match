@@ -1011,6 +1011,24 @@
 	 Renderizable.prototype.getY = function () {
         return this._y;
     };
+	/**
+	 * Returns the previous x coordinate
+	 *
+	 * @method getPrevX
+	 * @return {float}
+	 */
+    Renderizable.prototype.getPrevX = function () {
+        return this._prevX;
+    };
+	/**
+	 * Returns the previous y coordinate
+	 *
+	 * @method getPrevY
+	 * @return {float}
+	 */
+	 Renderizable.prototype.getPrevY = function () {
+        return this._prevY;
+    };
     /**
 	 * Returns the biggest number between width and height
 	 *

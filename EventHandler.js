@@ -29,6 +29,8 @@
 	};
 	EventHandler.name = "EventHandler";
 
+	EventHandler.name = "EventHandler";
+
 	namespace.EventHandler = EventHandler;
 
 })(window);
