@@ -199,13 +199,20 @@ var M = window.M || {},
 		this._gameLayers = new SimpleMap();
 		/**
 		 * Array of GameObject. Match loops the objects in this array calling the onLoop method of each of them. This operation
-		 * involves does not involve rendering. Match loops this list first, updates every object and once that is finished it loops
+		 * does not involve rendering. Match loops this list first, updates every object and once that is finished it loops
 		 * the game layers
 		 * @property _gameObjects
 		 * @private
 		 * @type Array
 		 */
 		this._gameObjects = new Array();
+		/**
+		 * Array of Triggers
+		 * @property _gameObjects
+		 * @private
+		 * @type Array
+		 */
+		this._triggers = new Array();
 		/**
 		 * Cache used for retrieving elements from onLoopList faster
 		 * @property cache
@@ -333,12 +340,15 @@ var M = window.M || {},
 	var debugElement = document.createElement("div"),
 		updateInfoContainer = document.createElement("div"),
 		renderInfoContainer = document.createElement("div"),
+		mouseInfoContainer = document.createElement("div"),
 		updateInfo = document.createElement("span"),
-		renderInfo = document.createElement("span");
+		renderInfo = document.createElement("span"),
+		mouseInfo = document.createElement("span");
 
 		debugElement.setAttribute("id", "debugInfo");
 		updateInfo.setAttribute("id", "updateInfo");
 		renderInfo.setAttribute("id", "renderInfo");
+		mouseInfo.setAttribute("id", "mouseInfo");
 
 		updateInfoContainer.innerHTML = "Updates: ";
 		updateInfoContainer.appendChild(updateInfo);
@@ -346,10 +356,14 @@ var M = window.M || {},
 		renderInfoContainer.innerHTML = "Renders: ";
 		renderInfoContainer.appendChild(renderInfo);
 
+		mouseInfoContainer.innerHTML = "Mouse: ";
+		mouseInfoContainer.appendChild(mouseInfo);
+
 		debugElement.appendChild(updateInfoContainer);
 		debugElement.appendChild(renderInfoContainer);
+		debugElement.appendChild(mouseInfoContainer);
 
-		debugElement.style = "font-family: verdana";
+		debugElement.style.setProperty("font-family", "verdana");
 
 	Match.prototype.getCamera = function() {
 		return this.renderer.camera;
@@ -558,11 +572,9 @@ var M = window.M || {},
 
 			var node = nodes[i];
 
-			// this._applyInput(p, node);
+			this._applyInput(node);
 
-			if (node.onLoop) {
-				node.onLoop(p);
-			}
+			node.onLoop(p);
 
 		}
 
@@ -640,6 +652,7 @@ var M = window.M || {},
 		
 			this._updateInput(p);
 			this.updateGameObjects(this._gameObjects, p);
+			this.updateTriggers(this._triggers);
 			this._lag -= this._msPerUpdate;
 
 		}
@@ -652,6 +665,8 @@ var M = window.M || {},
 		
 		renderInfo.innerHTML = new Date().getTime() - current;
 
+		mouseInfo.innerHTML = this.mouse.x + ": " + this.mouse.y;
+
 		/*
 		 * Update FPS count
 		 */
@@ -659,6 +674,12 @@ var M = window.M || {},
 
 		this.onAfterLoop.raise();
 
+	};
+	Match.prototype.updateTriggers = function(triggers) {
+		var i = 0, l = triggers.length;
+		for ( ;  i < l; i++ ) {
+			triggers[i].onLoop();
+		}
 	};
 	/**
 	 * Gets the result of all layers as an image in base64
@@ -817,9 +838,17 @@ var M = window.M || {},
 	 * @param {GameObject} gameObject the object to push to the game object list
 	 */
 	Match.prototype.pushGameObject = function(gameObject) {
+		
 		if ( !gameObject.onLoop ) throw new Error("Cannot add object " + gameObject.constructor.name + ", it doesn't have an onLoop method");
-		this._gameObjects.push(gameObject);
+		
+		if ( gameObject instanceof this.Entity ) {
+			this._gameObjects.push(gameObject);
+		} else {
+			this._triggers.push(gameObject);
+		}
+
 		this.onGameObjectPushed.raise();
+
 	};
 	/**
 	 * Shortcut to pushGameObject

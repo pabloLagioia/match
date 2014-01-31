@@ -161,22 +161,25 @@
 			}
 	 */
 	Keyboard.prototype.applyToObject = function( object ) {
-		
-        if ( !object.hasFocus ) return;
-        
-		if ( object.onKeyDown ) object.onKeyDown(this.keysDown);
-		if ( object.onKeyUp ) object.onKeyUp(this.keysUp);
-		
-		if ( object.keyDownMappings && this.keysDown.length > 0 ) {
-			for ( var i in object.keyDownMappings ) {
-				if ( this.keysDown[i] ) object[object.keyDownMappings[i]]();
-			}
+
+		if ( object.listensTo("keyDown") ) {
+			object.raiseEvent("keyDown", this.keysDown);
 		}
-		if ( object.keyUpMappings && this.keysUp ) {
-			for ( var i in object.keyUpMappings ) {
-				if ( this.keysUp[i] ) object[object.keyUpMappings[i]]();
-			}
+
+		if ( object.listensTo("keyUp" ) ) {
+			object.raiseEvent("keyUp", this.keysUp);
 		}
+		
+		// if ( object.keyDownMappings && this.keysDown.length > 0 ) {
+		// 	for ( var i in object.keyDownMappings ) {
+		// 		if ( this.keysDown[i] ) object[object.keyDownMappings[i]]();
+		// 	}
+		// }
+		// if ( object.keyUpMappings && this.keysUp ) {
+		// 	for ( var i in object.keyUpMappings ) {
+		// 		if ( this.keysUp[i] ) object[object.keyUpMappings[i]]();
+		// 	}
+		// }
 
 	};
 

@@ -2,12 +2,12 @@
 	
 	function AreaTrigger(left, top, width, height) {
 		
+		this.extendsTrigger();
+
 		this.left = left;
 		this.top = top;
 		this.width = width;
 		this.height = height;
-
-		this.disabled = false;
 
 		this.entitiesAndCallbacks = [];
 
@@ -26,9 +26,7 @@
 		return this.top + this.height;
 	};
 
-	AreaTrigger.prototype.onLoop = function() {
-
-		if ( this.disabled ) return;
+	AreaTrigger.prototype.update = function() {
 
 		var i = 0,
 			l = this.entitiesAndCallbacks.length,
@@ -49,14 +47,7 @@
 			});
 
 		}
-	};
-	
-	AreaTrigger.prototype.enable = function() {
-		this.disabled = false;
-	};
 
-	AreaTrigger.prototype.disable = function() {
-		this.disabled = true;
 	};
 
 	AreaTrigger.prototype.onObjectInArea = function(entity, callback) {
@@ -66,6 +57,8 @@
 		});
 	};
 
-	Match.AreaTrigger = AreaTrigger;
+	M.extend(AreaTrigger, M.Trigger);
+
+	M.AreaTrigger = AreaTrigger;
 
 })(Match, Match.collisions.Simple);

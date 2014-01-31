@@ -127,43 +127,43 @@
 			ps = this.prevSelectedObject;
 
 		if ( s ) {
-			if ( s.onMouseIn && !s._mouseInRaised ) {
+			if ( !s._mouseInRaised && s.listensTo("mouseIn") ) {
 				s._mouseInRaised = true;
-				s.onMouseIn(this);
+				s.raiseEvent("mouseIn", this);
 			}
 			if ( ps && ps != s ) {
 				ps._mouseInRaised = false;
-				if ( ps.onMouseOut ) {
-					ps.onMouseOut(this);
+				if ( ps.listensTo("mouseOut") ) {
+					ps.raiseEvent("mouseOut", this);
 				}
 			} 
-			if ( s.onMouseUp && this.up() ) {
+			if ( this.up() && s.listensTo("mouseUp") ) {
 				s.onMouseUp(this);
 			}
-			if ( s.onClick && this.clicked() ) {
-				s.onClick(this);
+			if ( this.clicked() && s.listensTo("click") ) {
+				s.raiseEvent("click", this);
 			}
 			if ( this.down() ) {
-				if ( s.onMouseDown ) {
-					s.onMouseDown(this);
+				if ( s.listensTo("mouseDown") ) {
+					s.raiseEvent("mouseDown", this);
 				}
 				this.isDragging = true;
-				if ( s.onDrag ) {
-					s.onDrag(this);
+				if ( s.listensTo("mouseDrag") ) {
+					s.raiseEvent("mouseDrag", this);
 				}
 			}
-			if ( s.onMouseOver ) {
-				s.onMouseOver(this);
+			if ( s.listensTo("mouseOver") ) {
+				s.raiseEvent("mouseOver", this);
 			}
-			if ( s.onMouseMove && this.moved() ) {
-				s.onMouseMove(this);
+			if ( this.moved() && s.listensTo("mouseMove") ) {
+				s.raiseEvent("mouseMove", this);
 			}
-			if ( s.onMouseWheel && this.wheel() ) {
-				s.onMouseWheel(this);
+			if ( this.wheel() && s.listensTo("mouseWheel") ) {
+				s.raiseEvent("mouseWheel", this);
 			}
-		} else if ( ps && ps.onMouseOut ) {
+		} else if ( ps && ps.listensTo("mouseOut") ) {
 			ps._mouseInRaised = false;
-			ps.onMouseOut(this);
+			ps.raiseEvent("mouseOut", this);
 		}
 		
 		this.prevSelectedObject = s;
@@ -301,14 +301,16 @@
 	 * @param {OnLoopProperties} p
 	 */
 	Mouse.prototype.isOverPixelPerfect = function( renderizable ) {
-		if ( ! renderizable.onRender ) return;
 		if ( ! renderizable._visible ) return;
 		var ctx = M.offScreenContext,
 			cnv = M.offScreenCanvas,
-			camera = M.camera;
+			camera = M.getCamera();
+		cnv.width = M.renderer.frontBuffer.canvas.width;
+		cnv.height = M.renderer.frontBuffer.canvas.height;
 		ctx.save();
 		ctx.clearRect(0, 0, cnv.width, cnv.height);
-		renderizable.onRender(ctx, cnv, camera._x, camera._y);
+		M.renderer.render(renderizable, ctx, camera._x, camera._y);
+		ctx.restore();
 		var imgData = ctx.getImageData(this.x, this.y, 1, 1);
 		if ( !imgData.data[3] ) return false;
 		if ( imgData.data[0] ) return true;
@@ -325,7 +327,7 @@
 	 * @return {Boolean} true if mouse is over this object else false
 	 */
 	Mouse.prototype.isOverPolygon = function (renderizable) {
-		var camera = M.camera,
+		var camera = M.getCamera(),
 			x = this.x + camera._x,
 			y = this.y + camera._y;
 		if (renderizable._rotation) {
@@ -371,12 +373,37 @@
 				}
 			}
 	 */
-	Mouse.prototype.applyToObject = function( renderizable ) {
+	Mouse.prototype.applyToEntity = function( renderizable ) {
 		if ( renderizable.onMouseOver || renderizable.onMouseIn || renderizable.onMouseOut || renderizable.onMouseWheel || ( renderizable.onMouseDown && this.down() ) || ( renderizable.onMouseUp && this.up() ) || ( renderizable.onClick && this.clicked() ) ) {
 			if ( this.isOverPolygon(renderizable) && this.isOverPixelPerfect(renderizable) ) {
 				this.select(renderizable);
 			}
 		}
+	};
+
+	Mouse.prototype.applyToObject = function( entity ) {
+	
+		var views = entity.views._values,
+			i = 0,
+			l = views.length,
+			renderizable;
+
+		if ( entity.listensTo("mouseOver") || entity.listensTo("mouseIn") || entity.listensTo("mouseOut") || entity.listensTo("onMouseWheel") || ( entity.listensTo("mouseDown") && this.down() ) || ( entity.listensTo("mouseUp") && this.up() ) || ( entity.listensTo("click") && this.clicked() ) ) {
+
+		// if ( entity.onMouseOver || entity.onMouseIn || entity.onMouseOut || entity.onMouseWheel || ( entity.onMouseDown && this.down() ) || ( entity.onMouseUp && this.up() ) || ( entity.onClick && this.clicked() ) ) {
+
+			for (; i < l; i++ ) {
+
+			renderizable = views[i];
+
+				if ( this.isOverPolygon(renderizable) && this.isOverPixelPerfect(renderizable) ) {
+					this.select(entity);
+				}
+
+			}
+			
+		}
+
 	};
 
 	if ( M.browser.isFirefox ) {
