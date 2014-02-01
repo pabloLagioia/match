@@ -624,6 +624,31 @@
 		this.onAllSoundsLoaded = new EventListener();
 		this.onSoundError = new EventListener();
 	};
+	
+	SoundManager.prototype.play = function(name, loop) {
+		var sound = this.assets[name];
+		if ( sound ) {
+			sound.play(loop);
+		}
+	};
+
+	SoundManager.prototype.stop = function(name) {
+		var sound = this.assets[name];
+		if ( sound ) {
+			sound.stop();
+		}
+	};
+
+	SoundManager.prototype.pause = function(name) {
+		var sound = this.assets[name];
+		if ( sound ) {
+			sound.pause();
+		}
+	};
+
+	SoundManager.prototype.getSound = function(name) {
+		return this.assets[name];
+	};
 
 	M.SoundManager = M.sounds = new SoundManager();
 
