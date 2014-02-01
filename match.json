@@ -44,6 +44,8 @@
 	"Timer",
 	"TimeCounter",
 	"Entity",
+	"game/triggers/Trigger",
+	"game/triggers/CollisionTrigger",
 	"game/triggers/AreaTrigger",
 	"game/scenes/matchLogo",
 	"game/scenes/loading"

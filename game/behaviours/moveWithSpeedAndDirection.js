@@ -5,7 +5,11 @@ M.registerBehaviour("moveWithSpeedAndDirection", function(entity, attributes, vi
 		location = attributes.get("location");
 	
 	if ( speed != 0 ) {
-		location.offset(speed * direction.x, speed * direction.y);
+		if ( attributes.get("manifold") && !attributes.get("preventMoveOnCollision") ) {
+			location.offset(speed * direction.x, speed * direction.y);
+		} else {
+			location.offset(speed * direction.x, speed * direction.y);
+		}
 	}
 			
 });

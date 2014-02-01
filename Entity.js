@@ -109,6 +109,8 @@
 		return this.views.remove(name);
 	};
 
+	Entity.name = "Entity";
+
 	M.extend(Entity, EventHandler);
 
 	namespace.Entity = Entity;

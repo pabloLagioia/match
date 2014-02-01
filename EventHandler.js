@@ -27,6 +27,9 @@
 	EventHandler.prototype.removeAllListeners = function(name) {
 		this._eventListeners = {};
 	};
+	EventHandler.prototype.listensTo = function(name) {
+		return this._eventListeners[name];
+	};
 
 	EventHandler.name = "EventHandler";
 
