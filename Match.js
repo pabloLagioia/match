@@ -521,6 +521,9 @@ var M = window.M || {},
 		arguments[0] = "M.plugins." + arguments[0];
 		this.registerClass.apply(this, arguments);
 	};
+	Match.prototype.registerPluginTemplate = function(id, html) {
+		this.plugins.html[id] = html;
+	};
 	Match.prototype.registerBehaviour = function(name, value, requires, description) {
 
 		if ( this.game.behaviours[name] == undefined ) {
