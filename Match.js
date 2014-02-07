@@ -1604,7 +1604,7 @@ var M = window.M || {},
 	 */
 	function gameLoop() {
 		M.gameLoop();
-		requestAnimationFrame(gameLoop, M.renderer.frontBuffer);
+		requestAnimationFrame(gameLoop);
 	}
 
 })(window);
