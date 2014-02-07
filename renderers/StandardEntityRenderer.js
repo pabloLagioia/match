@@ -155,7 +155,7 @@
 		return this.interpolate(object._y, object._prevY);
 	};
 	StandardEntityRenderer.prototype._applyTranslation = function(object, context, cameraX, cameraY) {
-		context.translate(object._x - cameraX, object._y - cameraY);
+		context.translate(M.fastRound(object._x - cameraX), M.fastRound(object._y - cameraY));
 	};
 	/**
 	 * Applies the rotation of this object to the provided context
@@ -337,9 +337,9 @@
 			if ( renderizable._fillStyle ) {
 				context.fillStyle = renderizable._fillStyle;
 			}
-
-			//Include alpha time here			
-			context.fillRect( renderizable._x - renderizable._halfWidth - cameraX, renderizable._y - renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
+			
+			// context.fillRect( renderizable._x - renderizable._halfWidth - cameraX, renderizable._y - renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
+			context.fillRect( M.fastRound(renderizable._x - renderizable._halfWidth - cameraX), M.fastRound(renderizable._y - renderizable._halfHeight - cameraY), renderizable._width, renderizable._height );
 			
 			if ( renderizable._strokeStyle ) {
 

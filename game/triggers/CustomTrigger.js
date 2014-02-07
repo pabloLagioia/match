@@ -1,5 +1,12 @@
 (function (M) {
+
+	var commonConditions = {
+		always: function() {
+			return true;
+		}
+	};	
 	
+
 	function CustomTrigger() {
 
 		this.extendsTrigger();
@@ -26,6 +33,13 @@
 	};
 
 	CustomTrigger.prototype.addCondition = function(callback) {
+		if ( typeof callback == "string" ) {
+			if ( commonConditions[callback] ) {
+				callback = commonConditions[callback];
+			} else {
+				throw new Error("Condition not found");
+			}
+		}
 		this.conditions.push(callback);
 	};
 

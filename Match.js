@@ -331,49 +331,13 @@ var M = window.M || {},
 		 * Start game loop when document is loaded
 		 */
 		document.addEventListener( "DOMContentLoaded", function() {
-			document.body.appendChild(debugElement);
 			self.setUpGameLoop();
 		});
 
 	}
-	
-	var debugElement = document.createElement("div"),
-		updateInfoContainer = document.createElement("div"),
-		renderInfoContainer = document.createElement("div"),
-		mouseInfoContainer = document.createElement("div"),
-		updateInfo = document.createElement("span"),
-		renderInfo = document.createElement("span"),
-		mouseInfo = document.createElement("span");
-
-		debugElement.setAttribute("id", "debugInfo");
-		updateInfo.setAttribute("id", "updateInfo");
-		renderInfo.setAttribute("id", "renderInfo");
-		mouseInfo.setAttribute("id", "mouseInfo");
-
-		updateInfoContainer.innerHTML = "Updates: ";
-		updateInfoContainer.appendChild(updateInfo);
-
-		renderInfoContainer.innerHTML = "Renders: ";
-		renderInfoContainer.appendChild(renderInfo);
-
-		mouseInfoContainer.innerHTML = "Mouse: ";
-		mouseInfoContainer.appendChild(mouseInfo);
-
-		debugElement.appendChild(updateInfoContainer);
-		debugElement.appendChild(renderInfoContainer);
-		debugElement.appendChild(mouseInfoContainer);
-
-		debugElement.style.setProperty("font-family", "verdana");
 
 	Match.prototype.getCamera = function() {
 		return this.renderer.camera;
-	};
-	
-	Match.prototype.getPluginTemplate = function(id) {
-		var div = document.createElement("div");
-		div.setAttribute("id", id);
-		div.innerHTML = this.plugins.html[id];
-		return div;
 	};
 	
 	Match.prototype.setUpdatesPerSecond = function(updates) {
@@ -517,10 +481,27 @@ var M = window.M || {},
 		}
 
 	};
+
 	Match.prototype.registerPlugin = function() {
 		arguments[0] = "M.plugins." + arguments[0];
 		this.registerClass.apply(this, arguments);
 	};
+	Match.prototype.registerPluginTemplate = function(id, html) {
+		this.plugins.html[id] = html;
+	};	
+	Match.prototype.getPluginTemplate = function(id) {
+		var div = document.createElement("div");
+		div.setAttribute("class", "match plugin " + id);
+		div.innerHTML = this.plugins.html[id];
+		return div;
+	};
+	Match.prototype.addPlugin = function(id) {
+		document.getElementById("match-plugins").appendChild(this.getPluginTemplate(id));
+	};	
+	Match.prototype.removePlugin = function(id) {
+		document.getElementById("#match-plugins").removeChild(document.getElementById(id));
+	};
+
 	Match.prototype.registerBehaviour = function(name, value, requires, description) {
 
 		if ( this.game.behaviours[name] == undefined ) {
@@ -657,15 +638,13 @@ var M = window.M || {},
 
 		}
 
-		updateInfo.innerHTML = new Date().getTime() - current;
+		this.updateTime = new Date().getTime() - current;
 		
 		current = new Date().getTime();
 
 		this.renderer.renderLayers(this._gameLayers);
 		
-		renderInfo.innerHTML = new Date().getTime() - current;
-
-		mouseInfo.innerHTML = this.mouse.x + ": " + this.mouse.y;
+		this.renderTime = new Date().getTime() - current;
 
 		/*
 		 * Update FPS count
@@ -1492,8 +1471,9 @@ var M = window.M || {},
 	 * @param {double} number the number to round
 	 * @return {int}
 	 */
-	Match.prototype.fastRound = function(number) {
-		return number >> 0;
+	Match.prototype.fastRound = function(n) {
+		// return number >> 0;
+		return (0.5 + n) << 0;
 	};
 	/**
 	 * Returns the a number indicating what percentage represents the given arguments
