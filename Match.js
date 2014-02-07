@@ -309,6 +309,10 @@ var M = window.M || {},
 			html: {
 			}
 		};
+
+		this.version = "1.6a";
+		this.name = "Match";
+		this.company = "Puzzling Ideas";
 		
 		/**
 		 * Common game attributes and behaviours
@@ -1237,6 +1241,9 @@ var M = window.M || {},
 								   canvas.webkitRequestFullScreen || 
 								   canvas.mozRequestFullScreen || 
 								   canvas.msRequestFullScreen;
+
+		canvas.setAttribute("data-engine", this.name);
+		canvas.setAttribute("data-version", this.version);
 
 		this.renderer = this.renderingProvider.getRenderer(canvas, mode);
 
