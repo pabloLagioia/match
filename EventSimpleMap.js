@@ -5,18 +5,18 @@
 		this.onSet = new EventListener();
 		this.onRemoved = new EventListener();
 	}
-
+	
 	EventSimpleMap.prototype.set = function(key, value) {
 		this.simpleMapSet(key, value);
 		this.onSet.raise(key);
 	};
 	EventSimpleMap.prototype.remove = function(key) {
-		this.simpleMapRemove(key, value);
+		this.simpleMapRemove(key);
 		this.onRemoved.raise(key);
 	};
-
-	M.extend(EventSimpleMap, SimpleMap);
-
+	
+	Class.extend(EventSimpleMap, SimpleMap);
+	
 	namespace.EventSimpleMap = EventSimpleMap;
-
+	
 })(window, SimpleMap, EventListener);

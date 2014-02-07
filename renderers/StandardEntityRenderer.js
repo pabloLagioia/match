@@ -581,7 +581,7 @@
 		
 	};
 	StandardEntityRenderer.prototype.renderLayer = function (layer, cameraX, cameraY, viewportWidth, viewportHeight) {
-	
+
 		if ( this._reRenderAllLayers || layer.needsRedraw ) {
 
 			var current,
@@ -651,6 +651,7 @@
 
 	};
 	StandardEntityRenderer.prototype.renderLayers = function(layers) {
+		this.frontBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
 		for ( var i = 0, l = layers._values.length; i < l; i++ ) {
 			this.renderLayer(layers._values[i], this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
 		}		
@@ -664,9 +665,6 @@
 			case types.SPRITE:
 				this.renderSprite(object, context, cameraX, cameraY);
 				break;
-			// case types.LAYER:
-			// 	this.renderLayer(object, this.camera._x, this.camera._y, this.camera.viewportWidth, this.camera.viewportHeight);
-			// 	break;
 			case types.BITMAP_TEXT:
 				this.renderBitmapText(object, context, cameraX, cameraY);
 				break;

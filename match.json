@@ -1,10 +1,11 @@
 [
+	"Class",
 	"EventHandler",
 	"EventListener",
 	"SimpleMap",
+	"EventSimpleMap",
 	"DefaultLogger",
 	"Match",
-	"EventSimpleMap",
 	"utils/Ajax",
 	"FPSCounter",
 	"GameObject",

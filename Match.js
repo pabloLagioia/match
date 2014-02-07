@@ -196,7 +196,7 @@ var M = window.M || {},
 		 * @private
 		 * @type Array
 		 */
-		this._gameLayers = new SimpleMap();
+		this._gameLayers = new EventSimpleMap();
 		/**
 		 * Array of GameObject. Match loops the objects in this array calling the onLoop method of each of them. This operation
 		 * does not involve rendering. Match loops this list first, updates every object and once that is finished it loops
@@ -1108,7 +1108,15 @@ var M = window.M || {},
 
 		if ( layer ) {
 
-			return this._gameLayers.remove(name);
+			for ( var i = 0; i < layer.onRenderList.length; i++ ) {
+				this.removeGameObject(layer.onRenderList[i]);
+			}
+
+			this._gameLayers.remove(name);
+
+			this.renderer._reRenderAllLayers = true;
+
+			return layer;
 
 		} else {
 		
@@ -1197,6 +1205,19 @@ var M = window.M || {},
 	Match.prototype.clearFrontBuffer = function() {
 		if ( this.frontBuffer ) {
 			this.frontBuffer.clearRect(0, 0, this.frontBuffer.canvas.width, this.frontBuffer.canvas.height);
+		}
+	};
+	/**
+	 * Sorts layers based on their z-index
+	 * @method sortLayers
+	 */
+	Match.prototype.sortLayers = function() {
+		this._gameLayers._values.sort(function(a, b) {
+			return a._zIndex - b._zIndex;
+		});
+		this._gameLayers._keys = {};
+		for ( var i = 0; i < this._gameLayers._values.length; i++ ) {
+			this._gameLayers._keys[this._gameLayers._values[i].name] = i;
 		}
 	};
 	/**
@@ -1434,26 +1455,7 @@ var M = window.M || {},
 	 * @param {Object} descendant object to put the methods from the parents prototype
 	 * @param {Object} parent where to take the methods to put in descendant
 	 */
-	Match.prototype.extend = function( child, parent ) {
-
-		if ( !child ) throw new Error("Child is undefined and cannot be extended");
-		if ( !parent ) throw new Error("Parent is undefined, you cannot extend child with an undefined parent");
-		if ( !parent.name ) throw new Error("Parent name is undefined. Please add a field name to the parent constructor where name is the name of the function. This usually creates issues in Internet Explorer." + parent);
-	
-		child.prototype["extends" + parent.name] = parent;
-
-		for (var m in parent.prototype) {
-
-			if ( !child.prototype[m] ) {
-				child.prototype[m] = parent.prototype[m];
-			} else if ( !child.prototype[parent.name + m]) {
-				//Cammel case method name
-				child.prototype[parent.name.substr(0, 1).toLowerCase() + parent.name.substr(1) + m.substr(0, 1).toUpperCase() + m.substr(1)] = parent.prototype[m];
-			}
-
-		}
-
-	};
+	Match.prototype.extend = Class.extend;
 	/**
 	 * Rounds a number to the specified decimals
 	 * @method round
