@@ -72,10 +72,21 @@
 	 * @method removeEventListener
 	 */
 	EventListener.prototype.removeEventListener = function(listener) {
-		var l = this.listeners.indexOf(listener);
-		if ( l > -1 ) {
-			this.listeners.splice(l, 1);
+		
+		var i = 0,
+			l = this.listeners.length;
+
+		for ( ; i < l; i++ ) {
+
+			if ( this.listeners[i].callback == listener || this.listeners[i].callbackName == listener ) {
+
+				this.listeners.splice(i, 1);
+				return;
+
+			}
+
 		}
+
 	};
 	/**
 	 * @method removeAllEventListeners

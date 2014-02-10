@@ -134,6 +134,11 @@
 		this.raiseEvent("locationChanged");
 	};
 
+	Camera.prototype.reset = function() {
+		this.setX(0);
+		this.setY(0);
+	};
+
 	Camera.prototype.getX = function() {
 		return this._x;
 	};
