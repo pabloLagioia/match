@@ -1,5 +1,8 @@
-
 <?php
+
+	require_once($_SERVER['DOCUMENT_ROOT'] . "paths.php");
+
+	import("editor.utils");
 
 	if ( array_key_exists("get", $_GET) ) {
 	
@@ -25,13 +28,31 @@
 	<!DOCTYPE>
 	<html>
 		<head>
+
 			<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
 			<title>Registered Game Behaviours</title>
+
+			<?php libraries() ?>
+			<?php bundle("footer") ?>
+			<?php bundle("header") ?>
+
 			<link rel="stylesheet" href="../style.css"/>
+
 			<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 			<script src="../main.js"></script>
+
 		</head>
 		<body>
+
+		<div id="main-wrapper">
+
+			<header>
+
+				<?php widget("header") ?>
+
+			</header>
+
 
 		<?php
 
@@ -85,6 +106,9 @@
 			echo "</ul>"
 
 		?>
+			<?php widget("footer"); ?>
+
+		</div>
 
 		</body>
 	</html>

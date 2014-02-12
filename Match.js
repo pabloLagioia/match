@@ -530,7 +530,9 @@ var M = window.M || {},
 		}
 	};
 	Match.prototype.createEntity = function(name) {
-		return this.game.entities[name]();
+		var entity = this.game.entities[name]();
+		entity.name = name;
+		return entity;
 	};	
 	Match.prototype.registerScene = function(name, value) {
 		if ( this.game.scenes[name] == undefined ) {

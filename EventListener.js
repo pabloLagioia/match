@@ -71,14 +71,17 @@
 	/**
 	 * @method removeEventListener
 	 */
-	EventListener.prototype.removeEventListener = function(listener) {
+	EventListener.prototype.removeEventListener = function(listener, owner) {
 		
 		var i = 0,
-			l = this.listeners.length;
+			l = this.listeners.length,
+			currentListener;
 
 		for ( ; i < l; i++ ) {
 
-			if ( this.listeners[i].callback == listener || this.listeners[i].callbackName == listener ) {
+			currentListener = this.listeners[i];
+
+			if ( currentListener.callback == listener || (currentListener.callbackName == listener && owner == currentListener.object ) ) {
 
 				this.listeners.splice(i, 1);
 				return;

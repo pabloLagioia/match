@@ -56,6 +56,12 @@
 		this.updateViewport();
 		
 	}
+	StandardEntityRenderer.prototype.getContext = function() {
+		return this.frontBuffer;
+	};
+	StandardEntityRenderer.prototype.getCanvas = function() {
+		return this.frontBuffer.canvas;
+	};
 	/**
 	 * Applies the operation of this object to the context as composite operation
 	 *
