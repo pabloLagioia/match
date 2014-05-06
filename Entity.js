@@ -84,6 +84,7 @@
 		} else {
 			this.behaviours.set(name, value);
 		}
+		return this;
 	};
 	
 	Entity.prototype.do = function(name) {
