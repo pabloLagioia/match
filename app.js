@@ -3,7 +3,27 @@ var express = require('express'),
 	fs = require("fs"),
 	path = require("path"),
 	app = express(),
+	// request = require("request"),
 	server;
+
+app.get("/attribute*", function(req, res) {
+	res.redirect("http://localhost:8081" + req.originalUrl);
+	// request.get("http://localhost:8081/" + req.originalUrl, function(err, response, body) {
+	// 	res.contentType(response.contentType).status(response.status).send(body);
+	// });
+});
+app.get("/behaviour*", function(req, res) {
+	res.redirect("http://localhost:8082" + req.originalUrl);
+	// request.get("http://localhost:8082" + req.originalUrl, function(err, response, body) {
+	// 	res.contentType(response.contentType).status(response.status).send(body);
+	// });
+});
+app.get("/plugin*", function(req, res) {
+	res.redirect("http://localhost:8083" + req.originalUrl);
+	// request.get("http://localhost:8083" + req.originalUrl, function(err, response, body) {
+	// 	res.contentType(response.contentType).status(response.status).send(body);
+	// });
+});
 
 app.get("/match", function(req, res) {
 
