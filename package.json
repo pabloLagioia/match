@@ -7,8 +7,7 @@
   },
   "dependencies": {
     "express": "3.4.8",
-    "request": "x"
+    "http-proxy": "^1.1.2"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }
