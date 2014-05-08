@@ -31,7 +31,6 @@
 	"GameLayer",
 	"SpriteManager",
 	"SoundManager",
-	"renderers/webgl-2d",
 	"renderers/Renderer",
 	"renderers/StandardEntityRenderer",
 	"renderers/RenderingProvider",
