@@ -1,5 +1,3 @@
-var car;
-
 function main() {
 
 	var CANVAS_W = 640,
@@ -77,19 +75,22 @@ function main() {
 	M.getCamera().setBoundingArea(0, 0, tileW * tilesX - CANVAS_W, tileH * tilesY - CANVAS_H);
 	
 	//PLAYER 1
-		car = M.game.entities.createCar();
+	var car = M.createEntity("car");
 		car.attribute("location").set((CANVAS_W / 2 + 160) * 2, (CANVAS_H / 2 + 400) * 2);
 		car.does("followCamera");
 		M.getCamera().centerAt(car.attribute("location").x, car.attribute("location").y);
 		M.add(car).to("track");
 	
 	//PLAYER 2	
-	var car2 = M.game.entities.createCar();
+	var car2 = M.createEntity("car");
 		car2.attribute("location").set((CANVAS_W / 2 + 220) * 2, (CANVAS_H / 2 + 400) * 2);
 		car2.has("keyboardMapping", {
 			up: "w", left: "a", right: "d", down: "s"
 		});
 		car2.view("base").setColor("blue");
 		M.add(car2).to("track");
+
+	window.player1 = car;
+	window.player2 = car2;
 
 }

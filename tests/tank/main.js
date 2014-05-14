@@ -51,7 +51,7 @@ M.registerScene("tanks", {
 	
 		for ( var i = 0; i < 100; i++ ) {
 			
-			tank = M.game.entities.createTank();
+			tank = M.createEntity("tank");
 			tank.getAttribute("location").set(M.random.integer(0, 640), M.random.integer(0, 480));
 
 			M.add(tank).to("gameArea");
