@@ -254,7 +254,11 @@
 				backBuffer.globalAlpha = currentLayer._alpha;
 			}
 
-			backBuffer.translate(this.backBufferHalfWidth, this.backBufferHalfHeight);
+			var hW = ~~(this.backBufferHalfWidth + 0.5),
+				hH = ~~(this.backBufferHalfHeight + 0.5);
+
+
+			backBuffer.translate(hW, hH);
 
 			if ( currentLayer.rotation ) {
 				backBuffer.rotate(currentLayer.rotation);
@@ -264,7 +268,7 @@
 				backBuffer.scale(currentLayer.scale.x, currentLayer.scale.y);
 			}
 
-			backBuffer.drawImage( result, -this.backBufferHalfWidth, -this.backBufferHalfHeight);
+			backBuffer.drawImage( result, hW, hH);
 
 			backBuffer.restore();
 
