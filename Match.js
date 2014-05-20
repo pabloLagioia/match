@@ -626,23 +626,23 @@ var M = window.M || {},
 
 		p.time = this.FpsCounter.timeInMillis;
 		
-		this._lag += current - this._previousLoopTime;
+		// this._lag += current - this._previousLoopTime;
 		this._previousLoopTime = current;
 
-		if ( this._lag > this._maxLag ) {
-			this._lag = this._maxLag;
-		}
+		// if ( this._lag > this._maxLag ) {
+		// 	this._lag = this._maxLag;
+		// }
 		
 		current = new Date().getTime();
 		
-		while ( this._lag > this._msPerUpdate ) {
+		// while ( this._lag > this._msPerUpdate ) {
 		
 			this._updateInput(p);
 			this.updateGameObjects(this._gameObjects, p);
 			this.updateTriggers(this._triggers);
-			this._lag -= this._msPerUpdate;
+			// this._lag -= this._msPerUpdate;
 
-		}
+		// }
 
 		this.updateTime = new Date().getTime() - current;
 		

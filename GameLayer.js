@@ -218,11 +218,11 @@
 		}
 
 		if ( !entity.setZIndex ) {
-			M.logger.warn(M.getObjectName(entity) + " does not implement setZIndex method");
+			// M.logger.warn(M.getObjectName(entity) + " does not implement setZIndex method");
 		}
 
 		if ( !entity.getZIndex ) {
-			M.logger.warn(M.getObjectName(entity) + " does not implement getZIndex method");
+			// M.logger.warn(M.getObjectName(entity) + " does not implement getZIndex method");
 		}
 
 		if ( !entity._zIndex ) {
