@@ -485,7 +485,7 @@
 	 * @param {float} value
 	 */
     Renderizable.prototype.setWidth = function (value) {
-    	value = ~~(value+0.5);
+    	//value = ~~(value+0.5);
 		if ( this._width != value ) {
 			this._width = value;
 			this._halfWidth = value / 2;
@@ -500,7 +500,7 @@
 	 * @param {float} value
 	 */
     Renderizable.prototype.setHeight = function (value) {
-    	value = ~~(value+0.5);
+    	//value = ~~(value+0.5);
 		if ( this._height != value ) {
 			this._height = value;
 			this._halfHeight = value / 2;
@@ -919,7 +919,7 @@
 	 * @param {float} x the rotation angle
 	 */
 	Renderizable.prototype.setX = function (value) {
-		value = ~~(value+0.5);
+		//value = ~~(value+0.5);
 		if ( value != this._x ) {
 			this._prevX = this._x;
 			this._x = value;
@@ -935,7 +935,7 @@
 	 * @param {float} y the rotation angle
 	 */
 	Renderizable.prototype.setY = function (value) {
-		value = ~~(value+0.5);
+		//value = ~~(value+0.5);
 		if ( value != this._y ) {
 			this._prevY = this._y;
 			this._y = value;

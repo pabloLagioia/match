@@ -254,8 +254,11 @@
 				backBuffer.globalAlpha = currentLayer._alpha;
 			}
 
-			var hW = ~~(this.backBufferHalfWidth + 0.5),
-				hH = ~~(this.backBufferHalfHeight + 0.5);
+			var hW = this.backBufferHalfWidth,
+				hH = this.backBufferHalfHeight;
+
+			// var hW = ~~(this.backBufferHalfWidth + 0.5),
+			// 	hH = ~~(this.backBufferHalfHeight + 0.5);
 
 
 			backBuffer.translate(hW, hH);
