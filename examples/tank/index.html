@@ -11,19 +11,28 @@
 			canvas {
 			}
 		</style>
+
+		<div class="toolbar">
+			<div class="camera-wrapper"></div>
+			<div class="debug-wrapper"></div>
+			<div class="game-entity-list-wrapper"></div>
+			<div class="grid-wrapper"></div>
+			<div class="layer-management-wrapper"></div>
+			<div class="object-placement-wrapper"></div>
+		</div>
+
         <script src="/match/merged"></script>
         <script src="/attribute/js?q=location,direction"></script>
-        <script src="/plugin/js?q=common,Camera%20Controller,Debug"></script>
-		<script src="/plugin/js?q=Layer%20Management"></script>
-		<script src="/plugin/js?q=GameEntityList"></script>
-		<script src="/plugin/js?q=Grid"></script>
-		<script src="/plugin/js?q=Object%20Placement"></script>
-		<script src="/plugin/js?q=Renderizable%20Dragger"></script>
-		<script src="/plugin/js?q=ToolsUI"></script>
         <script src="/behaviour/js?q=accelerate,decelerate,fixViewsToEntity,moveWithSpeedAndDirection,collide,fixViewsToEntity,followCamera"></script>
+        
+        <script src="/sdk/jquery.js"></script>
+        <script src="/sdk"></script>
+        <script src="/sdk/plugin/?q=common,camera-controller,debug,layer-management,game-entity-list,grid,object-placement,renderizable-dragger&autowire=true"></script>
+		
 		<script src="Bullet.js"></script>
 		<script src="Tank.js"></script>
 		<script src="main.js"></script>
+
 	</head>
 	<body>
 		<canvas width="640" height="480"></canvas>
