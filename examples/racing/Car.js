@@ -22,6 +22,7 @@ M.registerEntity("car", function () {
 	});
 
 	car.has("collisionGroup", 0);
+	car.has("preventMoveOnCollision", true);
 
 	//VIEWS
 	

@@ -161,7 +161,7 @@
 		return this.interpolate(object._y, object._prevY);
 	};
 	StandardEntityRenderer.prototype._applyTranslation = function(object, context, cameraX, cameraY) {
-		context.translate(M.fastRound(object._x - cameraX), M.fastRound(object._y - cameraY));
+		context.translate(object._x - cameraX, object._y - cameraY);
 	};
 	/**
 	 * Applies the rotation of this object to the provided context
@@ -473,7 +473,7 @@
 		} else {
 
 			context.beginPath();
-			context.arc( renderizable._x, renderizable._y, renderizable._radius, renderizable._startAngle, renderizable._endAngle, false);
+			context.arc( renderizable._x - cameraX, renderizable._y - cameraY, renderizable._radius, renderizable._startAngle, renderizable._endAngle, false);
 			context.closePath();
 
 			if ( renderizable._fillStyle ) {

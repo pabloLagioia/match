@@ -44,7 +44,7 @@ function main() {
 						height: tileH
 					});
 					
-					tile.has("collisionGroup", 0);
+					tile.has("collisionGroup", 1);
 					
 					break;
 				

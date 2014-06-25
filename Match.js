@@ -179,6 +179,8 @@ var M = window.M || {},
 	 *
 	 */
 	function Match() {
+
+		this.autowire = true;
 		
 		this.logger = new DefaultLogger();
 		/**
@@ -305,11 +307,6 @@ var M = window.M || {},
 		
 		this.setUpdatesPerSecond(this.DEFAULT_UPDATES_PER_SECOND);
 
-		this.plugins = {
-			html: {
-			}
-		};
-
 		this.version = "1.6a";
 		this.name = "Match";
 		this.company = "Puzzling Ideas";
@@ -335,7 +332,14 @@ var M = window.M || {},
 		 * Start game loop when document is loaded
 		 */
 		document.addEventListener( "DOMContentLoaded", function() {
-			self.setUpGameLoop();
+
+			var cnv = M.dom("canvas");
+
+			if ( self.autowire && cnv ) {
+				console.log("Autowire enabled. Starting Match on default canvas");
+				self.start(cnv);
+			}
+
 		});
 
 	}
@@ -376,17 +380,6 @@ var M = window.M || {},
 		this.createGameLayer(this.DEFAULT_LAYER_NAME).background = this.DEFAULT_LAYER_BACKGROUND;
 
 		gameLoop();
-		/*
-		 * If there is a main function defined in window, it is called
-		 */
-		if ( typeof window.main == "function" ) {
-			this.start();
-			if ( this.showLogo ) {
-				this._showLogo();
-			} else {
-				window.main();
-			}
-		}
 
 	};
 	Match.prototype._showLogo = function() {
@@ -402,6 +395,10 @@ var M = window.M || {},
 			
 		})
 
+	};
+	Match.prototype.restart = function() {
+		this.gameLoopAlreadySetup = false;
+		this.start();
 	};
 	/**
 	 * Set Keyboard object. This is called by default by the keyboard implementation of this library but it could be changed
@@ -485,7 +482,7 @@ var M = window.M || {},
 		}
 
 	};
-
+/*
 	Match.prototype.registerPlugin = function() {
 		arguments[0] = "M.plugins." + arguments[0];
 		this.registerClass.apply(this, arguments);
@@ -505,7 +502,7 @@ var M = window.M || {},
 	Match.prototype.removePlugin = function(id) {
 		document.getElementById("#match-plugins").removeChild(document.getElementById(id));
 	};
-
+*/
 	Match.prototype.registerBehaviour = function(name, value, requires, description) {
 
 		if ( this.game.behaviours[name] == undefined ) {
@@ -1256,7 +1253,7 @@ var M = window.M || {},
 		}
 
 		if ( ! (canvas instanceof HTMLCanvasElement) ) {
-			throw new Error("start is expecting an HTMLCanvasElement as argument");
+			throw new Error("M.start is expecting an HTMLCanvasElement as argument. If there's no canvas in the site, please add one and then call start. If M.autowire is true and there's no canvas on document load please set it to false.");
 		}
 
 		canvas.onselectstart = function() { return false; };
@@ -1273,8 +1270,17 @@ var M = window.M || {},
 		this._isPlaying = true;
 
 		if ( !this.gameLoopAlreadySetup ) {
+			
 			this.setUpGameLoop();
+
+			if ( this.showLogo ) {
+				this._showLogo();
+			} else if ( typeof window.main == "function" ) {
+				window.main();
+			}
+
 		}
+
 
 	};
 	/**

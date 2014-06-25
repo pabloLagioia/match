@@ -155,6 +155,11 @@
 		this.setY(this._y + value);
 	};
 
+	Camera.prototype.offset = function(x, y) {
+		this.offsetX(x);
+		this.offsetY(y);
+	};
+
 	Camera.prototype.getLeftFromLayer = function(layer) {
 		return this._x * layer.parrallaxFactor.x;
 	};
