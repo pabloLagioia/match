@@ -1,20 +1,20 @@
 (function (namespace) {
 
-	var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-	var ARGUMENT_NAMES = /([^\s,]+)/g;
+	// var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+	// var ARGUMENT_NAMES = /([^\s,]+)/g;
 
-	function getParamNames(func) {
+	// function getParamNames(func) {
 
-		var fnStr = func.toString().replace(STRIP_COMMENTS, ''),
-			result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).ModuleManager(ARGUMENT_NAMES);
+	// 	var fnStr = func.toString().replace(STRIP_COMMENTS, ''),
+	// 		result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).ModuleManager(ARGUMENT_NAMES);
 		
-		if(result == null) {
-			result = [];
-		}
+	// 	if(result == null) {
+	// 		result = [];
+	// 	}
 
-		return result
+	// 	return result
 
-	}
+	// }
 
 	function ModuleManager() {
 		this.modules = {};
@@ -32,9 +32,9 @@
 			"constructor": arguments[arguments.length - 1]
 		};
 
-		if ( module.requires.length == 0 ) {
-			module.requires = getParamNames(module.constructor);
-		}
+		// if ( module.requires.length == 0 ) {
+		// 	module.requires = getParamNames(module.constructor);
+		// }
 
 		this.modules[module.name] = module;
 

@@ -180,6 +180,9 @@ var M = window.M || {},
 	 */
 	function Match() {
 
+		this.extendsModuleManager();
+		this.extendsEventHandler();
+
 		this.autowire = true;
 		
 		this.logger = new DefaultLogger();
@@ -198,7 +201,8 @@ var M = window.M || {},
 		 * @private
 		 * @type Array
 		 */
-		this._gameLayers = new EventSimpleMap();
+		// this._gameLayers = new EventSimpleMap();
+		this._gameLayers = new SimpleMap();
 		/**
 		 * Array of GameObject. Match loops the objects in this array calling the onLoop method of each of them. This operation
 		 * does not involve rendering. Match loops this list first, updates every object and once that is finished it loops
@@ -264,25 +268,25 @@ var M = window.M || {},
 		 * @property onBeforeLoop
 		 * @type EventListener
 		 */
-		this.onBeforeLoop = new EventListener();
+		// this.onBeforeLoop = new EventListener();
 		/**
 		 * Event listener that will be raised after calling the game loop
 		 * @property onAfterLoop
 		 * @type EventListener
 		 */
-		this.onAfterLoop = new EventListener();
+		// this.onAfterLoop = new EventListener();
 		/**
 		 * Event listener that will be raised when an object is added
 		 * @property onGameObjectPushed
 		 * @type EventListener
 		 */
-		this.onGameObjectPushed = new EventListener();
+		// this.onGameObjectPushed = new EventListener();
 		/**
 		 * Event listener that will be raised when an object is removed
 		 * @property onGameObjectRemoved
 		 * @type EventListener
 		 */
-		this.onGameObjectRemoved = new EventListener();
+		// this.onGameObjectRemoved = new EventListener();
 		/**
 		 * Array containing input handlers
 		 * @property _inputHandlers
@@ -615,7 +619,9 @@ var M = window.M || {},
 
 		if ( !this._isPlaying ) return;
 		
-		this.onBeforeLoop.raise();
+		// this.onBeforeLoop.raise();
+
+		this.raise("beforeLoop");
 
 		var p = this.onLoopProperties,
 			current = this.getTime(),
@@ -654,7 +660,9 @@ var M = window.M || {},
 		 */
 		this.FpsCounter.count();
 
-		this.onAfterLoop.raise();
+		// this.onAfterLoop.raise();
+
+		this.raise("afterLoop");
 
 	};
 	Match.prototype.updateTriggers = function(triggers) {
@@ -829,7 +837,8 @@ var M = window.M || {},
 			this._triggers.push(gameObject);
 		}
 
-		this.onGameObjectPushed.raise();
+		// this.onGameObjectPushed.raise();
+		this.raise("gameObjectPushed");
 
 	};
 	/**
@@ -858,7 +867,8 @@ var M = window.M || {},
 
 					this._gameObjects.splice( index, 1);
 					
-					this.onGameObjectRemoved.raise();
+					// this.onGameObjectRemoved.raise();
+					this.raise("gameObjectRemoved");
 
 				}
 
@@ -866,7 +876,8 @@ var M = window.M || {},
 
 				this._gameObjects.splice( object, 1);
 				
-				this.onGameObjectRemoved.raise();
+				// this.onGameObjectRemoved.raise();
+				this.raise("gameObjectRemoved");
 
 			}
 
@@ -915,6 +926,7 @@ var M = window.M || {},
 			throw new Error("Cannot add null game layer");
 		}
 		this._gameLayers.set(name, gameLayer);
+		this.raise("gameLayerPushed", new Error('Show me the stack!'));
 	};
 	/**
 	 * Shortcut to pushGameLayer
@@ -1113,6 +1125,8 @@ var M = window.M || {},
 
 			this._gameLayers.remove(name);
 
+			this.raise("gameLayerRemoved", name);
+
 			this.renderer._reRenderAllLayers = true;
 
 			return layer;
@@ -1226,9 +1240,11 @@ var M = window.M || {},
 	Match.prototype.pause = function() {
 	
 		if ( this._isPlaying ) {
-			if ( this.onPause ) this.onPause();
+			// if ( this.onPause ) this.onPause();
+			this.raise("pause");
 		} else {
-			if ( this.onUnPause ) this.onUnPause();
+			// if ( this.onUnPause ) this.onUnPause();
+			this.raise("unpause");
 		}
 	
 		this._isPlaying = ! this._isPlaying;
@@ -1247,7 +1263,7 @@ var M = window.M || {},
 			M.start(document.querySelector("#gameCanvas"), true);
 	 */
 	Match.prototype.start = function(canvas, mode) {
-
+console.log("called start");
 		if ( !canvas ) {
 			canvas = M.dom("canvas");
 		}
@@ -1558,6 +1574,12 @@ var M = window.M || {},
 		}
 		return name;
 	};
+	Match.prototype.getLayerNames = function() {
+		return Object.keys(this._gameLayers._keys);
+	};
+
+	Class.extend(Match, ModuleManager);
+	Class.extend(Match, EventHandler);
 	
 	if ( !window.requestAnimationFrame ) {
 
