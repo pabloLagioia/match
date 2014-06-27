@@ -337,7 +337,7 @@ var M = window.M || {},
 		 */
 		document.addEventListener( "DOMContentLoaded", function() {
 
-			var cnv = M.dom("canvas");
+			var cnv = self.dom("canvas");
 
 			if ( self.autowire && cnv ) {
 				console.log("Autowire enabled. Starting Match on default canvas");
@@ -511,6 +511,7 @@ var M = window.M || {},
 
 		if ( this.game.behaviours[name] == undefined ) {
 			this.game.behaviours[name] = value;
+			this.raise("behaviourRegistered", name);
 		} else {
 			this.logger.warn("There is already a behaviour named ", name);
 		}
@@ -519,6 +520,7 @@ var M = window.M || {},
 	Match.prototype.registerAttribute = function(name, value) {
 		if ( this.game.attributes[name] == undefined ) {
 			this.game.attributes[name] = value;
+			this.raise("attributeRegistered", name);
 		} else {
 			this.logger.warn("There is already an attribute named ", name);
 		}
@@ -526,6 +528,7 @@ var M = window.M || {},
 	Match.prototype.registerEntity = function(name, value) {
 		if ( this.game.entities[name] == undefined ) {
 			this.game.entities[name] = value;
+			this.raise("entityRegistered", name);
 		} else {
 			this.logger.warn("There is already an entity named ", name);
 		}
@@ -533,6 +536,7 @@ var M = window.M || {},
 	Match.prototype.createEntity = function(name) {
 		var entity = this.game.entities[name]();
 		entity.name = name;
+		this.raise("entityCreated", name);
 		return entity;
 	};	
 	Match.prototype.registerScene = function(name, value) {
@@ -926,7 +930,7 @@ var M = window.M || {},
 			throw new Error("Cannot add null game layer");
 		}
 		this._gameLayers.set(name, gameLayer);
-		this.raise("gameLayerPushed", new Error('Show me the stack!'));
+		this.raise("gameLayerPushed", name);
 	};
 	/**
 	 * Shortcut to pushGameLayer
@@ -1089,6 +1093,7 @@ var M = window.M || {},
 		this.sprites.removeAllEventListeners();
 		this.sounds.removeAllEventListeners();
 		this.createGameLayer(this.DEFAULT_LAYER_NAME).background = this.DEFAULT_LAYER_BACKGROUND;
+		this.raise("sceneRemoved");
 	};
 	/**
 	 * Pushes all provided layers into Match list of game layers
@@ -1098,6 +1103,7 @@ var M = window.M || {},
 		for ( ; i < l; i++ ) {
 			this.pushGameLayer(layers[i]);
 		}
+		this.raise("scenePushed");
 	};
 	/**
 	 * Removes current layers and oushes all provided layers into Match list of game layers
@@ -1125,9 +1131,9 @@ var M = window.M || {},
 
 			this._gameLayers.remove(name);
 
-			this.raise("gameLayerRemoved", name);
-
 			this.renderer._reRenderAllLayers = true;
+
+			this.raise("gameLayerRemoved", name);
 
 			return layer;
 
@@ -1263,7 +1269,7 @@ var M = window.M || {},
 			M.start(document.querySelector("#gameCanvas"), true);
 	 */
 	Match.prototype.start = function(canvas, mode) {
-console.log("called start");
+
 		if ( !canvas ) {
 			canvas = M.dom("canvas");
 		}
