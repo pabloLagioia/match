@@ -26,8 +26,9 @@
 		return value;
 	};
 
-	function Entity() {
+	function Entity(name) {
 		this.extendsEventHandler();
+		this.name = name || ("Unnamed Entity" + M._gameObjects.length);
 		this.attributes = new SimpleMap();
 		this.behaviours = new SimpleMap();
 		this.views = new SimpleMap();

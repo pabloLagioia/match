@@ -249,6 +249,8 @@
 		//TODO: We need to know which objects were added so if they were outside the viewport we must not re render
 		this.needsRedraw = true;
 
+		M.raise("gameObjectPushedToLayer", entity);
+
 	};
 	GameLayer.prototype.push = GameLayer.prototype.add;
 	/**
@@ -369,7 +371,11 @@
 			var i = this.onRenderList.indexOf( object );
 
 			if ( i > -1 ) {
+				
 				this.onRenderList.splice( i, 1 );
+
+				M.raise("gameObjectRemovedFromLayer", object);
+
 			}
 
 		}
