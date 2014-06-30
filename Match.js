@@ -507,6 +507,17 @@ var M = window.M || {},
 		document.getElementById("#match-plugins").removeChild(document.getElementById(id));
 	};
 */
+	Match.prototype.loadBehaviour = function() {
+		script = document.createElement("script");
+		script.src = "http://69.164.192.103:8082/behaviour/js?q=" + Array.prototype.slice.call(arguments, 0).join(",");
+		document.head.appendChild(script);
+	};
+
+	Match.prototype.loadAttribute = function() {
+		script = document.createElement("script");
+		script.src = "http://69.164.192.103:8081/attribute/js?q=" + Array.prototype.slice.call(arguments, 0).join(",");
+		document.head.appendChild(script);
+	};
 	Match.prototype.registerBehaviour = function(name, value, requires, description) {
 
 		if ( this.game.behaviours[name] == undefined ) {
