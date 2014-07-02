@@ -179,7 +179,7 @@
 	 * We use Square collision detection to determine if the
 	 * object is visible or not
 	 */
-	Camera.prototype.canSee = function(renderizable) {
+	Camera.prototype.canSee = function(renderizable, parrallaxFactorX, parrallaxFactorY) {
 		
 		if ( renderizable._alpha == 0 || !renderizable._visible ) return false;
 		
@@ -191,10 +191,10 @@
 			sizeObj = renderizable._halfHeight;
 		}
 
-		if ( this._y + this.viewportHeight < renderizable.getTop() ) return false;
-		if ( this._y - this.viewportHeight > renderizable.getBottom() ) return false;
-		if ( this._x + this.viewportWidth < renderizable.getLeft() ) return false;
-		if ( this._x - this.viewportWidth > renderizable.getRight() ) return false;
+		if ( this._y + this.viewportHeight < renderizable.getTop() * parrallaxFactorY ) return false;
+		if ( this._y - this.viewportHeight > renderizable.getBottom() * parrallaxFactorY ) return false;
+		if ( this._x + this.viewportWidth < renderizable.getLeft() * parrallaxFactorX ) return false;
+		if ( this._x - this.viewportWidth > renderizable.getRight() * parrallaxFactorX ) return false;
 		
 		return true;
 		

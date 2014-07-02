@@ -595,7 +595,9 @@
 	};
 	StandardEntityRenderer.prototype.renderLayer = function (layer, cameraX, cameraY, viewportWidth, viewportHeight) {
 
-		if ( this._reRenderAllLayers || layer.needsRedraw ) {
+		if ( !layer._visible ) return;
+
+		// if ( this._reRenderAllLayers || layer.needsRedraw ) {
 
 			var current,
 				currentView,
@@ -604,7 +606,7 @@
 
 			if ( layer.background ) {
 				if ( layer.background.src ) {
-					this.backBuffer.drawImage(layer.background, 0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
+					this.backBuffer.drawImage(layer.background, 0, 0, canvas.width, canvas.height);
 				} else {
 					this.backBuffer.fillStyle = layer.background;
 					this.backBuffer.fillRect(0, 0, canvas.width, canvas.height);
@@ -621,10 +623,13 @@
 				for ( var j = 0, jl = currentViews.length; j < jl; j++ ) {
 			
 					currentView = currentViews[j];
+
+					var pFX = layer.parrallaxFactor.x,
+						pFY = layer.parrallaxFactor.y;
 			
-					if ( this.camera.canSee(currentView) ) {
+					if ( this.camera.canSee(currentView, pFX, pFY) ) {
 					
-						this.render(currentView, this.backBuffer, cameraX, cameraY);
+						this.render(currentView, this.backBuffer, cameraX * pFX, cameraY * pFY);
 					
 					}
 				
@@ -638,24 +643,47 @@
 			}
 
 			//TODO: Review buffer. Layer should not know anything about rendering
-			if ( layer._buffer == undefined ) {
-				layer._buffer = document.createElement("canvas").getContext("2d");
-				layer._buffer.canvas.width = canvas.width;
-				layer._buffer.canvas.height = canvas.height;
-			}
+			// if ( layer._buffer == undefined ) {
+			// 	layer._buffer = document.createElement("canvas").getContext("2d");
+			// 	layer._buffer.canvas.width = canvas.width;
+			// 	layer._buffer.canvas.height = canvas.height;
+			// }
 			
-			layer._buffer.clearRect(0, 0, canvas.width, canvas.height);
-			layer._buffer.drawImage(canvas, 0, 0);
+			// layer._buffer.clearRect(0, 0, canvas.width, canvas.height);
+			// layer._buffer.drawImage(canvas, 0, 0);
 			
-			layer.needsRedraw = false;
+			// layer.needsRedraw = false;
+
+			// if ( layer._alpha != undefined ) {
+			// 	this.frontBuffer.globalAlpha = layer._alpha;
+			// }
+
+			this._applyOperation(layer, this.frontBuffer);
+			this._applyAlpha(layer, this.frontBuffer);
+			// this._applyTranslation(layer, this.frontBuffer, 0, 0);
+			// this._applyRotation(layer, this.frontBuffer);
+			// this._applyScale(layer, this.frontBuffer);
+
+			// if ( layer._x != undefined && layer._y != undefined ) {
+			// 	this.frontBuffer.rotate(layer._rotation);
+			// }
+			// if ( layer._rotation != undefined ) {
+			// 	this.frontBuffer.rotate(layer._rotation);
+			// }
 
 			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
+
+			// if ( layer._rotation != undefined ) {
+			// 	this.frontBuffer.rotate(0);
+			// }
+
+			// this.frontBuffer.globalAlpha = 1;
 			
-		} else {
+		// } else {
 		
-			this.frontBuffer.drawImage(layer._buffer.canvas, 0, 0);
+		// 	this.frontBuffer.drawImage(layer._buffer.canvas, 0, 0);
 			
-		}
+		// }
 
 		// if ( this.needsSorting ) {
 		// 	this.sort();

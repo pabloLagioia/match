@@ -100,9 +100,9 @@
 	 */
 	Circle.prototype.getWidth = function() {
 		if ( this._scale ) {
-			return this._radius * this._scale.x;
+			return this._radius * 2 * this._scale.x;
 		} else {
-			return this._radius;
+			return this._radius * 2;
 		}
 	};
 	/**
@@ -112,9 +112,9 @@
 	 */
 	Circle.prototype.getHeight = function() {
 		if ( this._scale ) {
-			return this._radius * this._scale.y;
+			return this._radius * 2 * this._scale.y;
 		} else {
-			return this._radius;
+			return this._radius * 2;
 		}
 	};
 	/**

@@ -259,7 +259,7 @@
         this._height = this.currentFrame.height;
         this._halfWidth = this.currentFrame.halfWidth;
         this._halfHeight = this.currentFrame.halfHeight;
-        this.raiseEvent("frameChanged", index);
+        this.raiseEvent("attributeChanged", "frame");
     };
 	/**
 	 * Returns the constructor's name

@@ -61,6 +61,13 @@
 		 */
 		this._alpha;
 		/**
+		 * object visibility. Determines whether the object will be rendered or not
+		 * @private
+		 * @property _visible
+		 * @type Boolean
+		 */
+		this._visible = true;
+		/**
 		 * Parrallax factor is used for parralax scrolling. The object x and y coordinates are multiplied by the camera position to translate the scene in different speeds
 		 * @property parrallaxFactor
 		 * @type Object object that contains floats x and y
