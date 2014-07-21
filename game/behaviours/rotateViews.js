@@ -1,4 +1,4 @@
-M.registerBehaviour.does("rotateViews", function(e, a, v) {
+M.registerBehaviour("rotateViews", function(e, a, v) {
 
 	var rotation = a.get("rotation"),
 		offsetRotation = 0;
