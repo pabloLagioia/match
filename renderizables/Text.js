@@ -247,6 +247,10 @@
 		this._changed = true;
 		this.raiseEvent("familyChanged", value);
 	};
+
+	Text.prototype.setFont = Text.prototype.setFamily;
+
+	Text.prototype.getFont = Text.prototype.getFamily;
 	/**
 	 * Sets the font size
 	 *

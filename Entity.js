@@ -45,7 +45,21 @@
 		return this.attributes.get(name);
 	};
 
-	Entity.prototype.attribute = Entity.prototype.getAttribute;
+	Entity.prototype.attribute = function(name, value) {
+		if ( arguments.length == 2 ) {
+			this.attributes.set(name, value);
+		} else {
+			return this.attributes.get(name);
+		}
+	};
+
+	Entity.prototype.behaviour = function(name, value) {
+		if ( arguments.length == 2 ) {
+			this.behaviours.set(name, value);
+		} else {
+			return this.behaviours.get(name);
+		}
+	};
 	
 	Entity.prototype.getBehaviour = function(name) {
 		return this.behaviours.get(name);

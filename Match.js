@@ -328,6 +328,8 @@ var M = window.M || {},
 			entities: {
 			},
 			scenes: {
+			},
+			displays: {
 			}
 		};
 
@@ -486,27 +488,7 @@ var M = window.M || {},
 		}
 
 	};
-/*
-	Match.prototype.registerPlugin = function() {
-		arguments[0] = "M.plugins." + arguments[0];
-		this.registerClass.apply(this, arguments);
-	};
-	Match.prototype.registerPluginTemplate = function(id, html) {
-		this.plugins.html[id] = html;
-	};	
-	Match.prototype.getPluginTemplate = function(id) {
-		var div = document.createElement("div");
-		div.setAttribute("class", "match plugin " + id);
-		div.innerHTML = this.plugins.html[id];
-		return div;
-	};
-	Match.prototype.addPlugin = function(id) {
-		document.getElementById("match-plugins").appendChild(this.getPluginTemplate(id));
-	};	
-	Match.prototype.removePlugin = function(id) {
-		document.getElementById("#match-plugins").removeChild(document.getElementById(id));
-	};
-*/
+
 	Match.prototype.loadBehaviour = function() {
 		script = document.createElement("script");
 		script.src = "http://69.164.192.103:8082/behaviour/js?q=" + Array.prototype.slice.call(arguments, 0).join(",");
@@ -518,22 +500,67 @@ var M = window.M || {},
 		script.src = "http://69.164.192.103:8081/attribute/js?q=" + Array.prototype.slice.call(arguments, 0).join(",");
 		document.head.appendChild(script);
 	};
-	Match.prototype.registerBehaviour = function(name, value, requires, description) {
+	Match.prototype.registerBehaviour = function(name, value) {
 
-		if ( this.game.behaviours[name] == undefined ) {
-			this.game.behaviours[name] = value;
-			this.raise("behaviourRegistered", name);
-		} else {
-			this.logger.warn("There is already a behaviour named ", name);
+		if ( this.game.behaviours[name] ) {
+			this.logger.warn("There is already a behaviour named ", name, "current will be overriden");
 		}
+		this.game.behaviours[name] = value;
+		this.raise("behaviourRegistered", name);
 
 	};
-	Match.prototype.registerAttribute = function(name, value) {
-		if ( this.game.attributes[name] == undefined ) {
-			this.game.attributes[name] = value;
-			this.raise("attributeRegistered", name);
+	Match.prototype.behaviour = function() {
+		if ( arguments.length == 2 ) {
+			this.registerBehaviour(arguments[0], arguments[1]);
 		} else {
-			this.logger.warn("There is already an attribute named ", name);
+			return new this.game.behaviours[arguments[0]];
+		}
+	};
+	Match.prototype.capitalize = function(word) {
+		return word.charAt(0).toUpperCase() + word.substr(1);
+	};
+	Match.prototype.display = function(name, descriptor) {
+
+		if ( arguments.length == 2 ) {
+
+			var renderizableType = this.capitalize(descriptor.type);
+
+			if ( !this.renderizables[renderizableType] ) {
+				throw new Error("When trying to register a display, no display by the type '" + renderizableType + "' could be found. Try rectangle, circle, text or sprite");
+			}
+
+			this.game.displays[name] = descriptor;
+
+		} else {
+			
+			var display = this.game.displays[name];
+			
+			if ( display ) {
+				
+				var renderizable = new this.renderizables[this.capitalize(display.type)];
+
+				renderizable.set(display);
+
+				return renderizable;
+
+			} else {
+				throw new Error("When trying to instantiate a display, no display by the name '" + name + "' could be found");
+			}
+
+		}
+	};
+	Match.prototype.registerAttribute = function(name, value) {
+		if ( this.game.attributes[name] ) {
+			this.logger.warn("There is already an attribute named ", name, "current will be overriden");
+		}
+		this.game.attributes[name] = value;
+		this.raise("attributeRegistered", name);
+	};
+	Match.prototype.attribute = function() {
+		if ( arguments.length == 2 ) {
+			this.registerAttribute(arguments[0], arguments[1]);
+		} else {
+			return new this.game.attributes[arguments[0]];
 		}
 	};
 	Match.prototype.registerEntity = function(name, value) {
@@ -545,16 +572,91 @@ var M = window.M || {},
 		}
 	};
 	Match.prototype.createEntity = function(name) {
-		var entity = this.game.entities[name]();
-		entity.name = name;
-		this.raise("entityCreated", name);
+
+		var entityClass = this.game.entities[name];
+
+		if ( typeof entityClass == "function" ) {
+
+			//Custom spawner
+			var entity = entityClass();
+			entity.name = name;
+			this.raise("entityCreated", name);
+			return entity;
+			
+		} else {
+
+			//Default spawner
+			var entity = new this.Entity();
+
+			if ( entityClass.has ) {
+				for ( var i = 0; i < entityClass.has.length; i++ ) {
+					entity.has(entityClass.has[i]);
+				}
+			}
+
+			if ( entityClass.does ) {
+				for ( var i = 0; i < entityClass.does.length; i++ ) {
+					entity.does(entityClass.does[i]);
+				}
+			}
+
+			if ( entityClass.displays ) {
+				for ( var i = 0; i < entityClass.displays.length; i++ ) {
+					var display = this.display(entityClass.displays[i]);
+					entity.views.set(entityClass.displays[i], display);
+				}
+			}
+
+			entity.name = name;
+			this.raise("entityCreated", name);
+
+			return entity;
+
+		}
+
+	};
+	Match.prototype.entity = function() {
+		if ( arguments.length == 2 ) {
+			this.registerEntity(arguments[0], arguments[1]);
+		} else {
+			return this.createEntity(arguments[0]);
+		}
+	};
+	Match.prototype.spawn = function(name, initialize) {
+		
+		var entity = this.entity(name);
+
+		if ( initialize ) {
+			initialize(entity);
+		}
+
+		var addSystem = M.add(entity);
+
+		for ( var i = 0; i < entity.views._values.length; i++ ) {
+			if ( entity.views._values[i].layer ) {
+				//TODO: We need to be able to add just views to layers. This requires much more investigation and changing how layers work
+				addSystem.to(entity.views._values[i].layer);
+				return entity;
+			}
+		}
+
+		addSystem.to("world");
+
 		return entity;
-	};	
+
+	};
 	Match.prototype.registerScene = function(name, value) {
 		if ( this.game.scenes[name] == undefined ) {
 			this.game.scenes[name] = value;
 		} else {
-			this.logger.warn("There is already a scenes named ", name);
+			this.logger.warn("There is already a scene named ", name);
+		}
+	};
+	Match.prototype.scene = function(name, value) {
+		if ( arguments.length == 2 ) {
+			this.registerScene(name, value);
+		} else {
+			return this.getScene(name);
 		}
 	};
 	Match.prototype.unregisterScene = function(name) {
@@ -655,8 +757,8 @@ var M = window.M || {},
 		
 		// while ( this._lag > this._msPerUpdate ) {
 		
-			this._updateInput(p);
 			this.updateGameObjects(this._gameObjects, p);
+			this._updateInput(p);
 			this.updateTriggers(this._triggers);
 			// this._lag -= this._msPerUpdate;
 
@@ -915,7 +1017,7 @@ var M = window.M || {},
 	 * @return {GameLayer} the newly created layer
 	 */
 	Match.prototype.createGameLayer = function(name, zIndex) {
-		if ( !name ) {
+		if ( name === undefined ) {
 			throw new Error("Cannot create layer. You must name it.");
 		}
 		var gameLayer = new this.GameLayer(name, zIndex || M._gameLayers.length);
@@ -937,7 +1039,7 @@ var M = window.M || {},
 			M.pushGameLayer(layer);
 	 */
 	Match.prototype.pushGameLayer = function(name, gameLayer) {
-		if ( !gameLayer ) {
+		if ( gameLayer === undefined ) {
 			throw new Error("Cannot add null game layer");
 		}
 		this._gameLayers.set(name, gameLayer);
@@ -960,9 +1062,9 @@ var M = window.M || {},
 		var scene = this.getScene(name);
 
 		if ( scene ) {
-			this.logger.log("Loading scene by name '", name, "'");
+			this.logger.log("Loading scene by name", name);
 		} else {
-			this.logger.error("Unable to load scene by name '", name, "'");
+			this.logger.error("Unable to load scene by name", name, "It could not be found");
 			return;
 		}
 		
@@ -1580,6 +1682,9 @@ var M = window.M || {},
 	};
 	Match.prototype.getCenter = function() {
 		return this.renderer.getCenter();
+	};
+	Match.prototype.getSize = function() {
+		return this.renderer.getViewportSize();
 	};
 	Match.prototype.getObjectName = function(object) {
 		if (!object || !object.constructor) {

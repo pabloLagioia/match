@@ -16,7 +16,7 @@ M.registerBehaviour("fixViewsToEntity", function(e, a, v) {
 		this.location.y = 0;
 	}
 
-	if ( rotation != this.rotation ) {
+	if ( rotation && rotation != this.rotation ) {
 		offsetRotation = rotation - this.rotation;
 		this.rotation = rotation;
 	}

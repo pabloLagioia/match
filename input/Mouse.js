@@ -394,7 +394,7 @@
 
 			for (; i < l; i++ ) {
 
-			renderizable = views[i];
+				renderizable = views[i];
 
 				if ( this.isOverPolygon(renderizable) && this.isOverPixelPerfect(renderizable) ) {
 					this.select(entity);

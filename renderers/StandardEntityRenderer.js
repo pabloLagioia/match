@@ -32,9 +32,10 @@
 	
 		this.DEFAULT_COMPOSITE_OPERATION = 0;
 		this.DEFAULT_ALPHA = 1;
-		this.DEFAULT_SHADOW_OFFSET_X = 0;
-		this.DEFAULT_SHADOW_OFFSET_Y = 0;
-		this.DEFAULT_SHADOW_BLUR = 0;
+		this.DEFAULT_SHADOW_OFFSET_X = this.frontBuffer.shadowOffsetX;
+		this.DEFAULT_SHADOW_OFFSET_Y = this.frontBuffer.shadowOffsetY;
+		this.DEFAULT_SHADOW_COLOR = this.frontBuffer.shadowColor;
+		this.DEFAULT_SHADOW_BLUR = this.frontBuffer.shadowBlur;
 
 		this.shadowBlur = this.DEFAULT_SHADOW_BLUR;
 		this.shadowOffsetX = this.DEFAULT_SHADOW_OFFSET_X;
@@ -118,34 +119,54 @@
 	 * @param {StandardEntityRenderer} context
 	 */
 	StandardEntityRenderer.prototype._applyShadow = function(object, context) {
+		// if ( object._shadow ) {
+		// 	var s = object._shadow;
+		// 	context.shadowOffsetX = this.shadowOffsetX = s.x;
+		// 	context.shadowOffsetY = this.shadowOffsetY = s.y;
+		// 	context.shadowBlur = this.shadowBlur = s.blur;
+		// 	context.shadowColor = s.color;
+		// 	this.shadowChanged = true;
+		// } else if (this.shadowChanged) {
+		// 	this.resetShadow(context);
+		// }
+
+		context.shadowBlur = this.DEFAULT_SHADOW_BLUR;
+		context.shadowOffsetX = this.DEFAULT_SHADOW_OFFSET_X;
+		context.shadowOffsetY = this.DEFAULT_SHADOW_OFFSET_Y;
+		context.shadowColor = this.DEFAULT_SHADOW_COLOR;
+		
 		if ( object._shadow ) {
 			var s = object._shadow;
-			context.shadowOffsetX = this.shadowOffsetX = s.x;
-			context.shadowOffsetY = this.shadowOffsetY = s.y;
-			context.shadowBlur = this.shadowBlur = s.blur;
+			context.shadowOffsetX = s.x;
+			context.shadowOffsetY = s.y;
+			context.shadowBlur = s.blur;
 			context.shadowColor = s.color;
-			context.shadowChanged = false;
-		} else if (this.shadowChanged) {
-			this.resetShadow(context);
 		}
+
 	};
 	/**
 	 * @method resetShadow
 	 * @abstract
 	 */
 	StandardEntityRenderer.prototype.resetShadow = function(context) {
-		if ( this.shadowChanged ) {
-			if ( this.shadowBlur != this.DEFAULT_SHADOW_BLUR ) {
-				context.shadowBlur = this.shadowBlur = this.DEFAULT_SHADOW_BLUR;
-			}
-			if ( this.shadowOffsetX != this.DEFAULT_SHADOW_BLUR ) {
-				context.shadowOffsetX = this.shadowOffsetX = this.DEFAULT_SHADOW_OFFSET_X;
-			}
-			if ( this.shadowOffsetY != this.DEFAULT_SHADOW_OFFSET_Y ) {
-				context.shadowOffsetY = this.shadowOffsetY = this.DEFAULT_SHADOW_OFFSET_Y;
-			}
-			this.shadowChanged = false;
-		}
+		// if ( this.shadowChanged ) {
+			// if ( this.shadowBlur != this.DEFAULT_SHADOW_BLUR ) {
+			// 	context.shadowBlur = this.shadowBlur = this.DEFAULT_SHADOW_BLUR;
+			// }
+			// if ( this.shadowOffsetX != this.DEFAULT_SHADOW_BLUR ) {
+			// 	context.shadowOffsetX = this.shadowOffsetX = this.DEFAULT_SHADOW_OFFSET_X;
+			// }
+			// if ( this.shadowOffsetY != this.DEFAULT_SHADOW_OFFSET_Y ) {
+			// 	context.shadowOffsetY = this.shadowOffsetY = this.DEFAULT_SHADOW_OFFSET_Y;
+			// }
+			// this.shadowChanged = false;
+		// }
+
+		context.shadowBlur = this.DEFAULT_SHADOW_BLUR;
+		context.shadowOffsetX = this.DEFAULT_SHADOW_OFFSET_X;
+		context.shadowOffsetY = this.DEFAULT_SHADOW_OFFSET_Y;
+		context.shadowColor = this.DEFAULT_SHADOW_COLOR;
+
 	};
 	StandardEntityRenderer.prototype.setRenderingAlphaTime = function(alphaTime) {
 		this._alphaTime = alphaTime;
@@ -492,7 +513,8 @@
 			}
 			
 			context.strokeStyle = renderizable._strokeStyle;
-			context.stroke( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
+			// context.stroke( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
+			context.stroke();
 			
 		}
 
