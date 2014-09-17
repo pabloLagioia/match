@@ -16,7 +16,7 @@ Attributes are dumb objects that store values, ie. speed, position, direction, e
 Behaviours read the attributes and perform changes on them, for example, a behaviour called move would change the x and y values of the location attribute.
 
 ### Views/Displays
-Views or displays are objects that can be rendered.
+Views or displays are objects that can be rendered such as Rectangle, Circle, Sprite, Text or BitmapText
 
 ### Entities
 An entity is gathers attributes, behaviours and displays. This will be your final game object.
