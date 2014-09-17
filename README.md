@@ -20,13 +20,12 @@ Views or displays are objects that can be rendered.
 
 ### Entities
 An entity is gathers attributes, behaviours and displays. This will be your final game object.
-
-## How does it work?
-*Complete*
-
 The main idea here is that you add and remove behaviours to an entity in order to modify the way it behaves. For example if you had a
 behaviour called "takeDamage" which reduced health each time the object gets hit, to make the object invulnerable you just remove
 the "takeDamage" behaviour
+
+## How does it work?
+*Complete*
 
 ## Match Service
 To get Matchjs concatenated you can download [match-service](https://bitbucket.org/puzzlingideas/match-service). Place at the same directory level as this project and run node app.js.
