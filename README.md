@@ -24,6 +24,9 @@ The main idea here is that you add and remove behaviours to an entity in order t
 behaviour called "takeDamage" which reduced health each time the object gets hit, to make the object invulnerable you just remove
 the "takeDamage" behaviour
 
+##Example
+For a basic example on how to create entities, behaviours and attributes please refer to https://github.com/pabloLagioia/pong-using-matchjs/blob/master/public/main.js
+
 ## How does it work?
 *Complete*
 
