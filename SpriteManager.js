@@ -90,6 +90,10 @@
 
     }
 
+    SpriteManager.prototype.get = function( name ) {
+    	return this.assets[name];
+    };
+
 	/**
 	 * Method that gets called after an image has finished loading
 	 * @method _imageLoaded

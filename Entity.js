@@ -74,13 +74,47 @@
 	Entity.prototype.view = Entity.prototype.getView;
 	
 	Entity.prototype.has = function(name, value) {
+
+		//TODO: this might be a good idea to review. Consider performance costs vs usability, meaning, is this feature really needed? Besides retrocompat
 		if ( value == undefined ) {
-			value = M.game.attributes[name];
-			if ( typeof value == "function" ) {
-				value = new value;
-			}
-			if ( value == undefined ) {
-				return new StoreAs(name, this.attributes);
+
+			if ( typeof name === "object" ) {
+				
+				var key = Object.keys(name)[0];
+				value = M.game.attributes[key];
+
+				if ( value !== undefined ) {
+
+					value = new value;
+
+					var properties = name[key];
+
+					for ( var i in properties ) {
+
+						var setter = "set" + i[0].toUpperCase() + i.substr(1);
+
+						if ( value[setter] ) {
+							value[setter](properties[i]);
+						} else {
+							value[i] = properties[i];
+						}
+
+					}
+
+				} else {
+					value = name;
+				}
+				
+				name = key;
+
+			} else {
+				value = M.game.attributes[name];
+				if ( typeof value === "function" ) {
+					value = new value;
+				}
+				if ( value == undefined ) {
+					return new StoreAs(name, this.attributes);
+				}
 			}
 		}
 		this.attributes.set(name, value);

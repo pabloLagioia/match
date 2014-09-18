@@ -250,7 +250,6 @@ var M = window.M || {},
 			time: 0,
 			m: this
 		};
-
 		/**
 		 * Object that contains information about the current browser
 		 * @property browser
@@ -288,12 +287,12 @@ var M = window.M || {},
 		 */
 		// this.onGameObjectRemoved = new EventListener();
 		/**
-		 * Array containing input handlers
-		 * @property _inputHandlers
+		 * SimpleMap containing input handlers
+		 * @property input
 		 * @type Array
 		 * @private
 		 */
-		this._inputHandlers = [];
+		this.input = new SimpleMap();
 		
 		//Show logo and duration of animation
 		this.showLogo = true;
@@ -449,9 +448,8 @@ var M = window.M || {},
 	 * @param {input.Keyboard} keyboard the keyboard to bind
 	 */
 	Match.prototype.setKeyboard = function(keyboard) {
-		this.keyboard = keyboard;
 		this.onLoopProperties.keyboard = keyboard;
-		this._buildInputMapping();
+		this.input.set("keyboard", keyboard);
 	};
 	/**
 	 * Set Mouse object. This is called by default by the mouse implementation of this library but it could be changed
@@ -459,9 +457,8 @@ var M = window.M || {},
 	 * @param {input.Mouse} mouse the mouse to bind
 	 */
 	Match.prototype.setMouse = function(mouse) {
-		this.mouse = mouse;
 		this.onLoopProperties.mouse = mouse;
-		this._buildInputMapping();
+		this.input.set("mouse", mouse);
 	};
 	/**
 	 * Set Touch object. This is called by default by the touch implementation of this library but it could be changed
@@ -469,9 +466,8 @@ var M = window.M || {},
 	 * @param {input.Touch} touch the toucn to bind
 	 */
 	Match.prototype.setTouch = function(touch) {
-		this.touch = touch;
 		this.onLoopProperties.touch = touch;
-		this._buildInputMapping();
+		this.input.set("touch", touch);
 	};
 	/**
 	 * Set Accelerometer object. This is called by default by the accelerometer implementation of this library but it could be changed
@@ -479,9 +475,8 @@ var M = window.M || {},
 	 * @param {input.Accelerometer} accelerometer the accelerometer to bind
 	 */
 	Match.prototype.setAccelerometer = function(accelerometer) {
-		this.accelerometer = accelerometer;
 		this.onLoopProperties.accelerometer = accelerometer;
-		this._buildInputMapping();
+		this.input.set("accelerometer", accelerometer);
 	};
 	/**
 	 * Set Orientation object. This is called by default by the orientation implementation of this library but it could be changed
@@ -489,9 +484,8 @@ var M = window.M || {},
 	 * @param {input.Orientation} orientation the accelerometer to bind
 	 */
 	Match.prototype.setOrientation = function(orientation) {
-		this.orientation = orientation;
 		this.onLoopProperties.orientation = orientation;
-		this._buildInputMapping();
+		this.input.set("orientation", orientation);
 	};
 	Match.prototype.registerClass = function() {
 	
@@ -620,7 +614,7 @@ var M = window.M || {},
 			this.raise("entityCreated", name);
 			return entity;
 			
-		} else {
+		} else if ( entityClass !== undefined) {
 
 			//Default spawner
 			var entity = new this.Entity();
@@ -638,9 +632,40 @@ var M = window.M || {},
 			}
 
 			if ( entityClass.displays ) {
+
 				for ( var i = 0; i < entityClass.displays.length; i++ ) {
+
+					var displayData = entityClass.displays[i];
+
+					if ( typeof displayData === "object" ) {
+
+						var key = Object.keys(displayData)[0],
+							properties = displayData[key],
+							shape,
+							view;
+
+						if ( properties.text ) {
+							shape = "Text";
+						} else if ( properties.radius ) {
+							shape = "Circle";
+						} else if ( properties.image ) {
+							shape = "Sprite";
+						} else {
+							shape = "Rectangle";
+						}
+
+						view = new M.renderizables[shape];
+
+						view.set(properties);
+
+						entity.views.set(key, view);
+
+					} else {
+
 					var display = this.display(entityClass.displays[i]);
 					entity.views.set(entityClass.displays[i], display);
+
+					}
 				}
 			}
 
@@ -649,6 +674,8 @@ var M = window.M || {},
 
 			return entity;
 
+		} else {
+			throw new Error("Unable to instantiate entity by name '" + name + "' as it could not be found. Did you register it?");
 		}
 
 	};
@@ -728,9 +755,10 @@ var M = window.M || {},
 	 */
 	Match.prototype._applyInput = function(node) {
 		var i = 0,
-			l = this._inputHandlers.length;
+			input = this.input._values,
+			l = input.length;
 		for ( ; i < l; i++ ) {
-			this._inputHandlers[i].applyToObject(node);
+			input[i].applyToObject(node);
 		}
 	};
 	/**
@@ -739,31 +767,11 @@ var M = window.M || {},
 	 */
 	Match.prototype._updateInput = function() {
 		var i = 0,
-			l = this._inputHandlers.length;
+			input = this.input._values,
+			l = input.length;
 		for ( ; i < l; i++ ) {
-			this._inputHandlers[i].update();
+			input[i].update();
 		}
-	};
-	Match.prototype._buildInputMapping = function() {
-
-		var p = this.onLoopProperties;
-
-		if ( p.keyboard ) {
-			this._inputHandlers.push(p.keyboard);
-		}
-		if ( p.mouse ) {
-			this._inputHandlers.push(p.mouse);
-		}
-		if ( p.touch ) {
-			this._inputHandlers.push(p.touch);
-		}
-		if ( p.accelerometer ) {
-			this._inputHandlers.push(p.accelerometer);
-		}
-		if ( p.orientation ) {
-			this._inputHandlers.push(p.orientation);
-		}
-
 	};
 	/**
 	 * Game loop, loops through the game objects and then loops through the scenes rendering them
