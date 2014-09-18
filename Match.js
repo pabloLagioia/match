@@ -339,16 +339,55 @@ var M = window.M || {},
 		 */
 		document.addEventListener( "DOMContentLoaded", function() {
 
-			var cnv = self.dom("canvas");
+			if ( self.gameData ) {
 
-			if ( self.autowire && cnv ) {
-				console.log("Autowire enabled. Starting Match on default canvas");
-				self.start(cnv);
+				if ( self.gameData.title ) {
+					document.title = self.gameData.title;
+				}
+
+				var canvas = self.gameData.canvas || self.dom("canvas");
+
+				if ( self.gameData.size ) {
+					if ( self.gameData.size == "fullScreen" ) {
+						canvas.width = window.innerWidth;
+						canvas.height = window.innerHeight;
+					} else {
+						canvas.width = M.gameData.size.width;
+						canvas.height = M.gameData.size.height;
+					}
+				}
+
+				self.start(canvas);
+
+			} else {
+
+				//Retrocompat
+				var cnv = self.dom("canvas");
+
+				if ( self.autowire && cnv ) {
+					console.log("Autowire enabled. Starting Match on default canvas");
+					self.start(cnv);
+				}
+				
 			}
+
 
 		});
 
 	}
+
+	/**
+	 * size: "fullScreen" or {width: Number, height: Number}
+	 * canvas: HTMLCanvasElement or null (will get canvas from document)
+	 * title: String
+	 * description: String
+	 * main: String, Name of a Scene or function code
+	 */
+	Match.prototype.createGame = function(gameData) {
+
+		this.gameData = gameData;
+
+	};
 
 	Match.prototype.getCamera = function() {
 		return this.renderer.camera;
@@ -394,9 +433,7 @@ var M = window.M || {},
 
 			setTimeout(function() {
 				M.removeScene();
-				if ( window.main ) {
-					window.main();
-				}
+				M._normalStart();
 			}, M.LOGO_DURATION);
 			
 		})
@@ -857,6 +894,31 @@ var M = window.M || {},
 
 	};
 	/**
+	 * Gets the element matching the provided key.
+	 * Caches the last object retreived for faster performance.
+	 * @method get
+	 * @param {String} key the key of the object to get from the game objects list
+	 * @return {GameObject} the game object matching the provided key or null if it is not in the list
+	 * @example
+			var ninja = this.get("ninja");
+	 */
+	Match.prototype.getEntitiesByName = function(name) {
+
+		var entities = [],
+			i = this._gameObjects.length, 
+			current;
+
+		while ( i-- ) {
+			current = this._gameObjects[i];
+			if ( current.name === name ) {
+				entities.push(current);
+			}
+		}
+		
+		return entities;
+
+	};
+	/**
 	 * Gets the last element from the onLoopList
 	 * @method getLast
 	 * @return {GameObject} the last game object in the list or null if the list is empty
@@ -1067,8 +1129,12 @@ var M = window.M || {},
 			this.logger.error("Unable to load scene by name", name, "It could not be found");
 			return;
 		}
-		
+
 		this.removeScene();
+
+		if ( scene.fullScreen ) {
+			this.setFullScreen();
+		}
 		
 		if ( scene.loadingScene ) {
 		
@@ -1410,13 +1476,24 @@ var M = window.M || {},
 
 			if ( this.showLogo ) {
 				this._showLogo();
-			} else if ( typeof window.main == "function" ) {
-				window.main();
+			} else {
+				this._normalStart();
 			}
 
 		}
 
 
+	};
+	Match.prototype._normalStart = function() {
+		if ( this.gameData && this.gameData.main ) {
+			if ( typeof this.gameData.main == "string" ) {
+				this.setScene(this.gameData.main);
+			} else {
+				this.gameData.main();
+			}
+		} else if ( typeof window.main == "function" ) {
+			window.main();
+		}
 	};
 	/**
 	 * Removes the provided index from the given array
@@ -1676,8 +1753,13 @@ var M = window.M || {},
 		return null;
 	};
 	Match.prototype.setFullScreen = function() {
-		if ( this.frontBuffer && this.frontBuffer.canvas.requestFullScreen ) {
-			this.frontBuffer.canvas.requestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+		// if ( this.frontBuffer && this.frontBuffer.canvas.requestFullScreen ) {
+		// 	this.frontBuffer.canvas.requestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+		// }
+		if ( this.renderer ) {
+			this.renderer.setFullScreen();
+		} else {
+			throw new Error("Cannot set fullScreen. You must call M.start() to set the canvas");
 		}
 	};
 	Match.prototype.getCenter = function() {

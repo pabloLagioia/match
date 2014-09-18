@@ -1,4 +1,5 @@
 M.registerBehaviour("accelerate", function(e, a) {
+
 	if ( a.get("isAccelerating") ) {
 	
 		var speed = a.get("speed") + a.get("acceleration"),
@@ -11,4 +12,5 @@ M.registerBehaviour("accelerate", function(e, a) {
 		a.set("speed", speed);
 		
 	}
+
 });

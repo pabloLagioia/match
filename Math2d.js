@@ -288,7 +288,7 @@
 
 	};
 
-	/**
+   /**
 	* @class Vector2d
 	* @constructor
 	* @param {float} x

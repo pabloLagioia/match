@@ -8,14 +8,6 @@
 		
 		this.backBuffer = document.createElement("canvas").getContext("2d");
 
-		this.backBuffer.canvas.width = this.frontBuffer.canvas.width;
-		this.backBuffer.canvas.height = this.frontBuffer.canvas.height;
-		
-		this.backBufferHalfWidth = this.backBuffer.canvas.width / 2;
-		this.backBufferHalfHeight = this.backBuffer.canvas.height / 2;
-
-		this.frontBuffer = this.canvas.getContext("2d");
-
 		this.compositeOperations = [
 			"source-over",
 			"source-atop",
@@ -57,6 +49,11 @@
 		this.updateViewport();
 		
 	}
+	StandardEntityRenderer.prototype.setFullScreen = function() {
+		this.frontBuffer.canvas.width = window.innerWidth;
+		this.frontBuffer.canvas.height = window.innerHeight;
+		this.updateBufferSize();
+	};
 	StandardEntityRenderer.prototype.getContext = function() {
 		return this.frontBuffer;
 	};
@@ -320,6 +317,11 @@
 		if ( M.collisions.PixelPerfect ) {
 			M.collisions.PixelPerfect.testContext.canvas.width = this.backBuffer.canvas.width;
 			M.collisions.PixelPerfect.testContext.canvas.height = this.backBuffer.canvas.height;
+		}
+
+		if ( M.offScreenCanvas ) {
+			M.offScreenCanvas.width = this.frontBuffer.canvas.width;
+			M.offScreenCanvas.height = this.frontBuffer.canvas.height;
 		}
 
 		this.updateViewport();
@@ -723,7 +725,7 @@
 	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY) {
 
 		var types = M.renderizables.TYPES;
-		
+
 		switch ( object.TYPE ) {
 			case types.SPRITE:
 				this.renderSprite(object, context, cameraX, cameraY);

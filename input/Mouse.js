@@ -307,6 +307,7 @@
 			camera = M.getCamera();
 		cnv.width = M.renderer.frontBuffer.canvas.width;
 		cnv.height = M.renderer.frontBuffer.canvas.height;
+		//TODO: This might not be necessary cause we clean the context and it's the offscreen context used for testing
 		ctx.save();
 		ctx.clearRect(0, 0, cnv.width, cnv.height);
 		M.renderer.render(renderizable, ctx, camera._x, camera._y);

@@ -1,5 +1,6 @@
 /**
  * @module Match
+ * @deprecated
  */
 (function(M) {
 

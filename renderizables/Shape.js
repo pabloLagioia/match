@@ -200,7 +200,7 @@
 	 */
 	Shape.prototype.setShadow = function(x, y, color, blur) {
 		this._shadow = {
-			x: x, y: y, color: color || "black", blur: blur || 1
+			x: x, y: y, color: color || "#000000", blur: blur || 1
 		}
 		this.raiseEvent("shadowChanged", this._shadow);
 	};
@@ -211,6 +211,14 @@
 	 */
 	Shape.prototype.getShadow = function() {
 		return this._shadow;
+	};
+
+	Shape.prototype.setBlur = function(value, color) {
+		this.setShadow(0, 0, color || this._fillStyle, value)
+	};
+
+	Shape.prototype.getBlur = function() {
+		return this._shadow.blur;
 	};
 
 	Shape.name = "Shape";
