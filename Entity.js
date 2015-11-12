@@ -37,12 +37,18 @@
 	Entity.prototype.onLoop = function(p) {
 		var i = 0, a = this.attributes, views = this.views, v = this.behaviours._values, l = v.length;
 		for ( ; i < l; i++ ) {
-			v[i](this, a, views, p);
+			if (v[i]) {
+				v[i](this, a, views, p);
+			}
 		}
 	};
 	
 	Entity.prototype.getAttribute = function(name) {
 		return this.attributes.get(name);
+	};
+	
+	Entity.prototype.hasAttribute = function(name) {
+		return !!this.attributes.get(name);	
 	};
 
 	Entity.prototype.attribute = function(name, value) {
@@ -59,6 +65,10 @@
 		} else {
 			return this.behaviours.get(name);
 		}
+	};
+	
+	Entity.prototype.hasBehaviour = function(name) {
+		return !!this.behaviours.get(name);	
 	};
 	
 	Entity.prototype.getBehaviour = function(name) {
@@ -141,6 +151,10 @@
 		if ( behaviour ) {
 			behaviour(this, this.attributes, this.views, M.onLoopProperties)
 		}
+	};
+	
+	Entity.prototype.can = function(name) {
+		return !!this.behaviour.get(name);
 	};
 	
 	Entity.prototype.doesnt = function(name) {

@@ -4,7 +4,7 @@ M.registerEntity("tank", function() {
 
 	//ATTRIBUTES
 	
-	tank.has("location").set(350, 200);
+	tank.has("location").set(Math.random() * 640, Math.random() * 480);
 	tank.has("direction").set(0, -1);
 	tank.has("acceleration", 0.01);
 	tank.has("deceleration", 0.03);
@@ -21,8 +21,7 @@ M.registerEntity("tank", function() {
 	tank.has("turretDirectionVector").as("direction").set(0, -1);
 	
 	tank.has("lastTimeFire", 0);
-	tank.has("reloadTime", 500);
-	tank.has("fireBullet", false);
+	tank.has("reloadTime", 1500);
 
 	tank.has("keyboardMapping", {
 		up: "up",
@@ -90,32 +89,45 @@ M.registerEntity("tank", function() {
 	tank.does("accelerate");
 	
 	tank.does("deccelerate");
-	
-	tank.does("fire", function(e, a, views) {
-	
-		var fireBullet = a.get("fireBullet"),
-			lastTimeFire = a.get("lastTimeFire"),
-			reloadTime = a.get("reloadTime");
-		
-		if ( fireBullet && M.elapsedTimeFrom(lastTimeFire, reloadTime) ) {
-		
-			a.set("fireBullet", false);
-		
-			a.set("lastTimeFire", M.getTime());
-			
-			var turretDirection = a.get("turretDirectionVector"),
-				location = a.get("location");
-			
-			//CREATE BULLET AND ADD IT TO THE LAYER
-			var bullet = M.game.entities.createBullet();
-			bullet.attribute("direction").set(turretDirection.x, turretDirection.y);
-			bullet.attribute("location").set(location.x, location.y);
-			bullet.has("rotation", a.get("turretRotation"));
-			M.add(bullet).to("gameArea");
-			
-		}
-	
+
+	M.registerBehaviour("reload", function(e, a, views) {
+		e.doesnt("reload");
+		setTimeout(function() {
+			e.does("expectToFire");
+		}, a.get("reloadTime"));
 	});
+	
+	M.registerBehaviour("fire", function(e, a, views) {
+		
+		e.doesnt("fire");
+		
+		var turretDirection = a.get("turretDirectionVector"),
+			location = a.get("location");
+		
+		//CREATE BULLET AND ADD IT TO THE LAYER
+		var bullet = M.game.entities.bullet();
+		bullet.attribute("direction").set(turretDirection.x, turretDirection.y);
+		bullet.attribute("location").set(location.x, location.y);
+		bullet.has("rotation", a.get("turretRotation"));
+		M.add(bullet).to("gameArea");
+			
+	});
+	
+	M.registerBehaviour("expectToFire", function(e, a, v, input) {
+		
+		var keysDown = input.keyboard.keysDown,
+			mappings = a.get("keyboardMapping");
+			
+		if ( keysDown[mappings.fire] || input.touch.ended()) {
+			e.doesnt("expectToFire");
+			e.does("fire");
+			e.does("reload");
+		}
+		
+	});
+	
+	
+	tank.does("expectToFire");
 	
 	tank.does("listenToKeyboard", function(e, a, v, input) {
 	
@@ -171,10 +183,6 @@ M.registerEntity("tank", function() {
 
 		}
 		
-		if ( keysDown[mappings.fire] ) {
-			a.set("fireBullet", true);
-		}
-
 	});
 
 	// tank.does("collide");
