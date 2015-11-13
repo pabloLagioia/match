@@ -26,12 +26,38 @@
 		return value;
 	};
 
-	function Entity(name) {
+	function Entity(name, definition) {
 		this.extendsEventHandler();
+		
+		if (typeof name != "string") {
+			definition = name;
+			name = undefined;
+		}
+		
 		this.name = name || ("Unnamed Entity" + M._gameObjects.length);
 		this.attributes = new SimpleMap();
 		this.behaviours = new SimpleMap();
 		this.views = new SimpleMap();
+		
+		if (definition) {
+			
+			var self = this;
+			
+			definition.attributes && definition.attributes.forEach(function(attribute) {
+				self.has(attribute);
+			});
+						
+			definition.behaviours && definition.behaviours.forEach(function(behaviour) {
+				self.does(behaviour);
+			});
+						
+			// TODO: Define views 
+			// definition.views && definition.views.forEach(function(view) {
+			// 	self.show(view);
+			// });
+			
+		}
+		
 	}
 
 	Entity.prototype.onLoop = function(p) {

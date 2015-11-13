@@ -946,7 +946,13 @@ var M = window.M || {},
 	Match.prototype.add = function() {
 
 		for ( var i = 0; i < arguments.length; i++ ) {
+      
+      if (typeof arguments[i] == "string") {
+        arguments[i] = M.createEntity(arguments[i]);
+      }
+      
 			this.pushGameObject(arguments[i]);
+      
 		}
 	
 		return {
@@ -1018,7 +1024,7 @@ var M = window.M || {},
 		
 		if ( !gameObject.onLoop ) throw new Error("Cannot add object " + gameObject.constructor.name + ", it doesn't have an onLoop method");
 		
-		if ( gameObject instanceof this.Entity ) {
+    if ( gameObject instanceof this.Entity ) {
 			this._gameObjects.push(gameObject);
 		} else {
 			this._triggers.push(gameObject);

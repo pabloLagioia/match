@@ -16,9 +16,8 @@
 			sounds: null
 		}
 	}
-
-	Scene.prototype.addLayer = function(layer) {
-		
+	
+	Scene.prototype.addLayer = function(layer) {		
 	}
 	Scene.prototype.removeLayer = function(layer) {
 	}

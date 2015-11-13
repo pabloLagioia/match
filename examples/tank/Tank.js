@@ -1,6 +1,10 @@
 M.registerEntity("tank", function() {
 
-	var tank = new M.Entity();
+	var tank = new M.Entity({
+		"attributes": [
+			"location", "direction", "acceleration", "deceleration", "speed", "maxSpeed", "minSpeed", "canGoReverse"
+		]
+	});
 
 	//ATTRIBUTES
 	
