@@ -10,3 +10,4 @@ scenes/SimpleLoading.js
 utils/ArrayList.js
 .idea/
 node_modules/
+.DS_Store
