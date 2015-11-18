@@ -6,29 +6,36 @@ M.registerScene("tankScene", {
 	},
 	
 	loadingScene: "loading",
-
-	onLoad: function() {
-
-		var tanks = 1,
-        trees = 2;
-    
-		var object = new M.Entity(),
-			  center = M.getCenter();
-
-		object.shows("grass").as("sprite").set({
-			x: center.x, y: center.y, fill: "grass"
-		});
-
-		M.push(object).to("world");
-    			
-		for (var i = 0; i < tanks; i++) {
-			M.push("tank").to("world");
-		}
-		
-    for (var i = 0; i < trees; i++) {
-      M.push("tree").to("world");
+  
+  map: {
+    definition: [
+      [0, 0, 0, 0, 0, 0, 0, 0, 3],
+      [0, 1, 0, 0, 0, 0, 0, 0, 3],
+      [0, 0, 0, 0, 1, 0, 0, 0, 3],
+      [0, 0, 0, 1, 0, 0, 0, 0, 3],
+      [0, 0, 0, 0, 0, 0, 0, 0, 3],
+      [0, 0, 0, 2, 0, 0, 1, 0, 3],
+      [0, 0, 0, 0, 0, 0, 0, 0, 3],
+      [0, 1, 0, 0, 0, 0, 0, 0, 3],
+      [0, 0, 0, 0, 1, 0, 0, 0, 3],
+      [0, 0, 0, 1, 0, 0, 0, 0, 3],
+      [0, 0, 0, 0, 0, 0, 0, 0, 3]
+    ],
+    tile: {
+      width: 64,
+      height: 64
+    },
+    references: {
+      0: "grass",
+      1: ["grass", "tree"],
+      2: ["grass", "tank"],
+      3: function() {
+        if (M.random.bool()) {
+          return ["grass", "tree"];
+        }
+        return "grass";
+      }
     }
-		
-	}
+ }
 
 });

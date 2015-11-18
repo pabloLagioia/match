@@ -37,6 +37,9 @@
 		this.name = name || ("Unnamed Entity" + M._gameObjects.length);
 		this.attributes = new SimpleMap();
 		this.behaviours = new SimpleMap();
+    
+    this.customBehaviours = new Object();
+    
 		this.views = new SimpleMap();
 		
 		if (definition) {
@@ -113,64 +116,51 @@
 
 		//TODO: this might be a good idea to review. Consider performance costs vs usability, meaning, is this feature really needed? Besides retrocompat
 		if ( value == undefined ) {
-
-			if ( typeof name === "object" ) {
 				
-				var key = Object.keys(name)[0];
-				value = M.game.attributes[key];
-
-				if ( value !== undefined ) {
-
-					value = new value;
-
-					var properties = name[key];
-
-					for ( var i in properties ) {
-
-						var setter = "set" + i[0].toUpperCase() + i.substr(1);
-
-						if ( value[setter] ) {
-							value[setter](properties[i]);
-						} else {
-							value[i] = properties[i];
-						}
-
-					}
-
-				} else {
-					value = name;
-				}
-				
-				name = key;
-
-			} else {
-				value = M.game.attributes[name];
-				if ( typeof value === "function" ) {
-					value = new value;
-				}
-				if ( value == undefined ) {
-					return new StoreAs(name, this.attributes);
-				}
-			}
+      value = M.game.attributes[name];
+      
+      if ( typeof value == "function" ) {
+        value = new value;
+      }
+      
+      if ( value == undefined ) {
+        return new StoreAs(name, this.attributes);
+      }
+			
 		}
+    
 		this.attributes.set(name, value);
+    
 		return value;
+    
 	};
 	Entity.prototype.hasnt = function(name) {
 		return this.attributes.remove(name);
 	};
-	
+  
 	Entity.prototype.does = function(name, value) {
+    
+    if ( value ) {
+      this.registerBehaviour(name, value);
+    }
+    
 		if ( value == undefined ) {
-			value = M.game.behaviours[name];
+			value = M.game.behaviours[name] || this.customBehaviours[name];
 		}
+    
 		if ( value == undefined ) {
 			M.logger.error("Cannot add undefined behaviour " + name + " to entity");
 		} else {
 			this.behaviours.set(name, value);
 		}
+    
 		return this;
+    
 	};
+  
+  Entity.prototype.registerBehaviour = function(name, value) {
+    this.customBehaviours[name] = value;
+  };
 	
 	Entity.prototype.do = function(name) {
 		var behaviour = this.behaviour.get(name);
@@ -180,7 +170,7 @@
 	};
 	
 	Entity.prototype.can = function(name) {
-		return !!this.behaviour.get(name);
+		return !!this.behaviours.get(name);
 	};
 	
 	Entity.prototype.doesnt = function(name) {

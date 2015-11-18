@@ -1,4 +1,4 @@
-M.registerEntity("car", function () {
+M.registerEntity("car", function (fillStyle) {
 
 	var car = new M.Entity();
 
@@ -26,13 +26,10 @@ M.registerEntity("car", function () {
 
 	//VIEWS
 	
-	car.shows("base").as("rectangle").set({
-		x: 0, y: 0, color: "brown", width: 35, height: 50
-	});		
-	car.shows("front").as("rectangle").set({
-		x: 0, y: -20, color: "yellow", width: 20, height: 10
-	});
-	
+  car.shows("base").as("sprite").set({
+    "fill": fillStyle
+  });
+  
 	//BEHAVIOURS
 	
 	// car.does("compensateRotationSpeed", function(e,a) {

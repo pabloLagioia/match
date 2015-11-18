@@ -1,6 +1,6 @@
 {
 	"name": "location",
-	"description": "Provides information about the location the entity",
+	"description": "Provides information about the location of the entity",
 	"fields": {
 		"x": "Coordinate in the x axis",
 		"y": "Coordinate in the y axis"

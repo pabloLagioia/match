@@ -84,6 +84,20 @@
 			y: M.random.integer(minY, maxY)
 		}
 	};
+  /**
+	 * Returns a random string given a length
+	 *
+	 * @method string
+	 * @return {String}
+	 * @example "M.random.string(8)"
+	 */
+  Random.prototype.string = function(length) {
+    length = length || 16;
+    var chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var result = "";
+    for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+    return result;
+  };
 
 	M.random = new Random();
 

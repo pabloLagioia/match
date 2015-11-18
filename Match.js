@@ -432,7 +432,7 @@ var M = window.M || {},
 
 			setTimeout(function() {
 				M.removeScene();
-				M._normalStart();
+				M._regularStart();
 			}, M.LOGO_DURATION);
 			
 		})
@@ -602,14 +602,14 @@ var M = window.M || {},
 			this.logger.warn("There is already an entity named ", name);
 		}
 	};
-	Match.prototype.createEntity = function(name) {
+	Match.prototype.createEntity = function(name, properties, args) {
 
 		var entityClass = this.game.entities[name];
 
 		if ( typeof entityClass == "function" ) {
 
 			//Custom spawner
-			var entity = entityClass();
+			var entity = entityClass(properties, args);
 			entity.name = name;
 			this.raise("entityCreated", name);
 			return entity;
@@ -617,7 +617,7 @@ var M = window.M || {},
 		} else if ( entityClass !== undefined) {
 
 			//Default spawner
-			var entity = new this.Entity();
+			var entity = new this.Entity(properties, args);
 
 			if ( entityClass.has ) {
 				for ( var i = 0; i < entityClass.has.length; i++ ) {
@@ -729,6 +729,77 @@ var M = window.M || {},
 	Match.prototype.getScene = function(name) {
 		return this.game.scenes[name];
 	};
+  /**
+   * Creates objects and triggers based on a map given a map definition
+   */
+  Match.prototype.createMap = function(mapDefinition) {
+    
+    if (!mapDefinition) {
+      throw new Error("There is no map registered with name " + name);
+    }
+    
+    if (mapDefinition.cameraBoundingArea) {
+      this.getCamera().setBoundingArea(mapDefinition.cameraBoundingArea.left, mapDefinition.cameraBoundingArea.top, mapDefinition.cameraBoundingArea.right, mapDefinition.cameraBoundingArea.bottom);
+    }
+    
+    for (var row = 0; row < mapDefinition.definition.length; row++) {
+
+      for (var column = 0; column < mapDefinition.definition[row].length; column++) {
+        
+        var tileRef = mapDefinition.definition[row][column];
+        
+        var tileConstructor = mapDefinition.references[tileRef];
+        
+        var tile = {
+          "row": row,
+          "column": column,
+          "width": mapDefinition.tile.width,
+          "height": mapDefinition.tile.height,
+          "center": {
+            "x": column * mapDefinition.tile.width + mapDefinition.tile.width / 2,
+            "y": row * mapDefinition.tile.height + mapDefinition.tile.height / 2
+          },
+          "type": tileRef
+        };
+        
+        this._createMapTile(tileConstructor, tile);
+
+      }
+      
+    }
+    
+  };
+  Match.prototype._createMapTile = function(tileConstructor, tile) {
+    
+    if (typeof tileConstructor == "function") {
+      
+      this._createMapTile(tileConstructor(tile), tile);
+      
+    } else if (tileConstructor instanceof Array) {
+      
+      tileConstructor.forEach(function(currentTile) {
+        M._createMapTile(currentTile, tile);
+      });
+      
+    } else if (typeof tileConstructor == "string") {
+      
+      var argumentsIndex = tileConstructor.indexOf(":"),
+          args;
+      
+      if (argumentsIndex != -1) {
+        args = tileConstructor.substr(argumentsIndex + 1, tileConstructor.length);
+        tileConstructor = tileConstructor.substr(0, argumentsIndex);
+      }
+      
+      M.add(M.createEntity(tileConstructor, tile, args));
+      
+    } else {
+      
+      M.add(tileConstructor);
+      
+    }
+    
+  }
 	/**
 	 * Calls the onLoop method on all elements in nodes
 	 * @method updateGameObjects
@@ -960,22 +1031,14 @@ var M = window.M || {},
 			objects: arguments,
 			
 			to: function(layerName) {
-			
-				if ( !layerName ) {
+				
+        if ( !layerName ) {
 					return;
 				}
-			
-				var layer = M.layer(layerName);
-				
-				if ( !layer ) {
-					layer = M.createGameLayer(layerName);
-				}
-				
-				if ( layer ) {
-					for ( var i = 0; i < this.objects.length; i++ ) {
-						M.getLayer(layerName).add(this.objects[i]);
-					}
-				}
+        
+        for ( var i = 0; i < this.objects.length; i++ ) {
+          M.addToLayer(layerName, this.objects[i]);
+        }
 				
 			}
 		}
@@ -992,20 +1055,12 @@ var M = window.M || {},
 			objects: arguments,
 			
 			from: function(layerName) {
-			
-				if ( !layerName ) {
-					return;
-				}
-			
+					
 				var layer = M.layer(layerName);
-				
-				if ( !layer ) {
-					layer = M.createGameLayer(layerName);
-				}
-				
+								
 				if ( layer ) {
 					for ( var i = 0; i < this.objects.length; i++ ) {
-						M.getLayer(layerName).remove(this.objects[i]);
+						layer.remove(this.objects[i]);
 					}
 				}
 				
@@ -1013,6 +1068,24 @@ var M = window.M || {},
 		}
 
 	};
+  /**
+   * Adds a game object to a layer. If the layer does not exist it creates it and then adds the object to it.
+   */
+  Match.prototype.addToLayer = function(layerName, entity) {
+    
+    if ( !layerName ) {
+    	return;
+    }
+    
+    if (!entity) {
+      return;
+    }
+        
+    var layer = this.layer(layerName) || this.createGameLayer(layerName);
+    
+    layer.add(entity);
+    
+  };
 	Match.prototype.push = Match.prototype.add;	
 	/**
 	 * Pushes a game object, that is an object that implements an onLoop method, to the game object list.
@@ -1025,7 +1098,15 @@ var M = window.M || {},
 		if ( !gameObject.onLoop ) throw new Error("Cannot add object " + gameObject.constructor.name + ", it doesn't have an onLoop method");
 		
     if ( gameObject instanceof this.Entity ) {
-			this._gameObjects.push(gameObject);
+			
+      this._gameObjects.push(gameObject);
+      
+      var layer = gameObject.attribute("layer");
+      
+      if (layer) {
+        this.addToLayer(layer, gameObject);
+      }
+      
 		} else {
 			this._triggers.push(gameObject);
 		}
@@ -1175,8 +1256,18 @@ var M = window.M || {},
 									self.sounds.remove(i);
 								}
 							}
-							scene.onLoad();
+              
+              if (scene.map) {
+                //TODO: Should add to the loading
+                M.createMap(scene.map);
+              }
+              
+              if (scene.onLoad) {
+                scene.onLoad();
+              }
+              
 							loadingFinished = true;
+              
 						}
 					};
 					
@@ -1204,18 +1295,26 @@ var M = window.M || {},
 			
 		} else {
 
-			// var m = this;
-
 			var soundsReady = false,
 				spritesReady = false,
 				loadingFinished = false,
 				checkLoading = function() {
 					if ( !loadingFinished && soundsReady && spritesReady ) {
 						loadingFinished = true;
-						scene.onLoad();
-						if ( callback ) {
-							callback();
-						}
+            
+            if (scene.map) {
+              //TODO: Should add to the loading
+              M.createMap(scene.map);
+            }
+            
+            if (scene.onLoad) {
+              scene.onLoad();
+            } 
+            
+            if ( callback ) {
+              callback();
+            }
+            
 					}
 				};
 
@@ -1491,14 +1590,14 @@ var M = window.M || {},
 			if ( this.showLogo ) {
 				this._showLogo();
 			} else {
-				this._normalStart();
+				this._regularStart();
 			}
 
 		}
 
 
 	};
-	Match.prototype._normalStart = function() {
+	Match.prototype._regularStart = function() {
 		if ( this.gameData && this.gameData.main ) {
 			if ( typeof this.gameData.main == "string" ) {
 				this.setScene(this.gameData.main);
