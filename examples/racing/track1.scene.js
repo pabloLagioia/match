@@ -14,7 +14,8 @@ M.registerScene("track1", {
     "asphalt": "Dirt_roadstraight_08.png",
     "startingLine": "startingline_02.png",
     "asphaltCurve": "Dirt_90deg_08.png",
-    "bridge": "bridgeoverthetrack_02.png"
+    "bridge": "bridgeoverthetrack_02.png",
+    "tree": "tree-03.png"
   },
 
   map: {
@@ -32,7 +33,8 @@ M.registerScene("track1", {
       5: ["paviment:", "bridge"],
       6: ["grass", "curve:right"],
       7: ["grass", "curve:oleft"],
-      8: ["grass", "curve:oright"]
+      8: ["grass", "curve:oright"],
+      9: ["grass", "tree"]
     },
     cameraBoundingArea: {
       left: 0,
