@@ -632,6 +632,7 @@
 				if ( layer.background.src ) {
 					this.backBuffer.drawImage(layer.background, 0, 0, canvas.width, canvas.height);
 				} else {
+          //TODO: Not clearing the buffer will end up in displaying blurred images if background has opacity 
 					this.backBuffer.fillStyle = layer.background;
 					this.backBuffer.fillRect(0, 0, canvas.width, canvas.height);
 				}
@@ -649,7 +650,7 @@
 					currentView = currentViews[j];
 
 					var pFX = layer.parrallaxFactor.x,
-						pFY = layer.parrallaxFactor.y;
+						  pFY = layer.parrallaxFactor.y;
 			
 					if ( this.camera.canSee(currentView, pFX, pFY) ) {
 					
@@ -684,6 +685,8 @@
 
 			this._applyOperation(layer, this.frontBuffer);
 			this._applyAlpha(layer, this.frontBuffer);
+      
+      //TODO: Review translation, rotation and scale. This should work
 			// this._applyTranslation(layer, this.frontBuffer, 0, 0);
 			// this._applyRotation(layer, this.frontBuffer);
 			// this._applyScale(layer, this.frontBuffer);
@@ -694,8 +697,15 @@
 			// if ( layer._rotation != undefined ) {
 			// 	this.frontBuffer.rotate(layer._rotation);
 			// }
+      
+      
+      //TODO: Testing zoom, remove after testing
+      // if (this.zoom) {
+      //   this.frontBuffer.drawImage(this.backBuffer, -this.zoom, -this.zoom, )        
+      // } else {
+			 this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
+      // }
 
-			this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
 
 			// if ( layer._rotation != undefined ) {
 			// 	this.frontBuffer.rotate(0);
@@ -806,40 +816,6 @@
 		img.src = this.getAsBase64Image();
 		return img;
 	};
-	// /**
-	 // * Sets the background of the buffer
-	 // *
-	 // * @method setBackground
-	 // * @param {String} background a color, sprite name or null
-	 // * @example
-			// this.setBackground("black");
-			// this.setBackground("rgb(0, 100, 100)");
-			// this.setBackground("skySprite");
-			// this.setBackground(); //sets default background
-			// this.setBackground(""); //sets default background
-	 // */
-	// GameLayer.prototype.setBackground = function(background) {
-		// if ( !background == "" && typeof background == "string" ) {
-			// if ( M.sprites[background] ) {
-				// this.clearImage = M.sprites[background]._image;
-				// this.clear = this.clearUsingImage;
-			// } else {
-				// this.clearColor = background;
-				// this.clear = this.clearUsingFillColor;
-			// }
-		// } else {
-			// this.clear = this.clearUsingDefault;
-		// }
-	// };
-	// /**
-	 // * Gets the background of the buffer
-	 // *
-	 // * @method getBackground
-	 // * @return {String} a css string representing the background
-	 // */
-	// GameLayer.prototype.getBackground = function() {
-		// return this.buffer.canvas.getPropertyValue("background");
-	// };
 
 	M.extend(StandardEntityRenderer, Renderer);
 

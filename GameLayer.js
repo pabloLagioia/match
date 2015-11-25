@@ -34,7 +34,7 @@
 		 * @example
 				this.rotation = Math.PI;
 		 */
-        this.rotation = null;
+    this.rotation = null;
 		/**
 		 * object scale factor
 		 * @property scale
@@ -42,7 +42,7 @@
 		 * @example
 				this.scale = { x: 1, y: 1 };
 		 */
-        this.scale = null;
+    this.scale = null;
 		/**
 		 * Composite operation.
 		 * Possible values: "source-over" | "source-in" | "source-out" | "source-atop" | "destination-over" | "destination-in" | "destination-out" | "destination-atop" | "lighter" | "darker" | "copy" | "xor"
@@ -99,7 +99,17 @@
 		 * @type {int}
 		 */
 		this._zIndex = zIndex || 0;
-
+    /**
+	   * Sets the background of the buffer
+	   *
+	   * @method setBackground
+	   * @param {String} background a color, sprite name or null
+	   * @example
+		   this.background = "black";
+			 this.background = "rgb(0, 100, 100)";
+			 this.background = "skySprite";
+			 this.background = null; //sets default background
+	   */
 		this.background = null;
 
 		this.TYPE = M.renderizables.TYPES.LAYER;

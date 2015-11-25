@@ -65,9 +65,9 @@
 
 							entity.raiseEvent("onCollision", manifold);
 
-							if ( attributes.get("preventMoveOnCollision") ) {
-								location.set(location.prevX, location.prevY);
-							}
+							// if ( attributes.get("preventMoveOnCollision") ) {
+							// 	location.set(location.prevX, location.prevY);
+							// }
 							
 							return;
 						

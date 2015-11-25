@@ -1,0 +1,7 @@
+{
+  "name": "match-tool",
+  "description": "Provides tools to develop and run match",
+  "dependencies": {
+    "command-line-args": "^2.1.1"
+  }
+}

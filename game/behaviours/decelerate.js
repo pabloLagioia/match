@@ -1,4 +1,4 @@
-M.registerBehaviour("deccelerate", function(e, a) {
+M.registerBehaviour("decelerate", function(e, a) {
 	if ( a.get("isDecelerating") ) {
 	
 		var speed = a.get("speed") - a.get("deceleration"),

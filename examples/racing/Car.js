@@ -22,25 +22,16 @@ M.registerEntity("car", function (fillStyle) {
 	});
 
 	car.has("collisionGroup", 0);
-	car.has("preventMoveOnCollision", true);
 
-	//VIEWS
-	
+	//VIEWS	
   car.shows("base").as("sprite").set({
     "fill": fillStyle
   });
   
-	//BEHAVIOURS
-	
-	// car.does("compensateRotationSpeed", function(e,a) {
-		
-		// var rotationSpeed = a.get("rotationSpeed");
-		
-	// });
-	
+	//BEHAVIOURS	
 	car.does("accelerate");
 	
-	car.does("deccelerate");
+	car.does("decelerate");
 	
 	car.does("listenToKeyboard", function(e, a, v, input) {
 	
@@ -70,11 +61,24 @@ M.registerEntity("car", function (fillStyle) {
 		}
 	});
 	
-	car.does("collide");
-	
 	car.does("moveWithSpeedAndDirection");
 	
 	car.does("fixViewsToEntity");
+	
+  car.does("collide");
+    
+  car.does("cutSpeedToHalfOnCollision", function(e, a,b ) {
+    
+      if (a.get("manifold")) {
+        var speed = a.get("speed");
+        a.set("speed", speed / 2);
+      }
+    
+  });
+  
+  car.does("bounceOnCollision");
+  
+  // car.does("stopOnCollision");
 	
 	// car.does("followCamera");
 	
