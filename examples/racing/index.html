@@ -21,10 +21,12 @@
 		<p id="tacometer"></p>
 		<p id="camera"></p>
 		
-		<b>Player 1:</b>
+		<b>
+      <a href="#" data-action="center-camera" data-player="1">Player 1</a>
+    </b>
 		<p>UP - DOWN - LEFT - RIGHT</p>
 		
-		<b>Player 2:</b>
+		<b><a href="#" data-action="center-camera" data-player="2">Player 2</a></b>
 		<p>W - S - A - D</p>
 
 		<div class="toolbar">
@@ -36,10 +38,10 @@
 			<div class="object-placement-wrapper"></div>
 		</div>
 		
-        <script src="/match/merged"></script>
+    <script src="/match/merged"></script>
 
-        <script src="/attribute/js?q=location,direction"></script>
-        <script src="/behaviour/js?q=accelerate,decelerate,fixViewsToEntity,moveWithSpeedAndDirection,collide,fixViewsToEntity,followCamera,bounceOnCollision,stopOnCollision"></script>
+    <script src="/attribute/js?q=location,direction"></script>
+    <script src="/behaviour/js?q=accelerate,decelerate,fixViewsToEntity,moveWithSpeedAndDirection,collide,fixViewsToEntity,followCamera,bounceOnCollision,stopOnCollision"></script>
 <!--        
         <script src="/sdk/jquery.js"></script>
         <script src="/sdk"></script>

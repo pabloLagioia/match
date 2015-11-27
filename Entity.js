@@ -111,7 +111,9 @@
 	};
 
 	Entity.prototype.view = Entity.prototype.getView;
-	
+	/**
+   * Adds an attribute
+   */
 	Entity.prototype.has = function(name, value) {
 
 		//TODO: this might be a good idea to review. Consider performance costs vs usability, meaning, is this feature really needed? Besides retrocompat
@@ -134,13 +136,19 @@
 		return value;
     
 	};
+  /**
+   * Removes an attribute 
+   */
 	Entity.prototype.hasnt = function(name) {
 		return this.attributes.remove(name);
-	};
-  
+	};  
+  /**
+   * Adds a behaviour
+   * If value is present and the behaviour doesn't exist it registers it as a custom one then adds it to the entity.
+   */
 	Entity.prototype.does = function(name, value) {
     
-    if ( value ) {
+    if ( value && !M.game.behaviours[name] ) {
       this.registerBehaviour(name, value);
     }
     
@@ -157,26 +165,36 @@
 		return this;
     
 	};
-  
+  /**
+   * Registers a custom behaviour
+   */
   Entity.prototype.registerBehaviour = function(name, value) {
     this.customBehaviours[name] = value;
   };
-	
+	/**
+   * Forces the execution of a behaviour
+   */
 	Entity.prototype.do = function(name) {
 		var behaviour = this.behaviour.get(name);
 		if ( behaviour ) {
 			behaviour(this, this.attributes, this.views, M.onLoopProperties)
 		}
 	};
-	
+	/**
+   * Returns true if the entity has a behaviour matching name 
+   */
 	Entity.prototype.can = function(name) {
 		return !!this.behaviours.get(name);
 	};
-	
+	/**
+   * Removes a behaviour
+   */
 	Entity.prototype.doesnt = function(name) {
 		return this.behaviours.remove(name);
 	};
-
+  /**
+   * Adds a view
+   */
 	Entity.prototype.shows = function(name, value) {
 		if ( value == undefined ) {
 			return new ShowsAs(name, this.views);
@@ -184,7 +202,9 @@
 			this.views.set(name, value);
 		}
 	};
-	
+	/**
+   * Removes a view
+   */
 	Entity.prototype.doesntShow = function(name) {
 		return this.views.remove(name);
 	};

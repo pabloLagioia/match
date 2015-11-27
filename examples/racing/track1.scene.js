@@ -64,6 +64,30 @@ M.registerScene("track1", {
   
     window.player1 = car;
     window.player2 = car2;
+    
+    var elements = document.querySelectorAll("[data-action=center-camera]");
+    
+    for (var i = 0; i < elements.length; i++) {
+      
+      var element = elements[i];
+      
+      element.addEventListener("click", function(e) {
+        
+        e.preventDefault();
+                
+        if (e.currentTarget.dataset.player == 1) {
+          car2.doesnt("followCamera");
+          car.does("followCamera");
+          M.getCamera().centerAt(car.attribute("location").x, car.attribute("location").y);
+        } else {
+          car.doesnt("followCamera");
+          car2.does("followCamera");
+          M.getCamera().centerAt(car2.attribute("location").x, car2.attribute("location").y);
+        }
+                
+      });
+      
+    }
   
   }
 
