@@ -1264,6 +1264,7 @@ var M = window.M || {},
               
               if (scene.onLoad) {
                 scene.onLoad();
+                M.renderer.redrawAllLayers();
               }
               
 							loadingFinished = true;
@@ -1309,6 +1310,7 @@ var M = window.M || {},
             
             if (scene.onLoad) {
               scene.onLoad();
+              M.renderer.redrawAllLayers();
             } 
             
             if ( callback ) {

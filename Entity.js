@@ -95,11 +95,11 @@
 			return this.behaviours.get(name);
 		}
 	};
-	
+  
 	Entity.prototype.hasBehaviour = function(name) {
 		return !!this.behaviours.get(name);	
 	};
-	
+
 	Entity.prototype.getBehaviour = function(name) {
 		return this.behaviours.get(name);
 	};

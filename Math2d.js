@@ -336,6 +336,10 @@
     }
     return x;
   }
+  
+  Math2d.prototype.quadDerivative = function(ax2, bx, c) {
+    return [ax2 * 2, bx];
+  };
 
  /**
 	* @class Vector2d
@@ -378,7 +382,7 @@
 		return this;
 	};
 
-	M.Vector2d = Vector2d;
+	namespace.Vector2d = Vector2d;
 	
 	var instance = new Math2d();
 

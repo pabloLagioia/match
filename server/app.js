@@ -5,9 +5,9 @@ var express = require('express'),
 	app = express(),
 	matchInternalPath = __dirname.substr(0, __dirname.lastIndexOf("/")),
 	server,
-	watch = require("node-watch"),
-  open = require('open'),
-	merged = getMergedFiles();
+	process = require('child_process'),
+  colors = require("colors"),
+  open = require('open');
   
 app.use(function(req, res, next) {
 	
@@ -57,12 +57,13 @@ app.get("/attribute/js", function(req, res) {
 	
 });
 
+//TODO: Match doesnt work like this
 app.get("/match/merged/min", function(req, res) {
-	res.status(500).send("Not implemented yet!");
+	res.contentType("text/javascript").status(200).send(fs.readFileSync("build/matchBuild-min.js"));
 });
 
 app.get("/match/merged", function(req, res) {
-	res.contentType("text/javascript").status(200).send(merged);
+	res.contentType("text/javascript").status(200).send(fs.readFileSync("build/matchBuild.js"));
 });
 
 app.get("/match/*", function(req, res) {
@@ -102,35 +103,31 @@ app.get("/match/*", function(req, res) {
 
 });
 
-function getMergedFiles() {
-
-	var merged = "";
-
-	fileList.forEach(function(fileName) {
-
-		if ( fileName.substr(-3) != ".js" ) {
-			fileName += ".js";
-		}
-
-		merged += fs.readFileSync(path.join(matchInternalPath, fileName), "utf8");
-
-	});
-
-	return merged;
-		
-}
-
-watch([matchInternalPath, "match.json"], function(filename) {
-  if (!/\.js$/.test(filename)) {
-    return;
-  }
-	console.log(filename, "changed, rebuilding");
-	merged = getMergedFiles();
-});
-
 server = app.listen(8086, function() {
-	console.log('Match Service Listening on port %d', server.address().port);
-	console.log('You can navigate, for example, to http://localhost:' + server.address().port + "/match/merged to get the sources concatenated");
+	console.log(colors.green('Match Service Listening on port', server.address().port));
+	console.log('You can navigate to', colors.cyan.underline('http://localhost:' + server.address().port + "/match/merged"), "to get the sources concatenated");
   console.log("Serving folder", matchInternalPath);
   open('http://localhost:' + server.address().port + "/match/examples");
+});
+
+var ls = process.exec("gulp watch-develop", function(error, stdout, stderr) {
+  
+    if (error) {
+      console.error("Unable to run gulp. Please make sure you installed it using npm install -global gulp and then run npm install in this directory")
+    }
+    console.log('stdout:', stdout);
+    console.log('stderr:', stderr);
+    
+});
+
+ls.on("exit", function() {
+  console.log(colors.red("Gulp exited"));
+});
+
+ls.stdout.on('data', function (data) {
+  console.log(colors.green("GULP:"), data);
+});
+
+ls.stderr.on('data', function (data) {
+  console.log(colors.red("GULP:"), data);
 });

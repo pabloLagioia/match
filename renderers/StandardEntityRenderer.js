@@ -37,6 +37,8 @@
 		this.compositeOperation = this.DEFAULT_COMPOSITE_OPERATION;
 
 		this._reRenderAllLayers = false;
+    
+    this._buffers = {};
 
 		var self = this;
 
@@ -621,18 +623,21 @@
 
 		if ( !layer._visible ) return;
 
-		// if ( this._reRenderAllLayers || layer.needsRedraw ) {
+    //TODO: this code needs lots of testing. It works fine so far but you should check it later
+		if ( this._reRenderAllLayers || layer.needsRedraw ) {
 
 			var current,
-				currentView,
-				currentViews,
-				canvas = this.backBuffer.canvas;
+          currentView,
+          currentViews,
+          canvas = this.backBuffer.canvas;
 
 			if ( layer.background ) {
+        //TODO: Not clearing the buffer will end up in displaying blurred images if background has opacity 
 				if ( layer.background.src ) {
 					this.backBuffer.drawImage(layer.background, 0, 0, canvas.width, canvas.height);
-				} else {
-          //TODO: Not clearing the buffer will end up in displaying blurred images if background has opacity 
+				} else if (M.sprites.get(layer.background)) {
+					this.backBuffer.drawImage(M.sprites.get(layer.background), 0, 0, canvas.width, canvas.height);
+        } else {
 					this.backBuffer.fillStyle = layer.background;
 					this.backBuffer.fillRect(0, 0, canvas.width, canvas.height);
 				}
@@ -666,18 +671,8 @@
 			if ( layer.postProcessing ) {
 				layer.postProcessing(this.backBuffer, this.frontBuffer, cameraX, cameraY);
 			}
-
-			//TODO: Review buffer. Layer should not know anything about rendering
-			// if ( layer._buffer == undefined ) {
-			// 	layer._buffer = document.createElement("canvas").getContext("2d");
-			// 	layer._buffer.canvas.width = canvas.width;
-			// 	layer._buffer.canvas.height = canvas.height;
-			// }
 			
-			// layer._buffer.clearRect(0, 0, canvas.width, canvas.height);
-			// layer._buffer.drawImage(canvas, 0, 0);
-			
-			// layer.needsRedraw = false;
+			layer.needsRedraw = false;
 
 			// if ( layer._alpha != undefined ) {
 			// 	this.frontBuffer.globalAlpha = layer._alpha;
@@ -704,6 +699,17 @@
       //   this.frontBuffer.drawImage(this.backBuffer, -this.zoom, -this.zoom, )        
       // } else {
 			 this.frontBuffer.drawImage(this.backBuffer.canvas, 0, 0);
+       
+       var currentBuffer = this._getBuffer(layer.name);
+       
+       if (!currentBuffer) {
+         currentBuffer = this._createBuffer(layer.name);
+         currentBuffer.canvas.width = this.frontBuffer.canvas.width;
+         currentBuffer.canvas.height = this.frontBuffer.canvas.height;
+       }
+       
+       currentBuffer.drawImage(this.backBuffer.canvas, 0, 0);
+       
       // }
 
 
@@ -713,11 +719,13 @@
 
 			// this.frontBuffer.globalAlpha = 1;
 			
-		// } else {
+		} else {
 		
-		// 	this.frontBuffer.drawImage(layer._buffer.canvas, 0, 0);
+      //TODO: With every new game layer, we should store a new buffer in this renderer. This fails because the layer no longer has a buffer
+			// this.frontBuffer.drawImage(layer._buffer.canvas, 0, 0);
+			this.frontBuffer.drawImage(this._getBuffer(layer.name).canvas, 0, 0);
 			
-		// }
+		}
 
 		// if ( this.needsSorting ) {
 		// 	this.sort();
@@ -725,6 +733,14 @@
 		// }
 
 	};
+  StandardEntityRenderer.prototype._createBuffer = function(name) {
+    var buffer = document.createElement("canvas").getContext("2d");
+    this._buffers[name] = buffer;
+    return buffer;    
+  };
+  StandardEntityRenderer.prototype._getBuffer = function(name) {
+    return this._buffers[name];
+  };
 	StandardEntityRenderer.prototype.renderLayers = function(layers) {
 		this.frontBuffer.clearRect(0, 0, this.backBuffer.canvas.width, this.backBuffer.canvas.height);
 		for ( var i = 0, l = layers._values.length; i < l; i++ ) {
@@ -732,6 +748,9 @@
 		}		
 		this._reRenderAllLayers = false;
 	};
+  StandardEntityRenderer.prototype.redrawAllLayers = function() {
+    this._reRenderAllLayers = true;
+  };
 	StandardEntityRenderer.prototype.render = function(object, context, cameraX, cameraY) {
 
 		var types = M.renderizables.TYPES;
