@@ -874,8 +874,8 @@ var M = window.M || {},
 		// while ( this._lag > this._msPerUpdate ) {
 		
 			this.updateGameObjects(this._gameObjects, p);
+			this.updateTriggers(this._triggers, p);
 			this._updateInput(p);
-			this.updateTriggers(this._triggers);
 			// this._lag -= this._msPerUpdate;
 
 		// }
@@ -898,10 +898,10 @@ var M = window.M || {},
 		this.raise("afterLoop");
 
 	};
-	Match.prototype.updateTriggers = function(triggers) {
+	Match.prototype.updateTriggers = function(triggers, p) {
 		var i = 0, l = triggers.length;
 		for ( ;  i < l; i++ ) {
-			triggers[i].onLoop();
+			triggers[i].onLoop(p);
 		}
 	};
 	/**

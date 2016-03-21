@@ -97,9 +97,10 @@
 	 * @param {Event} event
 	 * @private
 	 */
-	Mouse.prototype.select = function( object ) {
+	Mouse.prototype.select = function( object, view ) {
 
 		if ( ! this.isDragging ) {
+      object.selectedView = view;
 			this.selectedObject = object;
 		}
 
@@ -124,7 +125,7 @@
 	Mouse.prototype.fireEventOnLastSelectedObject = function() {
 
 		var s = this.selectedObject,
-			ps = this.prevSelectedObject;
+        ps = this.prevSelectedObject;
 
 		if ( s ) {
 			if ( !s._mouseInRaised && s.listensTo("mouseIn") ) {
@@ -136,9 +137,9 @@
 				if ( ps.listensTo("mouseOut") ) {
 					ps.raiseEvent("mouseOut", this);
 				}
-			} 
+			}
 			if ( this.up() && s.listensTo("mouseUp") ) {
-				s.onMouseUp(this);
+				s.raiseEvent("mouseUp", this);
 			}
 			if ( this.clicked() && s.listensTo("click") ) {
 				s.raiseEvent("click", this);
@@ -169,10 +170,16 @@
 		this.prevSelectedObject = s;
 		
 		if ( ! this.isDragging ) {
-			this.selectedObject = null;
+      this.deselectObject();
 		}
 
 	};
+  Mouse.prototype.deselectObject = function() {
+    if (this.selectedObject) {
+      this.selectedObject.selectedView = null;
+      this.selectedObject = null;
+    }
+  };
 	/**
 	 * Returns whether the given button has been pressed and released
 	 * @method clicked
@@ -357,30 +364,6 @@
 		this.fireEventOnLastSelectedObject();
 		this.clear();
 	};
-	/**
-	 * Looks for mouse methods in the provided object and executes them if the object has focus.
-	 * @method applyToObject
-	 * @private
-	 * @param {M.renderers.Renderizable} renderizable
-	 * @param {OnLoopProperties} p
-	 *
-	 * @example 
-			Ninja.prototype.throwStar = function() { 
-				//throw ninja star
-			}
-			Ninja.prototype.onMouseDown = function(mouse) {
-				if ( mouse.down(mouse.LEFT) ) {
-					this.throwStar();
-				}
-			}
-	 */
-	Mouse.prototype.applyToEntity = function( renderizable ) {
-		if ( renderizable.onMouseOver || renderizable.onMouseIn || renderizable.onMouseOut || renderizable.onMouseWheel || ( renderizable.onMouseDown && this.down() ) || ( renderizable.onMouseUp && this.up() ) || ( renderizable.onClick && this.clicked() ) ) {
-			if ( this.isOverPolygon(renderizable) && this.isOverPixelPerfect(renderizable) ) {
-				this.select(renderizable);
-			}
-		}
-	};
 
 	Mouse.prototype.applyToObject = function( entity ) {
 	
@@ -391,14 +374,12 @@
 
 		if ( entity.listensTo("mouseOver") || entity.listensTo("mouseIn") || entity.listensTo("mouseOut") || entity.listensTo("onMouseWheel") || ( entity.listensTo("mouseDown") && this.down() ) || ( entity.listensTo("mouseUp") && this.up() ) || ( entity.listensTo("click") && this.clicked() ) ) {
 
-		// if ( entity.onMouseOver || entity.onMouseIn || entity.onMouseOut || entity.onMouseWheel || ( entity.onMouseDown && this.down() ) || ( entity.onMouseUp && this.up() ) || ( entity.onClick && this.clicked() ) ) {
-
 			for (; i < l; i++ ) {
 
 				renderizable = views[i];
 
 				if ( this.isOverPolygon(renderizable) && this.isOverPixelPerfect(renderizable) ) {
-					this.select(entity);
+					this.select(entity, renderizable);
 				}
 
 			}

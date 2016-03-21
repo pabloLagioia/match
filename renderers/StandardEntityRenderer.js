@@ -354,9 +354,8 @@
 			
 			if ( renderizable._fillStyle ) {
 				context.fillStyle = renderizable._fillStyle;
+			 context.fillRect( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
 			}
-			
-			context.fillRect( -renderizable._halfWidth, -renderizable._halfHeight, renderizable._width, renderizable._height );
 
 			if ( renderizable._strokeStyle ) {
 
@@ -374,10 +373,9 @@
 		
 			if ( renderizable._fillStyle ) {
 				context.fillStyle = renderizable._fillStyle;
+        // context.fillRect( renderizable._x - renderizable._halfWidth - cameraX, renderizable._y - renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
+        context.fillRect( M.fastRound(renderizable._x - renderizable._halfWidth - cameraX), M.fastRound(renderizable._y - renderizable._halfHeight - cameraY), renderizable._width, renderizable._height );
 			}
-			
-			// context.fillRect( renderizable._x - renderizable._halfWidth - cameraX, renderizable._y - renderizable._halfHeight - cameraY, renderizable._width, renderizable._height );
-			context.fillRect( M.fastRound(renderizable._x - renderizable._halfWidth - cameraX), M.fastRound(renderizable._y - renderizable._halfHeight - cameraY), renderizable._width, renderizable._height );
 			
 			if ( renderizable._strokeStyle ) {
 
@@ -623,8 +621,8 @@
 
 		if ( !layer._visible ) return;
 
-    //TODO: this code needs lots of testing. It works fine so far but you should check it later
-		if ( this._reRenderAllLayers || layer.needsRedraw ) {
+    //TODO: When adding or removing views, it doesnt update 
+		// if ( this._reRenderAllLayers || layer.needsRedraw ) {
 
 			var current,
           currentView,
@@ -719,13 +717,13 @@
 
 			// this.frontBuffer.globalAlpha = 1;
 			
-		} else {
+		// } else {
 		
       //TODO: With every new game layer, we should store a new buffer in this renderer. This fails because the layer no longer has a buffer
 			// this.frontBuffer.drawImage(layer._buffer.canvas, 0, 0);
-			this.frontBuffer.drawImage(this._getBuffer(layer.name).canvas, 0, 0);
+		// 	this.frontBuffer.drawImage(this._getBuffer(layer.name).canvas, 0, 0);
 			
-		}
+		// }
 
 		// if ( this.needsSorting ) {
 		// 	this.sort();

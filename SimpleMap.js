@@ -35,6 +35,8 @@
 			this._keys[key] = valueIndex;
 			this.length++;
 		}
+    
+    return value;
 
 	};
 	/**

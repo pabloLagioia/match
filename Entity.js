@@ -39,6 +39,7 @@
 		this.behaviours = new SimpleMap();
     
     this.customBehaviours = new Object();
+    this.customViews = new Object();
     
 		this.views = new SimpleMap();
 		
@@ -208,6 +209,18 @@
 	Entity.prototype.doesntShow = function(name) {
 		return this.views.remove(name);
 	};
+  
+  Entity.prototype.registerView = function(name, view) {
+    this.customViews[name] = view;
+  };
+  
+  Entity.prototype.addView = function(name) {
+    return this.views.set(name, this.customViews[name]);
+  };
+  
+  Entity.prototype.removeView = function(name) {
+    this.views.remove(name);
+  };
 
 	Entity.name = "Entity";
 

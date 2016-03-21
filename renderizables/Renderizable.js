@@ -479,6 +479,9 @@
     	}
 		return this;
     };
+    Renderizable.prototype.getVisible = function() {
+      return this._visible;
+    };
 	/**
 	 * Sets the width of this object
 	 * @method setWidth

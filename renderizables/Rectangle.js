@@ -25,11 +25,11 @@
 	 *
 	 * @method toString
 	 */
-    Rectangle.prototype.toString = function() {
-		return "Rectangle";
-    };
+  Rectangle.prototype.toString = function() {
+    return "Rectangle";
+  };
 
-    Rectangle.name = "Rectangle";
+  Rectangle.name = "Rectangle";
 
 	M.extend(Rectangle, Shape);
 
