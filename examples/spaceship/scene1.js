@@ -17,32 +17,32 @@ M.registerScene('scene1', {
     
     M.add(ship).to("space");
     
-    M.add({
-      "onLoop": function(p) {
+    // M.add({
+    //   "onLoop": function(p) {
         
-        if (!p.mouse.clicked(p.mouse.LEFT)) {
-          return;
-        }
+    //     if (!p.mouse.clicked(p.mouse.LEFT)) {
+    //       return;
+    //     }
         
-        if (!ship.view("selected").getVisible()) {
-          return;
-        }
+    //     if (!ship.view("selected").getVisible()) {
+    //       return;
+    //     }
         
-        var destination = ship.attribute("destination");
+    //     var destination = ship.attribute("destination");
         
-        destination.setX(p.mouse.x);
-        destination.setY(p.mouse.y);
+    //     destination.setX(p.mouse.x);
+    //     destination.setY(p.mouse.y);
         
-      }
-    });
+    //   }
+    // });
     
-    M.add({
-      "onLoop": function(p) {
-        if (!p.mouse.selectedObject && p.mouse.clicked(p.mouse.LEFT)) {
-          ship.view("selected").setVisible(false);
-        }
-      }
-    });
+    // M.add({
+    //   "onLoop": function(p) {
+    //     if (!p.mouse.selectedObject && p.mouse.clicked(p.mouse.LEFT)) {
+    //       ship.view("selected").setVisible(false);
+    //     }
+    //   }
+    // });
     
   }
 

@@ -97,51 +97,51 @@ M.registerEntity("ship", function() {
   
   
   
-  M.addTrigger("showMessage", "objectTypeInArea", {
-    "objectType": "ship",
-    "area": {
+  // M.addTrigger("showMessage", "objectTypeInArea", {
+  //   "objectType": "ship",
+  //   "area": {
       
-    }
-  });
+  //   }
+  // });
   
   
-  M.addTrigger("showMessage", {
-    "conditions": [function() {
-      return true;
-    }],
-    "actions": [function() {
-      alert("Hola!");
-    }]
-  });
+  // M.addTrigger("showMessage", {
+  //   "conditions": [function() {
+  //     return true;
+  //   }],
+  //   "actions": [function() {
+  //     alert("Hola!");
+  //   }]
+  // });
   
-  M.addTrigger("showMessage2", {
-    "conditions": [M.triggers.conditions.always],
-    "actions": [M.triggers.actions.sayHi]
-  });
+  // M.addTrigger("showMessage2", {
+  //   "conditions": [M.triggers.conditions.always],
+  //   "actions": [M.triggers.actions.sayHi]
+  // });
   
-  M.addTrigger("setShipDestination", {
-    "conditions": [
-      M.triggers.conditions.isObjectSelected(ship),
-      M.triggers.conditions.userClickedElsewhere
-    ],
-    "actions": [
-      function() {
-        ship.attribute("destination").setX(M.input.mouse.x).setY(M.input.mouse.y)
-      }
-    ]
-  });
+  // M.addTrigger("setShipDestination", {
+  //   "conditions": [
+  //     M.triggers.conditions.isObjectSelected(ship),
+  //     M.triggers.conditions.userClickedElsewhere
+  //   ],
+  //   "actions": [
+  //     function() {
+  //       ship.attribute("destination").setX(M.input.mouse.x).setY(M.input.mouse.y)
+  //     }
+  //   ]
+  // });
   
   return ship;
   
 });
 
-M.registerTrigger("setShipDestination", function() {
+// M.registerTrigger("setShipDestination", function() {
   
-  var trigger = new M.Trigger();
+//   var trigger = new M.Trigger();
   
-  trigger.addCondition("isObjectTypeSelected", "playerShip");
-  trigger.addCondition("userClickedElsewhere");
+//   trigger.addCondition("isObjectTypeSelected", "playerShip");
+//   trigger.addCondition("userClickedElsewhere");
   
-  trigger.addAction()
+//   trigger.addAction()
   
-});
+// });
