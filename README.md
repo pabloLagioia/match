@@ -34,3 +34,12 @@ For a basic example on how to create entities, behaviours and attributes please 
 To get Matchjs concatenated you can download [match-service](https://bitbucket.org/puzzlingideas/match-service). Place at the same directory level as this project and run node app.js.
 On your index.html link the src="http://localhost:8086/match/merged".
 The changes you do to Matchjs source will be reflected on the game code after pressing F5
+
+## Examples
+[Racing](http://pablolagioia.github.io/match/examples/racing/index.html)
+
+[Tank](http://pablolagioia.github.io/match/examples/tank/index.html)
+
+[Match Logo](http://pablolagioia.github.io/match/examples/logo/index.html)
+
+[Spaceship](http://pablolagioia.github.io/match/examples/spaceship/index.html)
