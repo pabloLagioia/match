@@ -748,7 +748,7 @@ var M = window.M || {},
         
         var tileRef = mapDefinition.definition[row][column];
         
-        var tileConstructor = mapDefinition.references[tileRef];
+        var tileConstructor = mapDefinition.entities[tileRef];
         
         var tile = {
           "row": row,

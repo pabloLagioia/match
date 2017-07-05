@@ -25,7 +25,7 @@ M.registerScene("tankScene", {
       width: 64,
       height: 64
     },
-    references: {
+    entities: {
       0: "grass",
       1: ["grass", "tree"],
       2: ["grass", "tank"],

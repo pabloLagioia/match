@@ -2,6 +2,48 @@ M.registerEntity("car", function (fillStyle) {
 
 	var car = new M.Entity();
 
+	function onKeyboard(e, a, v, input) {
+
+		var keysDown = input.keyboard.keysDown;
+	  var mappings = a.get("keyboardMapping");
+			
+		if ( keysDown[mappings.up] ) {
+
+			a.set("isAccelerating", true);
+			a.set("isDecelerating", false);
+
+		} else if ( keysDown[mappings.down] ) {
+
+			a.set("isDecelerating", true);
+			a.set("isAccelerating", false);
+
+		} else {
+
+			a.set("isAccelerating", false);
+			a.set("isDecelerating", false);
+			
+		}
+
+		if ( keysDown[mappings.left] ) {
+
+			var	rotationSpeed = a.get("rotationSpeed");
+			var rotation = a.get("rotation") - rotationSpeed;
+
+			a.set("rotation", rotation);
+			a.set("direction", M.math2d.getRotatedVertex(a.get("direction"), -rotationSpeed));
+
+		} else if ( keysDown[mappings.right] ) {
+
+			var	rotationSpeed = a.get("rotationSpeed");
+			var rotation = a.get("rotation") + rotationSpeed;
+
+			a.set("rotation", rotation);
+			a.set("direction", M.math2d.getRotatedVertex(a.get("direction"), rotationSpeed));
+
+		}
+
+	}
+
 	//ATTRIBUTES
 	
 	car.has("location");
@@ -33,33 +75,7 @@ M.registerEntity("car", function (fillStyle) {
 	
 	car.does("decelerate");
 	
-	car.does("listenToKeyboard", function(e, a, v, input) {
-	
-		var keysDown = input.keyboard.keysDown,
-			mappings = a.get("keyboardMapping");
-			
-		if ( keysDown[mappings.up] ) {
-			a.set("isAccelerating", true);
-			a.set("isDecelerating", false);
-		} else if ( keysDown[mappings.down] ) {
-			a.set("isDecelerating", true);
-			a.set("isAccelerating", false);
-		} else {
-			a.set("isAccelerating", false);
-			a.set("isDecelerating", false);
-		}
-		if ( keysDown[mappings.left] ) {
-			var	rotationSpeed = a.get("rotationSpeed"),
-				rotation = a.get("rotation") - rotationSpeed;
-			a.set("rotation", rotation);
-			a.set("direction", M.math2d.getRotatedVertex(a.get("direction"), -rotationSpeed));
-		} else if ( keysDown[mappings.right] ) {
-			var	rotationSpeed = a.get("rotationSpeed"),
-				rotation = a.get("rotation") + rotationSpeed;
-			a.set("rotation", rotation);
-			a.set("direction", M.math2d.getRotatedVertex(a.get("direction"), rotationSpeed));
-		}
-	});
+	car.does("listenToKeyboard", onKeyboard);
 	
 	car.does("moveWithSpeedAndDirection");
 	
@@ -68,16 +84,15 @@ M.registerEntity("car", function (fillStyle) {
   car.does("collide");
     
   car.does("cutSpeedToHalfOnCollision", function(e, a,b ) {
-    
-      if (a.get("manifold")) {
-        var speed = a.get("speed");
-        a.set("speed", speed / 2);
-      }
-    
+	
+		if (a.get("manifold")) {
+			a.set("speed", a.get("speed") / 2);
+		}
+	
   });
   
   car.does("bounceOnCollision");
-  
+
   // car.does("stopOnCollision");
 	
 	// car.does("followCamera");

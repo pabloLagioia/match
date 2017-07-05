@@ -24,13 +24,13 @@ M.registerScene("track1", {
       width: 128,
       height: 128
     },
-    references: {
+    entities: {
       0: "noPassable",
       1: "grass",
       2: "paviment",
-      3: ["paviment", "startingLine"],
-      4: ["grass", "curve:left"],
-      5: ["paviment:", "bridge"],
+      3: ["paviment", "startingLine"], //tile with 2 entities
+      4: ["grass", "curve:left"], //left is an argument for the curve entity constructor
+      5: ["paviment", "bridge"],
       6: ["grass", "curve:right"],
       7: ["grass", "curve:oleft"],
       8: ["grass", "curve:oright"],

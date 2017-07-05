@@ -197,11 +197,19 @@
    * Adds a view
    */
 	Entity.prototype.shows = function(name, value) {
-		if ( value == undefined ) {
-			return new ShowsAs(name, this.views);
-		} else {
-			this.views.set(name, value);
+
+		var _name = name;
+
+		if (!_name) {
+			_name = M.random.string();
 		}
+
+		if ( value == undefined ) {
+			return new ShowsAs(_name, this.views);
+		} else {
+			this.views.set(_name, value);
+		}
+
 	};
 	/**
    * Removes a view

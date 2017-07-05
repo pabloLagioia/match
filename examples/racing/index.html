@@ -8,45 +8,34 @@
 				margin: 0;
 				padding: 0;
 			}
-			canvas {
-				//background-color: green
-			}
 		</style>
 	</head>
 	<body>
 	
 		<canvas width="640" height="480"></canvas>
-		
-		<p id="info"></p>
-		<p id="tacometer"></p>
-		<p id="camera"></p>
-		
-		<b>
-      <a href="#" data-action="center-camera" data-player="1">Player 1</a>
-    </b>
-		<p>UP - DOWN - LEFT - RIGHT</p>
-		
-		<b><a href="#" data-action="center-camera" data-player="2">Player 2</a></b>
-		<p>W - S - A - D</p>
 
-		<div class="toolbar">
-			<div class="camera-wrapper"></div>
-			<div class="debug-wrapper"></div>
-			<div class="game-entity-list-wrapper"></div>
-			<div class="grid-wrapper"></div>
-			<div class="layer-management-wrapper"></div>
-			<div class="object-placement-wrapper"></div>
+		<div>
+		
+			<b><a href="#" data-action="center-camera" data-player="1">Player 1</a></b>
+			<p>UP - DOWN - LEFT - RIGHT</p>
+			
+			<b><a href="#" data-action="center-camera" data-player="2">Player 2</a></b>
+			<p>W - S - A - D</p>
+			
 		</div>
-		
-    <script src="/match/merged"></script>
 
-    <script src="/attribute/js?q=location,direction"></script>
-    <script src="/behaviour/js?q=accelerate,decelerate,fixViewsToEntity,moveWithSpeedAndDirection,collide,fixViewsToEntity,followCamera,bounceOnCollision,stopOnCollision"></script>
-<!--        
-        <script src="/sdk/jquery.js"></script>
-        <script src="/sdk"></script>
-        <script src="/sdk/plugin/?q=common,camera-controller,debug,layer-management,game-entity-list,grid,object-placement,renderizable-dragger&autowire=true"></script>
-		-->
+    <script src="../../server/build/matchBuild.js"></script>
+    <script src="../../game/attributes/location.js"></script>
+    <script src="../../game/attributes/direction.js"></script>
+    <script src="../../game/behaviours/accelerate.js"></script>
+    <script src="../../game/behaviours/decelerate.js"></script>
+    <script src="../../game/behaviours/fixViewsToEntity.js"></script>
+    <script src="../../game/behaviours/moveWithSpeedAndDirection.js"></script>
+    <script src="../../game/behaviours/collide.js"></script>
+    <script src="../../game/behaviours/followCamera.js"></script>
+    <script src="../../game/behaviours/bounceOnCollision.js"></script>
+    <script src="../../game/behaviours/stopOnCollision.js"></script>
+
 		<script src="Grass.js"></script>
 		<script src="tree.js"></script>
 		<script src="curve.js"></script>
